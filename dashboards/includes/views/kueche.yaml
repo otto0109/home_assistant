@@ -45,11 +45,10 @@
               - domain: light
                 name: "*üche*"
                 options:
-                  type: custom:button-card
-                  template: card_light
-                  entity: "[[[ return entity.entity_id ]]]"
-                  variables:
-                    ulm_card_light_enable_slider: true
+                  type: custom:mushroom-light-card
+                  fill_container: true
+                  show_brightness_control: true
+                  use_light_color: true
 
       - type: custom:button-card
         template: card_title
@@ -72,7 +71,7 @@
             ulm_card_thermostat_enable_controls: true
             ulm_card_thermostat_enable_hvac_modes: true
             ulm_card_thermostat_enable_popup: true
-            ulm_card_thermostat_enable_background_color: true
+            ulm_card_thermostat_enable_background_color: false
 
       - type: custom:button-card
         template: card_title

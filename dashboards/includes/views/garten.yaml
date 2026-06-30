@@ -45,19 +45,17 @@
               - domain: light
                 name: "*Garten*"
                 options:
-                  type: custom:button-card
-                  template: card_light
-                  entity: "[[[ return entity.entity_id ]]]"
-                  variables:
-                    ulm_card_light_enable_slider: true
+                  type: custom:mushroom-light-card
+                  fill_container: true
+                  show_brightness_control: true
+                  use_light_color: true
               - domain: light
                 name: "*Außen*"
                 options:
-                  type: custom:button-card
-                  template: card_light
-                  entity: "[[[ return entity.entity_id ]]]"
-                  variables:
-                    ulm_card_light_enable_slider: true
+                  type: custom:mushroom-light-card
+                  fill_container: true
+                  show_brightness_control: true
+                  use_light_color: true
 
       - type: custom:button-card
         template: card_title

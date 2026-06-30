@@ -26,7 +26,8 @@ views:
                   ulm_card_person_entity: person.laura
                   ulm_card_person_use_entity_picture: true
                   ulm_card_person_battery: sensor.pixel_7_pro_battery_level
-          - !include includes/home-welcome-stack.yaml
+          - type: vertical-stack
+            cards: !include includes/home-welcome-stack.yaml
           - type: custom:button-card
             template: card_title
             name: Räume

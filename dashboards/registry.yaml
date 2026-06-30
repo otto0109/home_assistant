@@ -6,6 +6,7 @@
 # • Eingebaut: Einstellungen → Dashboards → Übersicht & Landkarte → „Zur Seitenleiste“ AUS
 # • Standard: „Home“ (dieses Dashboard) → Als Standard festlegen
 # • Optional: HACS „Custom Sidebar“ + sidebar-config.yaml (siehe configuration.yaml)
+# • Lampen-Slider (ULM card_light): HACS „My Cards“ (AnthonMS/my-cards) — bereits in configuration.yaml als Ressource
 test-dashboard:
   mode: yaml
   title: Home

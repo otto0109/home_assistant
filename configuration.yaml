@@ -19,6 +19,10 @@ lovelace:
       type: module
     - url: /hacsfiles/decluttering-card/decluttering-card.js
       type: module
+    - url: /hacsfiles/lovelace-mushroom/mushroom.js
+      type: module
+    - url: /hacsfiles/my-cards/my-cards.js
+      type: module
 
 homeassistant:
   packages: !include_dir_named packages

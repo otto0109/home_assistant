@@ -76,9 +76,9 @@
               overflow: hidden;
             }
         card:
-          type: custom:button-card
-          template: card_light
+          type: custom:mushroom-light-card
           entity: light.licht_wohnzimmer
           name: Licht Wohnzimmer
-          variables:
-            ulm_card_light_enable_slider: true
+          fill_container: true
+          show_brightness_control: true
+          use_light_color: true

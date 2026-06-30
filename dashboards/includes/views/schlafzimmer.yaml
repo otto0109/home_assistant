@@ -17,47 +17,7 @@
       - type: custom:button-card
         template: card_title
         name: Schlafzimmer
-        label: Licht & Klima
-
-      - type: custom:button-card
-        template: card_title
-        name: Beleuchtung
-
-      - type: custom:mod-card
-        card_mod:
-          style: |
-            ha-card {
-              border-radius: 20px;
-              overflow: hidden;
-            }
-        card:
-          type: custom:auto-entities
-          show_empty: false
-          sort:
-            method: friendly_name
-          card:
-            type: grid
-            columns: 1
-            square: false
-          card_param: cards
-          filter:
-            include:
-              - domain: light
-                name: "*Schlafzimmer*"
-                options:
-                  type: custom:button-card
-                  template: card_light
-                  entity: "[[[ return entity.entity_id ]]]"
-                  variables:
-                    ulm_card_light_enable_slider: true
-              - domain: light
-                name: "*schlafzimmer*"
-                options:
-                  type: custom:button-card
-                  template: card_light
-                  entity: "[[[ return entity.entity_id ]]]"
-                  variables:
-                    ulm_card_light_enable_slider: true
+        label: Klima
 
       - type: custom:button-card
         template: card_title
@@ -80,4 +40,4 @@
             ulm_card_thermostat_enable_controls: true
             ulm_card_thermostat_enable_hvac_modes: true
             ulm_card_thermostat_enable_popup: true
-            ulm_card_thermostat_enable_background_color: true
+            ulm_card_thermostat_enable_background_color: false

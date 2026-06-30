@@ -194,15 +194,15 @@
         action: toggle
 
 - type: custom:button-card
-  template: card_graph
+  template:
+    - card_room
+    - purple_no_state
+  name: Energie
   entity: sensor.pv_pv_power
+  icon: mdi:solar-power-variant
   tap_action:
     action: navigate
-    navigation_path: energie
+    navigation_path: /test-dashboard/energie
   variables:
-    ulm_card_graph_name: Energie
-    ulm_card_graph_icon: mdi:solar-power-variant
-    ulm_card_graph_color: var(--color-purple)
-    ulm_card_graph_entity: sensor.pv_pv_power
-    ulm_card_graph_type: fill
-    ulm_card_graph_hours: 6
+    label_use_temperature: false
+    label_use_brightness: false
