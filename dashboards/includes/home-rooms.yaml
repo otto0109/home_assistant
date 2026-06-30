@@ -16,6 +16,7 @@ filter:
   template: |
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
     {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
+    {% set palette = ['yellow_no_state', 'pink_no_state', 'red_no_state', 'purple_no_state', 'grey_no_state', 'blue_no_state', 'green_no_state'] %}
     {% set ns = namespace(cards=[], sorted=[]) %}
     {% for aid in areas() %}
       {% set ns.sorted = ns.sorted + [{'aid': aid, 'name': area_name(aid)}] %}
@@ -95,11 +96,27 @@ filter:
               }
             }] %}
           {% endif %}
-          {% set tap = "[[[ hass.callService('script', 'turn_on', { entity_id: 'script.dashboard_raum_oeffnen', variables: { area: " ~ (aname | tojson) ~ " } }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
+          {% set room_color = namespace(t=palette[loop.index0 % 7]) %}
+          {% if aname == 'Wohnzimmer' or aid == 'wohnzimmer' %}
+            {% set room_color.t = 'yellow_no_state' %}
+          {% elif aname == 'Esszimmer' or aid == 'esszimmer' %}
+            {% set room_color.t = 'pink_no_state' %}
+          {% elif aname == 'Raum neben der Küche' or aname == 'Küche' or aid == 'raum_neben_der_kuche' or aid == 'kueche' %}
+            {% set room_color.t = 'red_no_state' %}
+          {% elif aname == 'Schlafzimmer' or aid == 'schlafzimmer' %}
+            {% set room_color.t = 'purple_no_state' %}
+          {% elif aname == 'Flur' or aname == 'Flur OG' or aid == 'flur' or aid == 'flur_og' %}
+            {% set room_color.t = 'grey_no_state' %}
+          {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
+            {% set room_color.t = 'blue_no_state' %}
+          {% elif aname == 'Garten' or aid == 'garten' %}
+            {% set room_color.t = 'green_no_state' %}
+          {% endif %}
+          {% set tap = "[[[ hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: " ~ (aname | tojson) ~ " }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
           {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set ns.cards = ns.cards + [{
             'type': 'custom:button-card',
-            'template': ['card_room', 'grey_no_state'],
+            'template': ['card_room', room_color.t],
             'entity': picked.e,
             'name': aname,
             'icon': icon,
