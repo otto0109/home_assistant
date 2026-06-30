@@ -1,0 +1,48 @@
+# Dreame Raumreinigung — Segment-IDs anpassen:
+# Entwicklerwerkzeuge → Zustände → vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+# Attribut „rooms“ oder „map“ → ID pro Raum eintragen
+
+script:
+  dreame_reinigen_wohnzimmer:
+    alias: "Dreame: Wohnzimmer"
+    icon: mdi:sofa
+    mode: single
+    sequence:
+      - action: dreame_vacuum.vacuum_clean_segment
+        target:
+          entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        data:
+          segments: 1
+
+  dreame_reinigen_esszimmer:
+    alias: "Dreame: Esszimmer"
+    icon: mdi:silverware-fork-knife
+    mode: single
+    sequence:
+      - action: dreame_vacuum.vacuum_clean_segment
+        target:
+          entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        data:
+          segments: 2
+
+  dreame_reinigen_kueche:
+    alias: "Dreame: Küche"
+    icon: mdi:stove
+    mode: single
+    sequence:
+      - action: dreame_vacuum.vacuum_clean_segment
+        target:
+          entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        data:
+          segments: 3
+
+  dreame_reinigen_flur_eg:
+    alias: "Dreame: Flur EG"
+    icon: mdi:stairs-down
+    mode: single
+    sequence:
+      - action: dreame_vacuum.vacuum_clean_segment
+        target:
+          entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        data:
+          segments: 4

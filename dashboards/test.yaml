@@ -49,7 +49,17 @@ views:
         template: card_vacuum
         entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
         variables:
-          ulm_card_vacuum_name: Rocky
+          ulm_card_vacuum_name: Dreame
+          ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
+          ulm_card_vacuum_camera_toggle: true
+      - type: custom:button-card
+        template: card_title
+        name: EG reinigen
+        label: Dreame — Raum per Knopfdruck
+      - type: grid
+        columns: 2
+        square: false
+        cards: !include includes/dreame-eg-clean.yaml
   - title: Wohnzimmer
     path: wohnzimmer
     subview: true
@@ -80,6 +90,63 @@ views:
                   options:
                     type: tile
                     vertical: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: tile
+            entity: light.licht_wohnzimmer
+            name: Wohnzimmer
+            vertical: true
+            features_position: bottom
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Dreame
+            icon: mdi:robot-vacuum
+          - type: button
+            name: Wohnzimmer reinigen
+            icon: mdi:broom
+            tap_action:
+              action: call-service
+              service: script.dreame_reinigen_wohnzimmer
+          - type: tile
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            name: Dreame
+            features:
+              - type: vacuum-commands
+          - type: custom:dreame-vacuum-map-card
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            map_entity: camera.dreame_bot_d9_max_map
+            theme: dark
+  - title: Esszimmer
+    path: esszimmer
+    subview: true
+    icon: mdi:silverware-fork-knife
+    theme: minimalist-desktop
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Licht-Szenen
+            icon: mdi:palette-swatch
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
                 - domain: scene
                   name: "*Esszimmer*"
                   options:
@@ -91,31 +158,11 @@ views:
           - type: heading
             heading: Beleuchtung
             icon: mdi:lightbulb-group
-          - type: grid
-            columns: 2
-            cards:
-              - type: tile
-                entity: light.licht_wohnzimmer
-                name: Wohnzimmer
-                vertical: true
-                features_position: bottom
-              - type: tile
-                entity: light.beleuchtung_bett_leuchte
-                name: Esszimmer
-                vertical: true
-                features_position: bottom
-          - type: markdown
-            content: >
-              _Weitere Lampen erscheinen automatisch, sobald sie in HA
-              existieren._
-      - type: grid
-        cards:
-          - type: heading
-            heading: Steckdosen
-            icon: mdi:power-socket-eu
-          - type: markdown
-            content: |
-              _Platzhalter: `switch.wohnzimmer_*`, `switch.esszimmer_*`_
+          - type: tile
+            entity: light.beleuchtung_bett_leuchte
+            name: Esszimmer
+            vertical: true
+            features_position: bottom
       - type: grid
         cards:
           - type: heading
@@ -127,63 +174,21 @@ views:
             features:
               - type: target-temperature
             features_position: bottom
-      - type: grid
-        cards:
-          - type: heading
-            heading: Fenster
-            icon: mdi:window-open-variant
-          - type: markdown
-            content: >
-              _Platzhalter: `binary_sensor.fenster_wohnzimmer_*`,
-              `binary_sensor.fenster_esszimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Türen
-            icon: mdi:door
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.tuer_wohnzimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Sensoren
-            icon: mdi:thermometer-lines
-          - type: markdown
-            content: >
-              _Platzhalter: `sensor.wohnzimmer_temperatur`,
-              `sensor.wohnzimmer_luftfeuchtigkeit`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Bewegungsmelder
-            icon: mdi:motion-sensor
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.bewegung_wohnzimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Batteriestände
-            icon: mdi:battery-medium
-          - type: markdown
-            content: |
-              _Platzhalter: Zigbee/Matter-Geräte mit `sensor.*_battery`_
+          - type: tile
+            entity: sensor.esszimmer_klimaanlage_energieverbrauch
+            name: Verbrauch
       - type: grid
         column_span: 2
         cards:
           - type: heading
-            heading: Geräte
+            heading: Dreame
             icon: mdi:robot-vacuum
-          - type: tile
-            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-            name: Staubsauger
-            features:
-              - type: vacuum-commands
-          - type: custom:dreame-vacuum-map-card
-            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-            map_entity: camera.dreame_bot_d9_max_map
-            theme: dark
+          - type: button
+            name: Esszimmer reinigen
+            icon: mdi:broom
+            tap_action:
+              action: call-service
+              service: script.dreame_reinigen_esszimmer
   - title: Küche
     path: kueche
     subview: true
@@ -225,17 +230,27 @@ views:
           - type: heading
             heading: Beleuchtung
             icon: mdi:lightbulb-group
-          - type: markdown
-            content: |
-              _Neue Szenen mit „Küche“ im Namen erscheinen oben automatisch._
-      - type: grid
-        cards:
-          - type: heading
-            heading: Steckdosen
-            icon: mdi:power-socket-eu
-          - type: markdown
-            content: |
-              _Platzhalter: `switch.kueche_*`_
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: light
+                  name: "*Küche*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: light
+                  name: "*kueche*"
+                  options:
+                    type: tile
+                    vertical: true
       - type: grid
         cards:
           - type: heading
@@ -249,47 +264,19 @@ views:
             features_position: bottom
           - type: tile
             entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
-            name: Klima — Verbrauch
+            name: Verbrauch
       - type: grid
+        column_span: 2
         cards:
           - type: heading
-            heading: Fenster
-            icon: mdi:window-open-variant
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.fenster_kueche_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Türen
-            icon: mdi:door
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.tuer_kueche_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Sensoren
-            icon: mdi:thermometer-lines
-          - type: markdown
-            content: |
-              _Platzhalter: `sensor.kueche_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Bewegungsmelder
-            icon: mdi:motion-sensor
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.bewegung_kueche_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Batteriestände
-            icon: mdi:battery-medium
-          - type: markdown
-            content: |
-              _Platzhalter: `sensor.kueche_*_battery`_
+            heading: Dreame
+            icon: mdi:robot-vacuum
+          - type: button
+            name: Küche reinigen
+            icon: mdi:broom
+            tap_action:
+              action: call-service
+              service: script.dreame_reinigen_kueche
   - title: Schlafzimmer
     path: schlafzimmer
     subview: true
@@ -331,18 +318,27 @@ views:
           - type: heading
             heading: Beleuchtung
             icon: mdi:lightbulb-group
-          - type: markdown
-            content: >
-              _Neue Szenen mit „Schlafzimmer“ im Namen erscheinen oben
-              automatisch._
-      - type: grid
-        cards:
-          - type: heading
-            heading: Steckdosen
-            icon: mdi:power-socket-eu
-          - type: markdown
-            content: |
-              _Platzhalter: `switch.schlafzimmer_*`_
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: light
+                  name: "*Schlafzimmer*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: light
+                  name: "*schlafzimmer*"
+                  options:
+                    type: tile
+                    vertical: true
       - type: grid
         cards:
           - type: heading
@@ -355,51 +351,11 @@ views:
             features_position: bottom
           - type: tile
             entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
-            name: Klima — Verbrauch
-      - type: grid
-        cards:
-          - type: heading
-            heading: Fenster
-            icon: mdi:window-open-variant
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.fenster_schlafzimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Türen
-            icon: mdi:door
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.tuer_schlafzimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Sensoren
-            icon: mdi:thermometer-lines
-          - type: markdown
-            content: |
-              _Platzhalter: `sensor.schlafzimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Bewegungsmelder
-            icon: mdi:motion-sensor
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.bewegung_schlafzimmer_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Batteriestände
-            icon: mdi:battery-medium
-          - type: markdown
-            content: |
-              _Platzhalter: `sensor.schlafzimmer_*_battery`_
-  - title: Flur
-    path: flur
+            name: Verbrauch
+  - title: Flur OG
+    path: flur-og
     subview: true
-    icon: mdi:door-open
+    icon: mdi:stairs-up
     theme: minimalist-desktop
     type: sections
     max_columns: 2
@@ -427,7 +383,7 @@ views:
                     type: tile
                     vertical: true
                 - domain: scene
-                  name: "*flur*"
+                  name: "*Treppe*"
                   options:
                     type: tile
                     vertical: true
@@ -437,81 +393,48 @@ views:
           - type: heading
             heading: Beleuchtung
             icon: mdi:lightbulb-group
-          - type: grid
-            columns: 2
-            cards:
-              - type: tile
-                entity: switch.flur_licht_shelly
-                name: Flur + Treppe
-                vertical: true
-              - type: tile
-                entity: switch.shelly_1_mini_gen4
-                name: Flur unten
-                vertical: true
-              - type: tile
-                entity: switch.licht_abstellraum_unten_sonoff
-                name: Abstellraum unten
-                vertical: true
-              - type: tile
-                entity: switch.licht_sonoff
-                name: Abstellraum oben
-                vertical: true
+          - type: tile
+            entity: switch.flur_licht_shelly
+            name: Flur + Treppenhaus
+            vertical: true
+          - type: tile
+            entity: switch.licht_sonoff
+            name: Abstellraum oben
+            vertical: true
+  - title: Flur EG
+    path: flur-eg
+    subview: true
+    icon: mdi:stairs-down
+    theme: minimalist-desktop
+    type: sections
+    max_columns: 2
+    sections:
       - type: grid
+        column_span: 2
         cards:
           - type: heading
-            heading: Steckdosen
-            icon: mdi:power-socket-eu
-          - type: markdown
-            content: |
-              _Platzhalter: `switch.flur_*`_
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: tile
+            entity: switch.shelly_1_mini_gen4
+            name: Flur unten
+            vertical: true
+          - type: tile
+            entity: switch.licht_abstellraum_unten_sonoff
+            name: Abstellraum unten
+            vertical: true
       - type: grid
+        column_span: 2
         cards:
           - type: heading
-            heading: Klima
-            icon: mdi:air-conditioner
-          - type: markdown
-            content: |
-              _Platzhalter: `climate.flur_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Fenster
-            icon: mdi:window-open-variant
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.fenster_flur_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Türen
-            icon: mdi:door
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.tuer_flur_*`, Haustür_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Sensoren
-            icon: mdi:thermometer-lines
-          - type: markdown
-            content: |
-              _Platzhalter: `sensor.flur_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Bewegungsmelder
-            icon: mdi:motion-sensor
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.bewegung_flur_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Batteriestände
-            icon: mdi:battery-medium
-          - type: markdown
-            content: |
-              _Shelly/Batterie-Sensoren: `sensor.flur_*_battery`_
+            heading: Dreame
+            icon: mdi:robot-vacuum
+          - type: button
+            name: Flur EG reinigen
+            icon: mdi:broom
+            tap_action:
+              action: call-service
+              service: script.dreame_reinigen_flur_eg
   - title: Garten
     path: garten
     subview: true
@@ -556,61 +479,42 @@ views:
         column_span: 2
         cards:
           - type: heading
-            heading: Beleuchtung
-            icon: mdi:lightbulb-group
-          - type: markdown
-            content: >
-              _Neue Szenen mit „Garten“ oder „Außen“ im Namen erscheinen oben
-              automatisch._
-      - type: grid
-        cards:
-          - type: heading
-            heading: Steckdosen & Bewässerung
+            heading: Bewässerung
             icon: mdi:watering-can
           - type: tile
             entity: switch.automatisch_bewasserung
             name: Automatik Bewässerung
             vertical: true
       - type: grid
+        column_span: 2
         cards:
           - type: heading
-            heading: Klima
-            icon: mdi:weather-partly-cloudy
-          - type: markdown
-            content: |
-              _Platzhalter: Außentemperatur `sensor.garten_*`, Wetterstation_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Fenster / Tore
-            icon: mdi:gate
-          - type: markdown
-            content: |
-              _Platzhalter: `cover.garagentor_*`, `binary_sensor.tor_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Sensoren
-            icon: mdi:thermometer-lines
-          - type: markdown
-            content: |
-              _Platzhalter: Bodenfeuchte, Regen `sensor.garten_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Bewegungsmelder
-            icon: mdi:motion-sensor
-          - type: markdown
-            content: |
-              _Platzhalter: `binary_sensor.bewegung_garten_*`_
-      - type: grid
-        cards:
-          - type: heading
-            heading: Batteriestände
-            icon: mdi:battery-medium
-          - type: markdown
-            content: |
-              _Platzhalter: Außensensoren `sensor.garten_*_battery`_
+            heading: Außen
+            icon: mdi:tree-outline
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: light
+                  name: "*Garten*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: light
+                  name: "*Außen*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: switch
+                  name: "*Garten*"
+                  options:
+                    type: tile
+                    vertical: true
   - title: Energie
     path: energie
     subview: true

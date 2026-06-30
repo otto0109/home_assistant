@@ -3,32 +3,40 @@
     - card_room
     - yellow_no_state
   name: Wohnzimmer
-  entity: climate.esszimmer_klimaanlage
+  entity: light.licht_wohnzimmer
   icon: mdi:sofa
   tap_action:
     action: navigate
     navigation_path: wohnzimmer
   variables:
-    label_use_temperature: true
+    label_use_temperature: false
+    label_use_brightness: true
     entity_1:
       entity_id: light.licht_wohnzimmer
       templates:
         - yellow_on
       tap_action:
         action: toggle
-    entity_2:
+
+- type: custom:button-card
+  template:
+    - card_room
+    - yellow_no_state
+  name: Esszimmer
+  entity: climate.esszimmer_klimaanlage
+  icon: mdi:silverware-fork-knife
+  tap_action:
+    action: navigate
+    navigation_path: esszimmer
+  variables:
+    label_use_temperature: true
+    entity_1:
       entity_id: light.beleuchtung_bett_leuchte
       templates:
         - yellow_on
       tap_action:
         action: toggle
-    entity_3:
-      entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-      templates:
-        - green_on
-      tap_action:
-        action: more-info
-    entity_4:
+    entity_2:
       entity_id: climate.esszimmer_klimaanlage
       templates:
         - blue_on
@@ -60,7 +68,7 @@
     - yellow_no_state
   name: Schlafzimmer
   entity: climate.schlafzimmer_klimaanlage
-  icon: mdi:bed
+  icon: mdi:bed-king-outline
   tap_action:
     action: navigate
     navigation_path: schlafzimmer
@@ -77,12 +85,12 @@
   template:
     - card_room
     - yellow_no_state
-  name: Flur
+  name: Flur OG
   entity: switch.flur_licht_shelly
-  icon: mdi:door-open
+  icon: mdi:stairs-up
   tap_action:
     action: navigate
-    navigation_path: flur
+    navigation_path: flur-og
   variables:
     label_use_temperature: false
     label_use_brightness: false
@@ -93,7 +101,33 @@
       tap_action:
         action: toggle
     entity_2:
+      entity_id: switch.licht_sonoff
+      templates:
+        - yellow_on
+      tap_action:
+        action: toggle
+
+- type: custom:button-card
+  template:
+    - card_room
+    - yellow_no_state
+  name: Flur EG
+  entity: switch.shelly_1_mini_gen4
+  icon: mdi:stairs-down
+  tap_action:
+    action: navigate
+    navigation_path: flur-eg
+  variables:
+    label_use_temperature: false
+    label_use_brightness: false
+    entity_1:
       entity_id: switch.shelly_1_mini_gen4
+      templates:
+        - yellow_on
+      tap_action:
+        action: toggle
+    entity_2:
+      entity_id: switch.licht_abstellraum_unten_sonoff
       templates:
         - yellow_on
       tap_action:
@@ -105,7 +139,7 @@
     - yellow_no_state
   name: Garten
   entity: switch.automatisch_bewasserung
-  icon: mdi:flower
+  icon: mdi:tree-outline
   tap_action:
     action: navigate
     navigation_path: garten
@@ -125,7 +159,7 @@
     - yellow_no_state
   name: Energie
   entity: sensor.pv_pv_power
-  icon: mdi:solar-power
+  icon: mdi:solar-power-variant
   tap_action:
     action: navigate
     navigation_path: energie

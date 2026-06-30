@@ -1,0 +1,39 @@
+- type: custom:button-card
+  template:
+    - card_vertical_button
+    - green_no_state
+  name: Wohnzimmer
+  icon: mdi:sofa
+  tap_action:
+    action: call-service
+    service: script.dreame_reinigen_wohnzimmer
+
+- type: custom:button-card
+  template:
+    - card_vertical_button
+    - green_no_state
+  name: Esszimmer
+  icon: mdi:silverware-fork-knife
+  tap_action:
+    action: call-service
+    service: script.dreame_reinigen_esszimmer
+
+- type: custom:button-card
+  template:
+    - card_vertical_button
+    - green_no_state
+  name: Küche
+  icon: mdi:stove
+  tap_action:
+    action: call-service
+    service: script.dreame_reinigen_kueche
+
+- type: custom:button-card
+  template:
+    - card_vertical_button
+    - green_no_state
+  name: Flur EG
+  icon: mdi:stairs-down
+  tap_action:
+    action: call-service
+    service: script.dreame_reinigen_flur_eg
