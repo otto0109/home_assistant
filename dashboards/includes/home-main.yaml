@@ -60,9 +60,7 @@
             "(min-width: 900px)":
               grid-template-columns: repeat(4, 1fr)
               grid-gap: 20px
-        cards:
-          - !include ulm-rooms.yaml
-          - !include ulm-room-energie.yaml
+        cards: !include ulm-rooms.yaml
 
       - type: custom:button-card
         template: card_vacuum

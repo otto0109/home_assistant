@@ -265,3 +265,5 @@
         - green_on
       tap_action:
         action: toggle
+
+- !include ulm-room-energie.yaml
