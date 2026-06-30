@@ -4,15 +4,25 @@
       :host {
         display: block;
         width: 100%;
-        max-width: 1480px;
-        margin: 0 auto;
-        padding: 8px 20px 36px;
+        max-width: none;
+        margin: 0;
+        padding: 8px 16px 36px;
         box-sizing: border-box;
       }
       ha-card {
         background: transparent !important;
         box-shadow: none !important;
         border: none !important;
+      }
+      @media (min-width: 1100px) {
+        :host {
+          padding: 12px 28px 40px;
+        }
+      }
+      @media (min-width: 1500px) {
+        :host {
+          padding: 16px 40px 48px;
+        }
       }
   card:
     type: vertical-stack
@@ -22,9 +32,22 @@
           style: |
             :host {
               display: block;
-              max-width: 560px;
+              max-width: 640px;
               margin-left: auto;
               margin-right: auto;
+            }
+            @media (min-width: 1100px) {
+              :host {
+                max-width: 760px;
+              }
+            }
+            @media (min-width: 1500px) {
+              :host {
+                max-width: 900px;
+              }
+              button-card $ ha-card$ {
+                min-height: 88px !important;
+              }
             }
         card:
           type: horizontal-stack
@@ -51,21 +74,95 @@
         template: card_title
         name: Räume
 
-      - type: custom:layout-card
-        layout:
-          width: 260
-          max_cols: 4
-          max_width: 400
-        cards: !include ulm-rooms.yaml
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            @media (min-width: 1100px) {
+              button-card $ ha-card$ {
+                min-height: 168px !important;
+                padding: 10px 8px !important;
+              }
+              button-card $ #name$ {
+                font-size: 1.2em !important;
+              }
+              button-card $ #state$,
+              button-card $ #label$ {
+                font-size: 1.05em !important;
+              }
+              button-card $ #img-cell$,
+              button-card $ #icon$ {
+                width: 64px !important;
+                height: 64px !important;
+              }
+              button-card $ ha-icon$ {
+                width: 32px !important;
+                height: 32px !important;
+              }
+            }
+            @media (min-width: 1500px) {
+              button-card $ ha-card$ {
+                min-height: 188px !important;
+              }
+              button-card $ #img-cell$,
+              button-card $ #icon$ {
+                width: 72px !important;
+                height: 72px !important;
+              }
+              button-card $ ha-icon$ {
+                width: 36px !important;
+                height: 36px !important;
+              }
+            }
+        card:
+          type: grid
+          columns: 2
+          square: false
+          cards: !include ulm-rooms.yaml
+          card_mod:
+            style: |
+              #root {
+                gap: 16px !important;
+              }
+              @media (min-width: 700px) {
+                #root {
+                  grid-template-columns: repeat(2, 1fr) !important;
+                  gap: 20px !important;
+                }
+              }
+              @media (min-width: 1000px) {
+                #root {
+                  grid-template-columns: repeat(3, 1fr) !important;
+                  gap: 22px !important;
+                }
+              }
+              @media (min-width: 1400px) {
+                #root {
+                  grid-template-columns: repeat(3, minmax(400px, 1fr)) !important;
+                  gap: 24px !important;
+                }
+              }
+              @media (min-width: 1800px) {
+                #root {
+                  grid-template-columns: repeat(4, minmax(380px, 1fr)) !important;
+                  gap: 28px !important;
+                }
+              }
 
       - type: custom:mod-card
         card_mod:
           style: |
-            :host {
-              display: block;
-              max-width: 900px;
-              margin-left: auto;
-              margin-right: auto;
+            @media (min-width: 1100px) {
+              button-card $ ha-card$ {
+                min-height: 120px !important;
+              }
+              button-card $ #name$ {
+                font-size: 1.15em !important;
+              }
+            }
+            @media (min-width: 1500px) {
+              button-card $ ha-card$ {
+                min-height: 140px !important;
+              }
             }
         card:
           type: custom:button-card
