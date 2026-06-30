@@ -1,4 +1,4 @@
-# Dynamische Raumkacheln — vollständige button-cards in layout-grid (card_param: cards).
+# Dynamische Raumkacheln — JSON-Array im auto-entities-Template (kein include).
 - type: custom:auto-entities
   show_empty: false
   card_param: cards
@@ -14,135 +14,74 @@
           grid-gap: 20px
   filter:
     template: |
-      {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
-      {% set chip_domains = ['light', 'climate', 'switch', 'script', 'fan'] %}
-      {% set ns = namespace(cards=[]) %}
-      {% for aid in areas() | sort %}
-        {% set aname = area_name(aid) %}
-        {% if aname %}
-          {% set picked = namespace(e=none) %}
-          {% for domain in domains %}
-            {% if picked.e is none %}
-              {% for e in states[domain] | sort(attribute='entity_id') %}
-                {% if area_id(e.entity_id) == aid %}
-                  {% set picked.e = e.entity_id %}
-                {% endif %}
-              {% endfor %}
-            {% endif %}
-          {% endfor %}
-          {% if picked.e is not none %}
-            {% set chips = namespace(ids=[]) %}
-            {% for cd in chip_domains %}
-              {% for e in states[cd] | sort(attribute='entity_id') %}
-                {% if area_id(e.entity_id) == aid and chips.ids | length < 3 %}
-                  {% set chips.ids = chips.ids + [e.entity_id] %}
-                {% endif %}
-              {% endfor %}
-            {% endfor %}
-            {% set vars = namespace(data={
-              'label_use_temperature': picked.e.split('.')[0] == 'climate' and state_attr(picked.e, 'current_temperature') is not none,
-              'label_use_brightness': picked.e.split('.')[0] == 'light'
-            }) %}
-            {% for i in range(chips.ids | length) %}
-              {% set eid = chips.ids[i] %}
-              {% set dom = eid.split('.')[0] %}
-              {% set ic = state_attr(eid, 'icon') | default('', true) %}
-              {% if dom == 'climate' %}
-                {% set chip = {
-                  'entity_id': eid,
-                  'icon': ic if ic else 'mdi:snowflake',
-                  'templates': ['blue_on'],
-                  'tap_action': {'action': 'more-info'}
-                } %}
-              {% elif dom == 'script' %}
-                {% set chip = {
-                  'entity_id': eid,
-                  'icon': ic if ic else 'mdi:broom',
-                  'templates': ['green_on'],
-                  'tap_action': {
-                    'action': 'call-service',
-                    'service': 'script.turn_on',
-                    'service_data': {'entity_id': eid}
-                  }
-                } %}
-              {% elif dom == 'light' %}
-                {% set chip = {
-                  'entity_id': eid,
-                  'icon': ic if ic else 'mdi:lightbulb',
-                  'templates': ['yellow_on'],
-                  'tap_action': {'action': 'toggle'}
-                } %}
-              {% elif dom == 'switch' %}
-                {% set chip = {
-                  'entity_id': eid,
-                  'icon': ic if ic else 'mdi:light-switch',
-                  'templates': ['grey_on'],
-                  'tap_action': {'action': 'toggle'}
-                } %}
-              {% elif dom == 'fan' %}
-                {% set chip = {
-                  'entity_id': eid,
-                  'icon': ic if ic else 'mdi:fan',
-                  'templates': ['green_on'],
-                  'tap_action': {'action': 'toggle'}
-                } %}
-              {% else %}
-                {% set chip = none %}
-              {% endif %}
-              {% if chip is not none %}
-                {% if i == 0 %}
-                  {% set vars.data = vars.data | combine({'entity_1': chip}) %}
-                {% elif i == 1 %}
-                  {% set vars.data = vars.data | combine({'entity_2': chip}) %}
-                {% elif i == 2 %}
-                  {% set vars.data = vars.data | combine({'entity_3': chip}) %}
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-            {% set tap_js = "[[[ hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: " ~ (aname | tojson) ~ " }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
-            {% set icon_js = "[[[ const aid = hass.entities[entity.entity_id]?.area_id; return (aid && hass.areas[aid]?.icon) || 'mdi:home-floor-1'; ]]]" %}
-            {% set ns.cards = ns.cards + [{
-              'type': 'custom:button-card',
-              'template': ['card_room', 'grey_no_state'],
-              'entity': picked.e,
-              'name': aname,
-              'icon': icon_js,
-              'double_tap_action': {'action': 'none'},
-              'tap_action': tap_js,
-              'variables': vars.data
-            }] %}
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-      {% set energie = {
-        'type': 'custom:button-card',
-        'template': ['card_room', 'purple_no_state'],
-        'name': 'Energie',
-        'entity': 'sensor.pv_pv_power',
-        'icon': 'mdi:solar-power-variant',
-        'tap_action': {'action': 'navigate', 'navigation_path': 'energie'},
-        'double_tap_action': {'action': 'none'},
-        'variables': {
-          'label_use_temperature': false,
-          'label_use_brightness': false,
-          'entity_1': {
-            'entity_id': 'sensor.pv_battery',
-            'icon': 'mdi:battery-high',
-            'templates': ['green_on'],
-            'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+      [
+      {%- set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] -%}
+      {%- set ns = namespace(first=true) -%}
+      {%- for aid in areas() | sort -%}
+        {%- set aname = area_name(aid) -%}
+        {%- if aname -%}
+          {%- set picked = namespace(e=none) -%}
+          {%- for domain in domains -%}
+            {%- if picked.e is none -%}
+              {%- for e in states[domain] | sort(attribute='entity_id') -%}
+                {%- if area_id(e.entity_id) == aid -%}
+                  {%- set picked.e = e.entity_id -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if picked.e is not none -%}
+            {%- set dom = picked.e.split('.')[0] -%}
+            {%- set use_temp = dom == 'climate' and state_attr(picked.e, 'current_temperature') is not none -%}
+            {%- set use_bri = dom == 'light' -%}
+            {%- if not ns.first -%},{%- endif -%}
+            {%- set ns.first = false -%}
+            {
+              "type": "custom:button-card",
+              "template": ["card_room", "grey_no_state"],
+              "entity": {{ picked.e | tojson }},
+              "name": {{ aname | tojson }},
+              "icon": "mdi:home-floor-1",
+              "double_tap_action": {"action": "none"},
+              "tap_action": {"action": "navigate", "navigation_path": "raum"},
+              "variables": {
+                "label_use_temperature": {{ use_temp | tojson }},
+                "label_use_brightness": {{ use_bri | tojson }}
+              }
+            }
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if not ns.first -%},{%- endif -%}
+      {
+        "type": "custom:button-card",
+        "template": ["card_room", "purple_no_state"],
+        "name": "Energie",
+        "entity": "sensor.pv_pv_power",
+        "icon": "mdi:solar-power-variant",
+        "double_tap_action": {"action": "none"},
+        "tap_action": {"action": "navigate", "navigation_path": "energie"},
+        "variables": {
+          "label_use_temperature": false,
+          "label_use_brightness": false,
+          "entity_1": {
+            "entity_id": "sensor.pv_battery",
+            "icon": "mdi:battery-high",
+            "templates": ["green_on"],
+            "tap_action": {"action": "navigate", "navigation_path": "energie"}
           },
-          'entity_2': {
-            'entity_id': 'sensor.pv_netzleistung',
-            'icon': 'mdi:transmission-tower',
-            'templates': ['blue_on'],
-            'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+          "entity_2": {
+            "entity_id": "sensor.pv_netzleistung",
+            "icon": "mdi:transmission-tower",
+            "templates": ["blue_on"],
+            "tap_action": {"action": "navigate", "navigation_path": "energie"}
           },
-          'entity_3': {
-            'entity_id': 'sensor.pv_activepower_load_sys',
-            'icon': 'mdi:home-lightning-bolt',
-            'templates': ['yellow_on'],
-            'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+          "entity_3": {
+            "entity_id": "sensor.pv_activepower_load_sys",
+            "icon": "mdi:home-lightning-bolt",
+            "templates": ["yellow_on"],
+            "tap_action": {"action": "navigate", "navigation_path": "energie"}
           }
         }
-      } %}
-      {{ ns.cards + [energie] }}
+      }
+      ]
