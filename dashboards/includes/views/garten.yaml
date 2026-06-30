@@ -1,61 +1,46 @@
-- type: custom:button-card
-  template: card_title
-  name: Garten
-  label: Außen & Bewässerung
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: Garten
+      label: Außen & Bewässerung
 
-- type: custom:auto-entities
-  show_empty: false
-  card:
-    type: grid
-    columns: 2
-    square: false
-  card_param: cards
-  filter:
-    include:
-      - domain: scene
-        name: "*Garten*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: scene
-        name: "*Außen*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: light
-        name: "*Garten*"
-        options:
-          type: custom:button-card
-          template: card_light
-          variables:
-            ulm_card_light_enable_slider: true
-      - domain: light
-        name: "*Außen*"
-        options:
-          type: custom:button-card
-          template: card_light
-          variables:
-            ulm_card_light_enable_slider: true
-      - domain: switch
-        name: "*Garten*"
-        options:
-          type: custom:button-card
-          template: card_power_outlet
+    - type: custom:button-card
+      template: card_title
+      name: Beleuchtung
 
-- type: custom:button-card
-  template: card_power_outlet
-  entity: switch.automatisch_bewasserung
-  name: Bewässerung
-  icon: mdi:watering-can
+    - type: custom:auto-entities
+      show_empty: false
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - domain: light
+            name: "*Garten*"
+            options:
+              type: custom:button-card
+              template: card_light
+              entity: "[[[ return entity.entity_id ]]]"
+              variables:
+                ulm_card_light_enable_slider: true
+          - domain: light
+            name: "*Außen*"
+            options:
+              type: custom:button-card
+              template: card_light
+              entity: "[[[ return entity.entity_id ]]]"
+              variables:
+                ulm_card_light_enable_slider: true
+
+    - type: custom:button-card
+      template: card_title
+      name: Bewässerung
+
+    - type: custom:button-card
+      template: card_power_outlet
+      entity: switch.automatisch_bewasserung
+      name: Automatisch draußen
+      icon: mdi:sprinkler-variant

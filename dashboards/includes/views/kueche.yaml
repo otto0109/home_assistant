@@ -1,66 +1,55 @@
-- type: custom:button-card
-  template: card_title
-  name: Küche
-  label: Licht & Klima
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: Küche
+      label: Licht & Klima
 
-- type: custom:auto-entities
-  show_empty: false
-  sort:
-    method: friendly_name
-  card:
-    type: grid
-    columns: 2
-    square: false
-  card_param: cards
-  filter:
-    include:
-      - domain: scene
-        name: "*Küche*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: scene
-        name: "*kueche*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: light
-        name: "*Küche*"
-        options:
-          type: custom:button-card
-          template: card_light
-          variables:
-            ulm_card_light_enable_slider: true
-      - domain: light
-        name: "*kueche*"
-        options:
-          type: custom:button-card
-          template: card_light
-          variables:
-            ulm_card_light_enable_slider: true
+    - type: custom:button-card
+      template: card_title
+      name: Beleuchtung
 
-- type: custom:button-card
-  template: card_thermostat
-  entity: climate.raum_neben_der_kuche_klimaanlage
+    - type: custom:auto-entities
+      show_empty: false
+      sort:
+        method: friendly_name
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - domain: light
+            name: "*Küche*"
+            options:
+              type: custom:button-card
+              template: card_light
+              entity: "[[[ return entity.entity_id ]]]"
+              variables:
+                ulm_card_light_enable_slider: true
+          - domain: light
+            name: "*kueche*"
+            options:
+              type: custom:button-card
+              template: card_light
+              entity: "[[[ return entity.entity_id ]]]"
+              variables:
+                ulm_card_light_enable_slider: true
 
-- type: custom:button-card
-  template: card_vertical_button
-  name: Küche reinigen
-  icon: mdi:broom
-  tap_action:
-    action: call-service
-    service: script.turn_on
-    service_data:
-      entity_id: script.dreame_reinigen_kueche
+    - type: custom:button-card
+      template: card_title
+      name: Klima
+
+    - !include fragments/climate-kueche.yaml
+
+    - type: custom:button-card
+      template: card_vertical_button
+      entity: script.dreame_reinigen_kueche
+      name: Küche reinigen
+      icon: mdi:broom
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        target:
+          entity_id: script.dreame_reinigen_kueche

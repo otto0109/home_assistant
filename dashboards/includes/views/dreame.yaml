@@ -1,0 +1,66 @@
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: Dreame
+      label: Karte & Steuerung
+
+    - type: custom:dreame-vacuum-map-card
+      entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      map_entity: camera.dreame_bot_d9_max_map
+      theme: dark
+
+    - type: custom:button-card
+      template: card_vacuum
+      entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      variables:
+        ulm_card_vacuum_name: Dreame
+
+    - type: custom:button-card
+      template: card_title
+      name: Räume reinigen
+
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: script.dreame_reinigen_wohnzimmer
+          name: Wohnzimmer
+          icon: mdi:sofa
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            target:
+              entity_id: script.dreame_reinigen_wohnzimmer
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: script.dreame_reinigen_esszimmer
+          name: Esszimmer
+          icon: mdi:silverware-fork-knife
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            target:
+              entity_id: script.dreame_reinigen_esszimmer
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: script.dreame_reinigen_kueche
+          name: Küche
+          icon: mdi:stove
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            target:
+              entity_id: script.dreame_reinigen_kueche
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: script.dreame_reinigen_flur_eg
+          name: Flur EG
+          icon: mdi:stairs-down
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            target:
+              entity_id: script.dreame_reinigen_flur_eg

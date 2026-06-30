@@ -1,56 +1,44 @@
-- type: custom:button-card
-  template: card_title
-  name: Schlafzimmer
-  label: Licht & Klima
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: Schlafzimmer
+      label: Licht & Klima
 
-- type: custom:auto-entities
-  show_empty: false
-  sort:
-    method: friendly_name
-  card:
-    type: grid
-    columns: 2
-    square: false
-  card_param: cards
-  filter:
-    include:
-      - domain: scene
-        name: "*Schlafzimmer*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: scene
-        name: "*schlafzimmer*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: light
-        name: "*Schlafzimmer*"
-        options:
-          type: custom:button-card
-          template: card_light
-          variables:
-            ulm_card_light_enable_slider: true
-      - domain: light
-        name: "*schlafzimmer*"
-        options:
-          type: custom:button-card
-          template: card_light
-          variables:
-            ulm_card_light_enable_slider: true
+    - type: custom:button-card
+      template: card_title
+      name: Beleuchtung
 
-- type: custom:button-card
-  template: card_thermostat
-  entity: climate.schlafzimmer_klimaanlage
+    - type: custom:auto-entities
+      show_empty: false
+      sort:
+        method: friendly_name
+      card:
+        type: grid
+        columns: 1
+        square: false
+      card_param: cards
+      filter:
+        include:
+          - domain: light
+            name: "*Schlafzimmer*"
+            options:
+              type: custom:button-card
+              template: card_light
+              entity: "[[[ return entity.entity_id ]]]"
+              variables:
+                ulm_card_light_enable_slider: true
+          - domain: light
+            name: "*schlafzimmer*"
+            options:
+              type: custom:button-card
+              template: card_light
+              entity: "[[[ return entity.entity_id ]]]"
+              variables:
+                ulm_card_light_enable_slider: true
+
+    - type: custom:button-card
+      template: card_title
+      name: Klima
+
+    - !include fragments/climate-schlafzimmer.yaml

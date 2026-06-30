@@ -1,95 +1,79 @@
-- type: custom:button-card
-  template: card_title
-  name: Einstellungen
-  label: Personen & System
-
-- type: horizontal-stack
+- type: vertical-stack
   cards:
     - type: custom:button-card
-      template: card_person
-      entity: person.thorge
+      template: card_title
+      name: Einstellungen
+      label: Personen & System
+
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:button-card
+          template: card_person
+          entity: person.thorge
+          variables:
+            ulm_card_person_entity: person.thorge
+            ulm_card_person_use_entity_picture: true
+            ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
+        - type: custom:button-card
+          template: card_person
+          entity: person.laura
+          variables:
+            ulm_card_person_entity: person.laura
+            ulm_card_person_use_entity_picture: true
+            ulm_card_person_battery: sensor.pixel_7_pro_battery_level
+
+    - type: custom:button-card
+      template: card_weather
+      entity: weather.wetter_home
       variables:
-        ulm_card_person_entity: person.thorge
-        ulm_card_person_use_entity_picture: true
-        ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
+        ulm_card_weather_enable_popup: true
+
     - type: custom:button-card
-      template: card_person
-      entity: person.laura
-      variables:
-        ulm_card_person_entity: person.laura
-        ulm_card_person_use_entity_picture: true
-        ulm_card_person_battery: sensor.pixel_7_pro_battery_level
+      template: card_title
+      name: Wettervorhersage
 
-- type: custom:button-card
-  template: card_weather
-  entity: weather.wetter_home
-  variables:
-    ulm_card_weather_enable_popup: true
+    - type: entities
+      entities:
+        - entity: input_select.wetter_ansicht
 
-- type: custom:button-card
-  template: card_title
-  name: Wetter
-  label: "[[[ return states['input_select.wetter_ansicht'].state ]]]"
+    - type: conditional
+      conditions:
+        - condition: state
+          entity: input_select.wetter_ansicht
+          state: Stündlich
+      card:
+        type: weather-forecast
+        entity: weather.wetter_home
+        forecast_type: hourly
 
-- type: horizontal-stack
-  cards:
+    - type: conditional
+      conditions:
+        - condition: state
+          entity: input_select.wetter_ansicht
+          state: Täglich
+      card:
+        type: weather-forecast
+        entity: weather.wetter_home
+        forecast_type: daily
+
     - type: custom:button-card
-      template: card_vertical_button
-      name: Stündlich
-      icon: mdi:weather-partly-cloudy
-      tap_action:
-        action: call-service
-        service: input_select.select_option
-        data:
-          entity_id: input_select.wetter_ansicht
-          option: Stündlich
+      template: card_title
+      name: Standorte
+
+    - type: map
+      entities:
+        - entity: person.thorge
+        - entity: person.laura
+      theme_mode: auto
+      aspect_ratio: "16:9"
+
     - type: custom:button-card
-      template: card_vertical_button
-      name: Täglich
-      icon: mdi:calendar
-      tap_action:
-        action: call-service
-        service: input_select.select_option
-        data:
-          entity_id: input_select.wetter_ansicht
-          option: Täglich
+      template: card_title
+      name: Kalender
 
-- type: conditional
-  conditions:
-    - condition: state
-      entity: input_select.wetter_ansicht
-      state: Stündlich
-  card:
-    type: weather-forecast
-    entity: weather.wetter_home
-    forecast_type: hourly
-
-- type: conditional
-  conditions:
-    - condition: state
-      entity: input_select.wetter_ansicht
-      state: Täglich
-  card:
-    type: weather-forecast
-    entity: weather.wetter_home
-    forecast_type: daily
-
-- type: custom:button-card
-  template: card_title
-  name: Standorte
-
-- type: map
-  entities:
-    - entity: person.thorge
-    - entity: person.laura
-  theme_mode: auto
-  aspect_ratio: "16:9"
-
-- type: custom:button-card
-  template: card_title
-  name: Kalender
-
-- type: calendar
-  entities:
-    - calendar.thorge_3_laura
-  initial_view: listWeek
+    - type: calendar
+      entities:
+        - calendar.thorge_3_laura
+      initial_view: listWeek

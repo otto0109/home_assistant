@@ -1,0 +1,6 @@
+- type: tile
+  entity: climate.raum_neben_der_kuche_klimaanlage
+  name: Klimaanlage
+  icon: mdi:snowflake
+  features:
+    - type: climate-hvac-modes

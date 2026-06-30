@@ -1,48 +1,22 @@
-- type: custom:button-card
-  template: card_title
-  name: Flur OG
-  label: Treppenhaus & Abstellraum
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: Flur OG
+      label: Treppenhaus & Abstellraum
 
-- type: custom:auto-entities
-  show_empty: false
-  card:
-    type: grid
-    columns: 2
-    square: false
-  card_param: cards
-  filter:
-    include:
-      - domain: scene
-        name: "*Flur*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
-      - domain: scene
-        name: "*Treppe*"
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          icon: mdi:palette-outline
-          tap_action:
-            action: call-service
-            service: scene.turn_on
-            data:
-              entity_id: this.entity_id
+    - type: custom:button-card
+      template: card_title
+      name: Beleuchtung
 
-- type: custom:button-card
-  template: card_power_outlet
-  entity: switch.flur_licht_shelly
-  name: Flur + Treppenhaus
-  icon: mdi:ceiling-light
+    - type: custom:button-card
+      template: card_power_outlet
+      entity: switch.flur_licht_shelly
+      name: Flur + Treppenhaus
+      icon: mdi:ceiling-light
 
-- type: custom:button-card
-  template: card_power_outlet
-  entity: switch.licht_sonoff
-  name: Abstellraum oben
-  icon: mdi:warehouse
+    - type: custom:button-card
+      template: card_power_outlet
+      entity: switch.licht_sonoff
+      name: Abstellraum oben
+      icon: mdi:warehouse

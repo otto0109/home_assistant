@@ -1,134 +1,124 @@
-- type: custom:button-card
-  template: card_title
-  name: Netzwerk
-  label: "[[[ return states['sensor.speedtest_download'].state + ' Mbit/s ↓ · ' + states['sensor.speedtest_upload'].state + ' Mbit/s ↑' ]]]"
-
-- type: custom:button-card
-  template: card_graph
-  entity: sensor.speedtest_download
-  variables:
-    ulm_card_graph_name: Download
-    ulm_card_graph_icon: mdi:download
-    ulm_card_graph_color: var(--color-blue)
-    ulm_card_graph_entity: sensor.speedtest_download
-    ulm_card_graph_type: fill
-    ulm_card_graph_hours: 24
-
-- type: custom:button-card
-  template: card_graph
-  entity: sensor.speedtest_upload
-  variables:
-    ulm_card_graph_name: Upload
-    ulm_card_graph_icon: mdi:upload
-    ulm_card_graph_color: var(--color-green)
-    ulm_card_graph_entity: sensor.speedtest_upload
-    ulm_card_graph_type: fill
-    ulm_card_graph_hours: 24
-
-- type: custom:button-card
-  template: card_title
-  name: Verlauf
-  label: "[[[ return states['input_select.router_zeitraum'].state ]]]"
-
-- type: horizontal-stack
+- type: vertical-stack
   cards:
     - type: custom:button-card
-      template: card_vertical_button
-      name: 24h
-      icon: mdi:clock-outline
-      tap_action:
-        action: call-service
-        service: input_select.select_option
-        data:
-          entity_id: input_select.router_zeitraum
-          option: 24h
+      template: card_title
+      name: Netzwerk
+      label: "[[[ return states['sensor.speedtest_download'].state + ' Mbit/s ↓ · ' + states['sensor.speedtest_upload'].state + ' Mbit/s ↑' ]]]"
+
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: custom:button-card
+          template: card_graph
+          entity: sensor.speedtest_download
+          variables:
+            ulm_card_graph_name: Download
+            ulm_card_graph_icon: mdi:download
+            ulm_card_graph_color: var(--color-blue)
+            ulm_card_graph_entity: sensor.speedtest_download
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 24
+        - type: custom:button-card
+          template: card_graph
+          entity: sensor.speedtest_upload
+          variables:
+            ulm_card_graph_name: Upload
+            ulm_card_graph_icon: mdi:upload
+            ulm_card_graph_color: var(--color-green)
+            ulm_card_graph_entity: sensor.speedtest_upload
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 24
+
     - type: custom:button-card
-      template: card_vertical_button
-      name: Woche
-      icon: mdi:calendar-week
-      tap_action:
-        action: call-service
-        service: input_select.select_option
-        data:
-          entity_id: input_select.router_zeitraum
-          option: Woche
-    - type: custom:button-card
-      template: card_vertical_button
-      name: Monat
-      icon: mdi:calendar-month
-      tap_action:
-        action: call-service
-        service: input_select.select_option
-        data:
-          entity_id: input_select.router_zeitraum
-          option: Monat
+      template: card_title
+      name: Verlauf
+      label: "[[[ return states['input_select.router_zeitraum'].state ]]]"
 
-- type: conditional
-  conditions:
-    - condition: state
-      entity: input_select.router_zeitraum
-      state: 24h
-  card:
-    type: custom:mini-graph-card
-    hours_to_show: 24
-    points_per_hour: 2
-    line_width: 3
-    show:
-      labels: true
-      legend: true
-      icon: false
-    entities:
-      - entity: sensor.speedtest_download
-        name: Download
-        color: "#4285f4"
-      - entity: sensor.speedtest_upload
-        name: Upload
-        color: "#34a853"
+    - type: entities
+      entities:
+        - entity: input_select.router_zeitraum
 
-- type: conditional
-  conditions:
-    - condition: state
-      entity: input_select.router_zeitraum
-      state: Woche
-  card:
-    type: custom:mini-graph-card
-    hours_to_show: 168
-    group_by:
-      duration: 1h
-      func: avg
-    line_width: 2
-    show:
-      labels: true
-      legend: true
-      icon: false
-    entities:
-      - entity: sensor.speedtest_download
-        name: Download
-        color: "#4285f4"
-      - entity: sensor.speedtest_upload
-        name: Upload
-        color: "#34a853"
+    - type: conditional
+      conditions:
+        - condition: state
+          entity: input_select.router_zeitraum
+          state: 24h
+      card:
+        type: custom:mini-graph-card
+        name: 24 Stunden
+        hours_to_show: 24
+        height: 200
+        points_per_hour: 2
+        line_width: 2
+        lower_bound: 0
+        show:
+          labels: false
+          extrema: false
+          legend: true
+          icon: false
+        entities:
+          - entity: sensor.speedtest_download
+            name: Download
+            color: "#4285f4"
+            show_fill: true
+          - entity: sensor.speedtest_upload
+            name: Upload
+            color: "#34a853"
+            show_fill: true
 
-- type: conditional
-  conditions:
-    - condition: state
-      entity: input_select.router_zeitraum
-      state: Monat
-  card:
-    type: custom:mini-graph-card
-    hours_to_show: 720
-    group_by:
-      duration: 6h
-      func: avg
-    line_width: 2
-    show:
-      labels: true
-      legend: true
-      icon: false
-    entities:
-      - entity: sensor.speedtest_download
-        name: Download
-        color: "#4285f4"
-      - entity: sensor.speedtest_upload
-        name: Upload
-        color: "#34a853"
+    - type: conditional
+      conditions:
+        - condition: state
+          entity: input_select.router_zeitraum
+          state: Woche
+      card:
+        type: custom:mini-graph-card
+        name: Woche
+        hours_to_show: 168
+        height: 200
+        group_by:
+          duration: 1h
+          func: avg
+        line_width: 2
+        lower_bound: 0
+        show:
+          labels: false
+          extrema: false
+          legend: true
+          icon: false
+        entities:
+          - entity: sensor.speedtest_download
+            name: Download
+            color: "#4285f4"
+          - entity: sensor.speedtest_upload
+            name: Upload
+            color: "#34a853"
+
+    - type: conditional
+      conditions:
+        - condition: state
+          entity: input_select.router_zeitraum
+          state: Monat
+      card:
+        type: custom:mini-graph-card
+        name: Monat
+        hours_to_show: 720
+        height: 200
+        group_by:
+          duration: 6h
+          func: avg
+        line_width: 2
+        lower_bound: 0
+        show:
+          labels: false
+          extrema: false
+          legend: true
+          icon: false
+        entities:
+          - entity: sensor.speedtest_download
+            name: Download
+            color: "#4285f4"
+          - entity: sensor.speedtest_upload
+            name: Upload
+            color: "#34a853"

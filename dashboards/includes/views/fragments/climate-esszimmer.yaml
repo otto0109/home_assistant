@@ -1,0 +1,6 @@
+- type: tile
+  entity: climate.esszimmer_klimaanlage
+  name: Klimaanlage
+  icon: mdi:snowflake
+  features:
+    - type: climate-hvac-modes

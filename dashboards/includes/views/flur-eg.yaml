@@ -1,26 +1,33 @@
-- type: custom:button-card
-  template: card_title
-  name: Flur EG
-  label: Erdgeschoss
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: Flur EG
+      label: Erdgeschoss
 
-- type: custom:button-card
-  template: card_power_outlet
-  entity: switch.shelly_1_mini_gen4
-  name: Flur unten
-  icon: mdi:door-sliding
+    - type: custom:button-card
+      template: card_title
+      name: Beleuchtung
 
-- type: custom:button-card
-  template: card_power_outlet
-  entity: switch.licht_abstellraum_unten_sonoff
-  name: Abstellraum unten
-  icon: mdi:warehouse
+    - type: custom:button-card
+      template: card_power_outlet
+      entity: switch.shelly_1_mini_gen4
+      name: Flur unten
+      icon: mdi:ceiling-light
 
-- type: custom:button-card
-  template: card_vertical_button
-  name: Flur EG reinigen
-  icon: mdi:broom
-  tap_action:
-    action: call-service
-    service: script.turn_on
-    service_data:
-      entity_id: script.dreame_reinigen_flur_eg
+    - type: custom:button-card
+      template: card_power_outlet
+      entity: switch.licht_abstellraum_unten_sonoff
+      name: Abstellraum unten
+      icon: mdi:warehouse
+
+    - type: custom:button-card
+      template: card_vertical_button
+      entity: script.dreame_reinigen_flur_eg
+      name: Flur EG reinigen
+      icon: mdi:broom
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        target:
+          entity_id: script.dreame_reinigen_flur_eg
