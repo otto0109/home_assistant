@@ -1,0 +1,41 @@
+type: custom:button-card
+template: card_welcome_home
+variables:
+  ulm_weather: weather.wetter_home
+  scene_1:
+    entity_id: scene.wohnzimmer_volle_beluechtung
+    icon: mdi:ceiling-light
+    name: Voll
+    color: yellow
+  scene_2:
+    entity_id: scene.wohnzimmer_fehrnsehen
+    icon: mdi:television
+    name: TV
+    color: purple
+  lights_off:
+    entity_id: script.alle_lichter_aus
+    icon: mdi:lightbulb-off-outline
+    name: Alle aus
+    color: red
+    state: "off"
+  info_1:
+    entity_id: sensor.pv_pv_power
+    icon: mdi:weather-sunny
+    name: Solar
+    color: yellow
+    state: "on"
+    nav_path: energie
+  info_2:
+    entity_id: sensor.pv_battery
+    icon: mdi:battery-high
+    name: Speicher
+    color: green
+    state: "on"
+    nav_path: energie
+  info_3:
+    entity_id: sensor.speedtest_download
+    icon: mdi:router-wireless
+    name: Router
+    color: blue
+    state: "on"
+    nav_path: netzwerk

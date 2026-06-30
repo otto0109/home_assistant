@@ -1,0 +1,60 @@
+- type: custom:button-card
+  template: card_title
+  name: Wohnzimmer
+  label: Licht & Geräte
+
+- type: custom:auto-entities
+  show_empty: false
+  sort:
+    method: friendly_name
+  card:
+    type: grid
+    columns: 2
+    square: false
+  card_param: cards
+  filter:
+    include:
+      - domain: scene
+        name: "*Wohnzimmer*"
+        options:
+          type: custom:button-card
+          template: card_vertical_button
+          icon: mdi:palette-outline
+          tap_action:
+            action: call-service
+            service: scene.turn_on
+            data:
+              entity_id: this.entity_id
+
+- type: custom:button-card
+  template: card_light
+  entity: light.licht_wohnzimmer
+  variables:
+    ulm_card_light_enable_slider: true
+    ulm_card_light_enable_color: true
+
+- type: custom:button-card
+  template: card_title
+  name: Dreame
+  label: Staubsauger
+
+- type: custom:button-card
+  template: card_vertical_button
+  name: Wohnzimmer reinigen
+  icon: mdi:broom
+  tap_action:
+    action: call-service
+    service: script.turn_on
+    service_data:
+      entity_id: script.dreame_reinigen_wohnzimmer
+
+- type: custom:button-card
+  template: card_vacuum
+  entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+  variables:
+    ulm_card_vacuum_name: Dreame
+
+- type: custom:dreame-vacuum-map-card
+  entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+  map_entity: camera.dreame_bot_d9_max_map
+  theme: dark

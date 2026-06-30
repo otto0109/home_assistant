@@ -1,6 +1,53 @@
-# Dreame Raumreinigung — Segment-IDs anpassen:
-# Entwicklerwerkzeuge → Zustände → vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-# Attribut „rooms“ oder „map“ → ID pro Raum eintragen
+# Dreame Raumreinigung
+#
+# Segment-IDs aus der gespeicherten Karte (Dreame-App / Map-Card):
+# | ID | Dreame-Name   | HA-Raum      |
+# |----|---------------|--------------|
+# | 1  | Living Room   | Wohnzimmer   |
+# | 2  | Corridor      | Flur EG      |
+# | 3  | Kitchen       | Küche        |
+# | 4  | Dining Hall   | Esszimmer    |
+# | 5  | Kitchen 2     | (nicht genutzt)|
+#
+# Prüfen: Entwicklerwerkzeuge → Zustände → vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+# Attribut „rooms“ oder select.*_room_*_name Entities
+
+input_number:
+  dreame_segment_wohnzimmer:
+    name: Dreame Segment Wohnzimmer
+    icon: mdi:sofa
+    min: 1
+    max: 15
+    step: 1
+    mode: box
+    initial: 1
+
+  dreame_segment_flur_eg:
+    name: Dreame Segment Flur EG
+    icon: mdi:stairs-down
+    min: 1
+    max: 15
+    step: 1
+    mode: box
+    initial: 2
+
+  dreame_segment_kueche:
+    name: Dreame Segment Küche
+    icon: mdi:stove
+    min: 1
+    max: 15
+    step: 1
+    mode: box
+    initial: 3
+
+  dreame_segment_esszimmer:
+    name: Dreame Segment Esszimmer
+    icon: mdi:silverware-fork-knife
+    min: 1
+    max: 15
+    step: 1
+    mode: box
+    initial: 4
 
 script:
   dreame_reinigen_wohnzimmer:
@@ -12,7 +59,7 @@ script:
         target:
           entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
         data:
-          segments: 1
+          segments: "{{ states('input_number.dreame_segment_wohnzimmer') | int }}"
 
   dreame_reinigen_esszimmer:
     alias: "Dreame: Esszimmer"
@@ -23,7 +70,7 @@ script:
         target:
           entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
         data:
-          segments: 2
+          segments: "{{ states('input_number.dreame_segment_esszimmer') | int }}"
 
   dreame_reinigen_kueche:
     alias: "Dreame: Küche"
@@ -34,7 +81,7 @@ script:
         target:
           entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
         data:
-          segments: 3
+          segments: "{{ states('input_number.dreame_segment_kueche') | int }}"
 
   dreame_reinigen_flur_eg:
     alias: "Dreame: Flur EG"
@@ -45,4 +92,4 @@ script:
         target:
           entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
         data:
-          segments: 4
+          segments: "{{ states('input_number.dreame_segment_flur_eg') | int }}"

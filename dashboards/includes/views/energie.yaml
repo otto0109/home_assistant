@@ -1,0 +1,322 @@
+- type: custom:button-card
+  template: card_title
+  name: Energie
+  label: Solar, Speicher & Verbrauch
+
+- type: custom:power-flow-card-plus
+  clickable_entities: true
+  use_new_flow_rate_model: true
+  min_flow_rate: 0.75
+  max_flow_rate: 6
+  min_expected_power: 0.01
+  max_expected_power: 11000
+  w_decimals: 0
+  kw_decimals: 2
+  display_zero_lines:
+    mode: transparency
+    transparency: 70
+  entities:
+    solar:
+      entity: sensor.pv_pv_power
+      name: Solar
+      icon: mdi:solar-power-variant
+      color_icon: true
+      display_zero: true
+      secondary_info:
+        entity: sensor.pv_kwpeak
+        unit_of_measurement: kWp
+        decimals: 2
+    grid:
+      entity: sensor.pv_netzleistung
+      name: Netz
+      icon: mdi:transmission-tower
+      display_state: one_way
+      color_circle: color_dynamically
+    battery:
+      entity: sensor.pv_battery_power
+      state_of_charge: sensor.pv_battery
+      name: Speicher
+      display_state: one_way
+      color_circle: color_dynamically
+      state_of_charge_decimals: 0
+    home:
+      entity: sensor.pv_activepower_load_sys
+      name: Haus
+      icon: mdi:home
+      color_icon: true
+      override_state: true
+
+- type: custom:button-card
+  template: card_graph
+  entity: sensor.pv_pv_power
+  variables:
+    ulm_card_graph_name: Solar
+    ulm_card_graph_icon: mdi:solar-power-variant
+    ulm_card_graph_color: var(--color-yellow)
+    ulm_card_graph_entity: sensor.pv_pv_power
+    ulm_card_graph_type: fill
+    ulm_card_graph_hours: 24
+
+- type: custom:button-card
+  template: card_graph
+  entity: sensor.pv_activepower_load_sys
+  variables:
+    ulm_card_graph_name: Verbrauch
+    ulm_card_graph_icon: mdi:home-lightning-bolt
+    ulm_card_graph_color: var(--color-blue)
+    ulm_card_graph_entity: sensor.pv_activepower_load_sys
+    ulm_card_graph_type: fill
+    ulm_card_graph_hours: 24
+
+- type: grid
+  columns: 2
+  square: false
+  cards:
+    - type: custom:button-card
+      template: card_generic
+      entity: sensor.pv_today_energy_export
+      icon: mdi:transmission-tower-export
+      name: Einspeisung heute
+    - type: custom:button-card
+      template: card_generic
+      entity: sensor.pv_today_energy_import
+      icon: mdi:transmission-tower-import
+      name: Netzbezug heute
+    - type: custom:button-card
+      template: card_generic
+      entity: sensor.pv_battery
+      icon: mdi:battery-high
+      name: Speicher
+    - type: custom:button-card
+      template: card_generic
+      entity: sensor.pv_battery_power
+      icon: mdi:battery-charging
+      name: Batterie Leistung
+
+- type: custom:button-card
+  template: card_title
+  name: Verlauf
+  label: "[[[ return states['input_select.pv_zeitraum'].state ]]]"
+
+- type: horizontal-stack
+  cards:
+    - type: custom:button-card
+      template: card_vertical_button
+      name: Live
+      icon: mdi:pulse
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        data:
+          entity_id: input_select.pv_zeitraum
+          option: Live
+    - type: custom:button-card
+      template: card_vertical_button
+      name: 24h
+      icon: mdi:clock-outline
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        data:
+          entity_id: input_select.pv_zeitraum
+          option: 24h
+    - type: custom:button-card
+      template: card_vertical_button
+      name: Woche
+      icon: mdi:calendar-week
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        data:
+          entity_id: input_select.pv_zeitraum
+          option: Woche
+    - type: custom:button-card
+      template: card_vertical_button
+      name: Monat
+      icon: mdi:calendar-month
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        data:
+          entity_id: input_select.pv_zeitraum
+          option: Monat
+    - type: custom:button-card
+      template: card_vertical_button
+      name: Jahr
+      icon: mdi:calendar
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        data:
+          entity_id: input_select.pv_zeitraum
+          option: Jahr
+    - type: custom:button-card
+      template: card_vertical_button
+      name: Gesamt
+      icon: mdi:history
+      tap_action:
+        action: call-service
+        service: input_select.select_option
+        data:
+          entity_id: input_select.pv_zeitraum
+          option: Lebenslang
+
+- type: conditional
+  conditions:
+    - condition: state
+      entity: input_select.pv_zeitraum
+      state: Live
+  card:
+    type: custom:mini-graph-card
+    hours_to_show: 1
+    points_per_hour: 12
+    line_width: 3
+    animate: true
+    show:
+      labels: true
+      legend: true
+      icon: false
+    entities:
+      - entity: sensor.pv_pv_power
+        name: Solar
+        color: "#f4b400"
+      - entity: sensor.pv_activepower_load_sys
+        name: Verbrauch
+        color: "#4285f4"
+      - entity: sensor.pv_battery_power
+        name: Batterie
+        color: "#34a853"
+
+- type: conditional
+  conditions:
+    - condition: state
+      entity: input_select.pv_zeitraum
+      state: 24h
+  card:
+    type: custom:mini-graph-card
+    hours_to_show: 24
+    points_per_hour: 4
+    line_width: 3
+    animate: false
+    show:
+      labels: true
+      legend: true
+      icon: false
+    entities:
+      - entity: sensor.pv_pv_power
+        name: Solar
+        color: "#f4b400"
+      - entity: sensor.pv_activepower_load_sys
+        name: Verbrauch
+        color: "#4285f4"
+      - entity: sensor.pv_battery_power
+        name: Batterie
+        color: "#34a853"
+
+- type: conditional
+  conditions:
+    - condition: state
+      entity: input_select.pv_zeitraum
+      state: Woche
+  card:
+    type: custom:mini-graph-card
+    hours_to_show: 168
+    group_by:
+      duration: 1h
+      func: avg
+    line_width: 2
+    show:
+      labels: true
+      legend: true
+      icon: false
+    entities:
+      - entity: sensor.pv_pv_power
+        name: Solar
+        color: "#f4b400"
+      - entity: sensor.pv_activepower_load_sys
+        name: Verbrauch
+        color: "#4285f4"
+      - entity: sensor.pv_battery_power
+        name: Batterie
+        color: "#34a853"
+
+- type: conditional
+  conditions:
+    - condition: state
+      entity: input_select.pv_zeitraum
+      state: Monat
+  card:
+    type: custom:mini-graph-card
+    hours_to_show: 720
+    group_by:
+      duration: 6h
+      func: avg
+    line_width: 2
+    show:
+      labels: true
+      legend: true
+      icon: false
+    entities:
+      - entity: sensor.pv_pv_power
+        name: Solar
+        color: "#f4b400"
+      - entity: sensor.pv_activepower_load_sys
+        name: Verbrauch
+        color: "#4285f4"
+      - entity: sensor.pv_battery_power
+        name: Batterie
+        color: "#34a853"
+
+- type: conditional
+  conditions:
+    - condition: state
+      entity: input_select.pv_zeitraum
+      state: Jahr
+  card:
+    type: custom:mini-graph-card
+    hours_to_show: 8760
+    group_by:
+      duration: 1d
+      func: avg
+    line_width: 2
+    show:
+      labels: true
+      legend: true
+      icon: false
+    entities:
+      - entity: sensor.pv_pv_power
+        name: Solar
+        color: "#f4b400"
+      - entity: sensor.pv_activepower_load_sys
+        name: Verbrauch
+        color: "#4285f4"
+      - entity: sensor.pv_battery_power
+        name: Batterie
+        color: "#34a853"
+
+- type: conditional
+  conditions:
+    - condition: state
+      entity: input_select.pv_zeitraum
+      state: Lebenslang
+  card:
+    type: custom:mini-graph-card
+    hours_to_show: 8760
+    group_by:
+      duration: 1d
+      func: avg
+    line_width: 2
+    show:
+      labels: true
+      legend: true
+      icon: false
+    entities:
+      - entity: sensor.pv_pv_power
+        name: Solar
+        color: "#f4b400"
+      - entity: sensor.pv_activepower_load_sys
+        name: Verbrauch
+        color: "#4285f4"
+      - entity: sensor.pv_battery_power
+        name: Batterie
+        color: "#34a853"
