@@ -13,15 +13,26 @@
     label_use_brightness: true
     entity_1:
       entity_id: light.licht_wohnzimmer
+      icon: mdi:floor-lamp
       templates:
         - yellow_on
       tap_action:
         action: toggle
+    entity_2:
+      entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      icon: mdi:broom
+      templates:
+        - green_on
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        service_data:
+          entity_id: script.dreame_reinigen_wohnzimmer
 
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - pink_no_state
   name: Esszimmer
   entity: climate.esszimmer_klimaanlage
   icon: mdi:silverware-fork-knife
@@ -32,21 +43,33 @@
     label_use_temperature: true
     entity_1:
       entity_id: light.beleuchtung_bett_leuchte
+      icon: mdi:chandelier
       templates:
-        - yellow_on
+        - pink_on
       tap_action:
         action: toggle
     entity_2:
       entity_id: climate.esszimmer_klimaanlage
+      icon: mdi:air-conditioner
       templates:
         - blue_on
       tap_action:
         action: more-info
+    entity_3:
+      entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      icon: mdi:broom
+      templates:
+        - green_on
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        service_data:
+          entity_id: script.dreame_reinigen_esszimmer
 
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - red_no_state
   name: Küche
   entity: climate.raum_neben_der_kuche_klimaanlage
   icon: mdi:stove
@@ -57,15 +80,26 @@
     label_use_temperature: true
     entity_1:
       entity_id: climate.raum_neben_der_kuche_klimaanlage
+      icon: mdi:air-conditioner
       templates:
         - blue_on
       tap_action:
         action: more-info
+    entity_2:
+      entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      icon: mdi:broom
+      templates:
+        - green_on
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        service_data:
+          entity_id: script.dreame_reinigen_kueche
 
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - purple_no_state
   name: Schlafzimmer
   entity: climate.schlafzimmer_klimaanlage
   icon: mdi:bed-king-outline
@@ -76,6 +110,7 @@
     label_use_temperature: true
     entity_1:
       entity_id: climate.schlafzimmer_klimaanlage
+      icon: mdi:air-conditioner
       templates:
         - blue_on
       tap_action:
@@ -84,10 +119,10 @@
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - grey_no_state
   name: Flur OG
   entity: switch.flur_licht_shelly
-  icon: mdi:stairs-up
+  icon: mdi:home-floor-a
   tap_action:
     action: navigate
     navigation_path: flur-og
@@ -96,24 +131,26 @@
     label_use_brightness: false
     entity_1:
       entity_id: switch.flur_licht_shelly
+      icon: mdi:ceiling-light
       templates:
-        - yellow_on
+        - grey_on
       tap_action:
         action: toggle
     entity_2:
       entity_id: switch.licht_sonoff
+      icon: mdi:stairs
       templates:
-        - yellow_on
+        - grey_on
       tap_action:
         action: toggle
 
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - blue_no_state
   name: Flur EG
   entity: switch.shelly_1_mini_gen4
-  icon: mdi:stairs-down
+  icon: mdi:home-floor-b
   tap_action:
     action: navigate
     navigation_path: flur-eg
@@ -122,24 +159,36 @@
     label_use_brightness: false
     entity_1:
       entity_id: switch.shelly_1_mini_gen4
+      icon: mdi:door-sliding
       templates:
-        - yellow_on
+        - blue_on
       tap_action:
         action: toggle
     entity_2:
       entity_id: switch.licht_abstellraum_unten_sonoff
+      icon: mdi:warehouse
       templates:
-        - yellow_on
+        - blue_on
       tap_action:
         action: toggle
+    entity_3:
+      entity_id: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      icon: mdi:broom
+      templates:
+        - green_on
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        service_data:
+          entity_id: script.dreame_reinigen_flur_eg
 
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - green_no_state
   name: Garten
   entity: switch.automatisch_bewasserung
-  icon: mdi:tree-outline
+  icon: mdi:flower-tulip-outline
   tap_action:
     action: navigate
     navigation_path: garten
@@ -148,6 +197,7 @@
     label_use_brightness: false
     entity_1:
       entity_id: switch.automatisch_bewasserung
+      icon: mdi:watering-can
       templates:
         - green_on
       tap_action:
@@ -156,7 +206,7 @@
 - type: custom:button-card
   template:
     - card_room
-    - yellow_no_state
+    - purple_no_state
   name: Energie
   entity: sensor.pv_pv_power
   icon: mdi:solar-power-variant
@@ -168,6 +218,7 @@
     label_use_brightness: false
     entity_1:
       entity_id: sensor.pv_battery
+      icon: mdi:battery-high
       templates:
         - green_on
       tap_action:
@@ -175,8 +226,9 @@
         navigation_path: energie
     entity_2:
       entity_id: sensor.pv_activepower_load_sys
+      icon: mdi:home-lightning-bolt
       templates:
-        - yellow_on
+        - purple_on
       tap_action:
         action: navigate
         navigation_path: energie

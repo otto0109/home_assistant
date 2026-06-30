@@ -1,6 +1,6 @@
 button_card_templates: !include_dir_merge_named "../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
 
-title: Test
+title: Home
 theme: minimalist-desktop
 background: var(--background-image)
 views:
@@ -13,7 +13,7 @@ views:
         variables:
           ulm_weather: weather.wetter_home
           entity_1:
-            entity_id: sensor.pv_pv_power
+            entity_id: sun.sun
             icon: mdi:solar-power-variant
             name: Solar
             color: yellow
@@ -24,6 +24,12 @@ views:
             name: Speicher
             color: green
             _nav_path: energie
+          entity_3:
+            entity_id: sensor.speedtest_download
+            icon: mdi:router-wireless
+            name: Router
+            color: blue
+            _nav_path: netzwerk
       - type: horizontal-stack
         cards:
           - type: custom:button-card
@@ -52,14 +58,6 @@ views:
           ulm_card_vacuum_name: Dreame
           ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
           ulm_card_vacuum_camera_toggle: true
-      - type: custom:button-card
-        template: card_title
-        name: EG reinigen
-        label: Dreame — Raum per Knopfdruck
-      - type: grid
-        columns: 2
-        square: false
-        cards: !include includes/dreame-eg-clean.yaml
   - title: Wohnzimmer
     path: wohnzimmer
     subview: true
@@ -164,19 +162,15 @@ views:
             vertical: true
             features_position: bottom
       - type: grid
+        column_span: 2
         cards:
-          - type: heading
-            heading: Klima
-            icon: mdi:air-conditioner
           - type: tile
             entity: climate.esszimmer_klimaanlage
             name: Esszimmer
+            icon: mdi:air-conditioner
             features:
               - type: target-temperature
             features_position: bottom
-          - type: tile
-            entity: sensor.esszimmer_klimaanlage_energieverbrauch
-            name: Verbrauch
       - type: grid
         column_span: 2
         cards:
@@ -252,19 +246,15 @@ views:
                     type: tile
                     vertical: true
       - type: grid
+        column_span: 2
         cards:
-          - type: heading
-            heading: Klima
-            icon: mdi:air-conditioner
           - type: tile
             entity: climate.raum_neben_der_kuche_klimaanlage
             name: Küche
+            icon: mdi:air-conditioner
             features:
               - type: target-temperature
             features_position: bottom
-          - type: tile
-            entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
-            name: Verbrauch
       - type: grid
         column_span: 2
         cards:
@@ -340,18 +330,14 @@ views:
                     type: tile
                     vertical: true
       - type: grid
+        column_span: 2
         cards:
-          - type: heading
-            heading: Klima
-            icon: mdi:air-conditioner
           - type: tile
             entity: climate.schlafzimmer_klimaanlage
+            icon: mdi:air-conditioner
             features:
               - type: target-temperature
             features_position: bottom
-          - type: tile
-            entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
-            name: Verbrauch
   - title: Flur OG
     path: flur-og
     subview: true
@@ -396,10 +382,12 @@ views:
           - type: tile
             entity: switch.flur_licht_shelly
             name: Flur + Treppenhaus
+            icon: mdi:ceiling-light
             vertical: true
           - type: tile
             entity: switch.licht_sonoff
             name: Abstellraum oben
+            icon: mdi:warehouse
             vertical: true
   - title: Flur EG
     path: flur-eg
@@ -418,10 +406,12 @@ views:
           - type: tile
             entity: switch.shelly_1_mini_gen4
             name: Flur unten
+            icon: mdi:door-sliding
             vertical: true
           - type: tile
             entity: switch.licht_abstellraum_unten_sonoff
             name: Abstellraum unten
+            icon: mdi:warehouse
             vertical: true
       - type: grid
         column_span: 2
@@ -518,7 +508,7 @@ views:
   - title: Energie
     path: energie
     subview: true
-    icon: mdi:solar-power
+    icon: mdi:solar-power-variant
     theme: minimalist-desktop
     type: sections
     max_columns: 2
@@ -571,60 +561,31 @@ views:
       - type: grid
         column_span: 2
         cards:
-          - type: heading
-            heading: Heute
-            icon: mdi:calendar-today
           - type: grid
             columns: 2
             cards:
               - type: tile
                 entity: sensor.pv_today_energy_export
-                name: Einspeisung
+                name: Einspeisung heute
                 icon: mdi:transmission-tower-export
               - type: tile
                 entity: sensor.pv_today_energy_import
-                name: Netzbezug
+                name: Netzbezug heute
                 icon: mdi:transmission-tower-import
+              - type: tile
+                entity: sensor.pv_battery
+                name: Speicher
+                icon: mdi:battery-high
+              - type: tile
+                entity: sensor.pv_pv_power
+                name: Solar jetzt
+                icon: mdi:solar-power-variant
       - type: grid
         column_span: 2
         cards:
-          - type: heading
-            heading: Verlauf heute
-            icon: mdi:chart-line
-          - type: history-graph
-            hours_to_show: 24
-            refresh_interval: 60
-            show_names: true
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-              - entity: sensor.pv_battery_power
-                name: Batterie
-      - type: grid
-        column_span: 2
-        cards:
-          - type: heading
-            heading: Klima — Verbrauch
-            icon: mdi:air-conditioner
-          - type: grid
-            columns: 3
-            cards:
-              - type: tile
-                entity: sensor.esszimmer_klimaanlage_energieverbrauch
-                name: Esszimmer
-              - type: tile
-                entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
-                name: Küche
-              - type: tile
-                entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
-                name: Schlafzimmer
-      - type: grid
-        column_span: 2
-        cards:
-          - type: heading
-            heading: Zeitraum
+          - type: tile
+            entity: input_select.pv_zeitraum
+            name: Zeitraum
             icon: mdi:chart-timeline-variant
           - type: horizontal-stack
             cards:
@@ -678,16 +639,6 @@ views:
                     entity_id: input_select.pv_zeitraum
                   data:
                     option: Jahr
-              - type: button
-                name: Gesamt
-                icon: mdi:chart-areaspline
-                tap_action:
-                  action: call-service
-                  service: input_select.select_option
-                  target:
-                    entity_id: input_select.pv_zeitraum
-                  data:
-                    option: Lebenslang
           - type: conditional
             conditions:
               - condition: state
@@ -705,8 +656,6 @@ views:
                   name: Verbrauch
                 - entity: sensor.pv_battery_power
                   name: Batterie
-                - entity: sensor.pv_battery
-                  name: Ladestand
           - type: conditional
             conditions:
               - condition: state
@@ -745,10 +694,6 @@ views:
                   name: Verbrauch
                 - entity: sensor.pv_battery_power
                   name: Batterie
-                - entity: sensor.pv_today_energy_import
-                  name: Import
-                - entity: sensor.pv_today_energy_export
-                  name: Export
           - type: conditional
             conditions:
               - condition: state
@@ -768,10 +713,6 @@ views:
                   name: Verbrauch
                 - entity: sensor.pv_battery_power
                   name: Batterie
-                - entity: sensor.pv_today_energy_import
-                  name: Import
-                - entity: sensor.pv_today_energy_export
-                  name: Export
           - type: conditional
             conditions:
               - condition: state
@@ -791,10 +732,6 @@ views:
                   name: Verbrauch
                 - entity: sensor.pv_battery_power
                   name: Batterie
-                - entity: sensor.pv_today_energy_import
-                  name: Import
-                - entity: sensor.pv_today_energy_export
-                  name: Export
           - type: conditional
             conditions:
               - condition: state
@@ -814,16 +751,6 @@ views:
                   name: Verbrauch
                 - entity: sensor.pv_battery_power
                   name: Batterie
-                - entity: sensor.pv_today_energy_import
-                  name: Import
-                - entity: sensor.pv_today_energy_export
-                  name: Export
-                - entity: sensor.esszimmer_klimaanlage_energieverbrauch
-                  name: Klima Esszimmer
-                - entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
-                  name: Klima Küche
-                - entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
-                  name: Klima Schlafzimmer
   - title: Sicherheit
     path: sicherheit
     subview: true
@@ -890,30 +817,34 @@ views:
   - title: Netzwerk
     path: netzwerk
     subview: true
-    icon: mdi:lan
+    icon: mdi:router-wireless
     theme: minimalist-desktop
     type: sections
-    max_columns: 1
+    max_columns: 2
     sections:
       - type: grid
+        column_span: 2
         cards:
-          - type: heading
-            heading: Speedtest
-            icon: mdi:speedometer
           - type: grid
             columns: 2
             cards:
               - type: tile
                 entity: sensor.speedtest_download
                 name: Download
+                icon: mdi:download
               - type: tile
                 entity: sensor.speedtest_upload
                 name: Upload
+                icon: mdi:upload
+          - type: tile
+            entity: input_select.router_zeitraum
+            name: Verlauf
+            icon: mdi:chart-line
           - type: horizontal-stack
             cards:
               - type: button
                 name: 24h
-                show_icon: false
+                icon: mdi:clock-outline
                 tap_action:
                   action: call-service
                   service: input_select.select_option
@@ -923,7 +854,7 @@ views:
                     option: 24h
               - type: button
                 name: Woche
-                show_icon: false
+                icon: mdi:calendar-week
                 tap_action:
                   action: call-service
                   service: input_select.select_option
@@ -933,7 +864,7 @@ views:
                     option: Woche
               - type: button
                 name: Monat
-                show_icon: false
+                icon: mdi:calendar-month
                 tap_action:
                   action: call-service
                   service: input_select.select_option
@@ -986,42 +917,6 @@ views:
               entities:
                 - sensor.speedtest_download
                 - sensor.speedtest_upload
-      - type: grid
-        cards:
-          - type: heading
-            heading: Infrastruktur
-            icon: mdi:server-network
-          - type: grid
-            columns: 2
-            cards:
-              - type: markdown
-                content: |
-                  **Router**
-                  _Platzhalter: `sensor.router_*`, `device_tracker.*`_
-              - type: markdown
-                content: |
-                  **NAS**
-                  _Platzhalter: `sensor.nas_*`, `binary_sensor.nas_online`_
-              - type: markdown
-                content: >
-                  **Server**
-
-                  _Platzhalter: `sensor.server_*`, Ping
-                  `binary_sensor.server_online`_
-              - type: markdown
-                content: |
-                  **Switch**
-                  _Platzhalter: `sensor.switch_*_port_*`_
-              - type: markdown
-                content: |
-                  **USV**
-                  _Platzhalter: `sensor.usv_*`, `binary_sensor.usv_on_battery`_
-              - type: markdown
-                content: >
-                  **Home Assistant**
-
-                  _Platzhalter: `sensor.home_assistant_*`, CPU, Speicher,
-                  Uptime_
   - title: Einstellungen
     path: einstellungen
     subview: true

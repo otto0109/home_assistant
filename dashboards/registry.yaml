@@ -1,13 +1,9 @@
 # Registrierung der YAML-Dashboards (wird von configuration.yaml eingebunden)
+# Einziges Dashboard in Git — HA-Standard (Übersicht, Landkarte, …) und
+# ULM-Beispieldashboards in der UI ausblenden (siehe Hinweise unten).
 test-dashboard:
   mode: yaml
-  title: Test
+  title: Home
   icon: mdi:home
   filename: dashboards/test.yaml
-  show_in_sidebar: true
-uebersicht-dashboard:
-  mode: yaml
-  title: Übersicht
-  icon: mdi:view-dashboard
-  filename: dashboards/uebersicht.yaml
   show_in_sidebar: true
