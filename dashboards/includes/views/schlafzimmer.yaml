@@ -1,39 +1,58 @@
-- type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: card_title
-      name: Schlafzimmer
-      label: Licht & Klima
+- type: custom:mod-card
+  !include ../fragments/subview-padding.yaml
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:button-card
+        template: card_title
+        name: Schlafzimmer
+        label: Licht & Klima
 
-    - type: custom:auto-entities
-      show_empty: false
-      sort:
-        method: friendly_name
-      card:
-        type: grid
-        columns: 1
-        square: false
-      card_param: cards
-      filter:
-        include:
-          - domain: light
-            name: "*Schlafzimmer*"
-            options:
-              type: tile
-              icon: mdi:floor-lamp
-              features:
-                - type: light-brightness
-          - domain: light
-            name: "*schlafzimmer*"
-            options:
-              type: tile
-              icon: mdi:floor-lamp
-              features:
-                - type: light-brightness
+      - type: custom:button-card
+        template: card_title
+        name: Beleuchtung
 
-    - type: tile
-      entity: climate.schlafzimmer_klimaanlage
-      name: Klimaanlage
-      icon: mdi:snowflake
-      features:
-        - type: climate-hvac-modes
+      - type: custom:mod-card
+        !include ../fragments/light-card-rounded.yaml
+        card:
+          type: custom:auto-entities
+          show_empty: false
+          sort:
+            method: friendly_name
+          card:
+            type: grid
+            columns: 1
+            square: false
+          card_param: cards
+          filter:
+            include:
+              - domain: light
+                name: "*Schlafzimmer*"
+                options:
+                  type: custom:button-card
+                  template: card_light
+                  entity: "[[[ return entity.entity_id ]]]"
+                  variables:
+                    ulm_card_light_enable_slider: true
+              - domain: light
+                name: "*schlafzimmer*"
+                options:
+                  type: custom:button-card
+                  template: card_light
+                  entity: "[[[ return entity.entity_id ]]]"
+                  variables:
+                    ulm_card_light_enable_slider: true
+
+      - type: custom:button-card
+        template: card_title
+        name: Klima
+
+      - type: custom:mod-card
+        !include ../fragments/light-card-rounded.yaml
+        card:
+          type: tile
+          entity: climate.schlafzimmer_klimaanlage
+          name: Klimaanlage
+          icon: mdi:snowflake
+          features:
+            - type: climate-hvac-modes

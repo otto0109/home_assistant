@@ -1,0 +1,31 @@
+# Icons für Raumkarten-Chips (ULM liest oft das Entity-Icon)
+homeassistant:
+  customize:
+    light.licht_wohnzimmer:
+      icon: mdi:floor-lamp
+    light.beleuchtung_bett_leuchte:
+      icon: mdi:chandelier
+    switch.flur_licht_shelly:
+      icon: mdi:ceiling-light
+    switch.licht_sonoff:
+      icon: mdi:warehouse
+    switch.shelly_1_mini_gen4:
+      icon: mdi:ceiling-light
+    switch.licht_abstellraum_unten_sonoff:
+      icon: mdi:warehouse
+    switch.automatisch_bewasserung:
+      icon: mdi:sprinkler-variant
+    climate.esszimmer_klimaanlage:
+      icon: mdi:snowflake
+    climate.raum_neben_der_kuche_klimaanlage:
+      icon: mdi:snowflake
+    climate.schlafzimmer_klimaanlage:
+      icon: mdi:snowflake
+    script.dreame_reinigen_wohnzimmer:
+      icon: mdi:broom
+    script.dreame_reinigen_esszimmer:
+      icon: mdi:broom
+    script.dreame_reinigen_kueche:
+      icon: mdi:broom
+    script.dreame_reinigen_flur_eg:
+      icon: mdi:broom

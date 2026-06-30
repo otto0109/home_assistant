@@ -1,34 +1,84 @@
-- type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: card_title
-      name: Wohnzimmer
-      label: Licht & Szenen
+- type: custom:mod-card
+  card_mod:
+    style: |
+      ha-card {
+        margin: 16px auto 24px auto;
+        max-width: 720px;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #root {
+        gap: 14px;
+      }
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:button-card
+        template: card_title
+        name: Wohnzimmer
+        label: Licht & Szenen
 
-    - type: custom:button-card
-      template: card_title
-      name: Szenen
+      - type: custom:button-card
+        template: card_title
+        name: Szenen
 
-    - type: grid
-      columns: 2
-      square: false
-      cards:
-        - type: tile
-          entity: scene.wohnzimmer_volle_beluechtung
-          name: Voll
-          icon: mdi:ceiling-light
-        - type: tile
-          entity: scene.wohnzimmer_fehrnsehen
-          name: TV
-          icon: mdi:television
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mod-card
+            card_mod:
+              style: |
+                ha-card {
+                  border-radius: 20px;
+                  overflow: hidden;
+                }
+            card:
+              type: custom:button-card
+              template: card_vertical_button
+              entity: scene.wohnzimmer_volle_beluechtung
+              name: Voll
+              icon: mdi:ceiling-light
+              tap_action:
+                action: call-service
+                service: scene.turn_on
+                target:
+                  entity_id: scene.wohnzimmer_volle_beluechtung
+          - type: custom:mod-card
+            card_mod:
+              style: |
+                ha-card {
+                  border-radius: 20px;
+                  overflow: hidden;
+                }
+            card:
+              type: custom:button-card
+              template: card_vertical_button
+              entity: scene.wohnzimmer_fehrnsehen
+              name: TV
+              icon: mdi:television
+              tap_action:
+                action: call-service
+                service: scene.turn_on
+                target:
+                  entity_id: scene.wohnzimmer_fehrnsehen
 
-    - type: custom:button-card
-      template: card_title
-      name: Beleuchtung
+      - type: custom:button-card
+        template: card_title
+        name: Beleuchtung
 
-    - type: tile
-      entity: light.licht_wohnzimmer
-      name: Licht Wohnzimmer
-      icon: mdi:floor-lamp
-      features:
-        - type: light-brightness
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: 20px;
+              overflow: hidden;
+            }
+        card:
+          type: custom:button-card
+          template: card_light
+          entity: light.licht_wohnzimmer
+          name: Licht Wohnzimmer
+          variables:
+            ulm_card_light_enable_slider: true

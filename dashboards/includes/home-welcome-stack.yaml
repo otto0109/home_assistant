@@ -1,56 +1,93 @@
-- type: custom:button-card
-  template: card_welcome_scenes
-  variables:
-    ulm_weather: weather.wetter_home
-    entity_1:
-      entity_id: scene.wohnzimmer_volle_beluechtung
-      icon: mdi:ceiling-light
-      name: Voll
-      color: yellow
-    entity_2:
-      entity_id: scene.wohnzimmer_fehrnsehen
-      icon: mdi:television
-      name: TV
-      color: purple
-    entity_3:
-      entity_id: script.alle_lichter_aus
-      icon: mdi:lightbulb-off-outline
-      name: Alle aus
-      color: red
-    entity_4:
-      entity_id: ""
-    entity_5:
-      entity_id: ""
-    entity_6:
-      entity_id: ""
-    entity_7:
-      entity_id: ""
-- type: custom:button-card
-  template: card_scenes_welcome
-  variables:
-    entity_1:
-      entity_id: sensor.pv_pv_power
-      icon: mdi:weather-sunny
-      name: Solar
-      color: yellow
-      nav_path: energie
-    entity_2:
-      entity_id: sensor.pv_battery
-      icon: mdi:battery-high
-      name: Speicher
-      color: green
-      nav_path: energie
-    entity_3:
-      entity_id: sensor.speedtest_download
-      icon: mdi:router-wireless
-      name: Router
-      color: blue
-      nav_path: netzwerk
-    entity_4:
-      entity_id: ""
-    entity_5:
-      entity_id: ""
-    entity_6:
-      entity_id: ""
-    entity_7:
-      entity_id: ""
+- type: vertical-stack
+  cards:
+    - type: custom:button-card
+      template: card_title
+      name: |
+        [[[
+          var h = new Date().getHours();
+          var greet = h >= 18 ? 'Guten Abend' : h >= 12 ? 'Guten Tag' : h >= 5 ? 'Guten Morgen' : 'Hallo';
+          var first = (user.name || '').split(' ')[0];
+          return greet + ', ' + first + '!';
+        ]]]
+      label: |
+        [[[
+          var w = states['weather.wetter_home'];
+          if (!w || ['unavailable', 'unknown'].includes(w.state)) {
+            return new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+          }
+          var temp = w.attributes.temperature;
+          var unit = w.attributes.temperature_unit || '°C';
+          return temp + unit + ' · ' + w.state;
+        ]]]
+
+    - type: custom:button-card
+      template: card_title
+      name: Szenen
+
+    - type: grid
+      columns: 3
+      square: false
+      cards:
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: scene.wohnzimmer_volle_beluechtung
+          name: Voll
+          icon: mdi:ceiling-light
+          tap_action:
+            action: call-service
+            service: scene.turn_on
+            target:
+              entity_id: scene.wohnzimmer_volle_beluechtung
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: scene.wohnzimmer_fehrnsehen
+          name: TV
+          icon: mdi:television
+          tap_action:
+            action: call-service
+            service: scene.turn_on
+            target:
+              entity_id: scene.wohnzimmer_fehrnsehen
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: script.alle_lichter_aus
+          name: Alle aus
+          icon: mdi:lightbulb-off-outline
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            target:
+              entity_id: script.alle_lichter_aus
+
+    - type: custom:button-card
+      template: card_title
+      name: Status
+
+    - type: grid
+      columns: 3
+      square: false
+      cards:
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: sun.sun
+          name: Solar
+          icon: mdi:weather-sunny
+          tap_action:
+            action: navigate
+            navigation_path: energie
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: sensor.pv_battery
+          name: Speicher
+          icon: mdi:battery-high
+          tap_action:
+            action: navigate
+            navigation_path: energie
+        - type: custom:button-card
+          template: card_vertical_button
+          entity: sensor.speedtest_download
+          name: Router
+          icon: mdi:router-wireless
+          tap_action:
+            action: navigate
+            navigation_path: netzwerk

@@ -1,22 +1,31 @@
-- type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: card_title
-      name: Flur OG
-      label: Treppenhaus & Abstellraum
+- type: custom:mod-card
+  !include ../fragments/subview-padding.yaml
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:button-card
+        template: card_title
+        name: Flur OG
+        label: Treppenhaus & Abstellraum
 
-    - type: custom:button-card
-      template: card_title
-      name: Beleuchtung
+      - type: custom:button-card
+        template: card_title
+        name: Beleuchtung
 
-    - type: custom:button-card
-      template: card_power_outlet
-      entity: switch.flur_licht_shelly
-      name: Flur + Treppenhaus
-      icon: mdi:ceiling-light
+      - type: custom:mod-card
+        !include ../fragments/light-card-rounded.yaml
+        card:
+          type: custom:button-card
+          template: card_power_outlet
+          entity: switch.flur_licht_shelly
+          name: Flur + Treppenhaus
+          icon: mdi:ceiling-light
 
-    - type: custom:button-card
-      template: card_power_outlet
-      entity: switch.licht_sonoff
-      name: Abstellraum oben
-      icon: mdi:warehouse
+      - type: custom:mod-card
+        !include ../fragments/light-card-rounded.yaml
+        card:
+          type: custom:button-card
+          template: card_power_outlet
+          entity: switch.licht_sonoff
+          name: Abstellraum oben
+          icon: mdi:warehouse

@@ -194,58 +194,15 @@
         action: toggle
 
 - type: custom:button-card
-  template:
-    - card_room
-    - purple_no_state
-  name: Energie
+  template: card_graph
   entity: sensor.pv_pv_power
-  icon: mdi:solar-power-variant
-  show_state: false
   tap_action:
     action: navigate
     navigation_path: energie
   variables:
-    label_use_temperature: false
-    label_use_brightness: false
-  label: |
-    [[[
-      function fmt(id) {
-        var e = states[id];
-        if (!e || ['unavailable', 'unknown'].includes(e.state)) return null;
-        var v = parseFloat(e.state);
-        if (isNaN(v)) return null;
-        if (Math.abs(v) >= 1000) return (Math.abs(v) / 1000).toFixed(1) + ' kW';
-        return Math.round(Math.abs(v)) + ' W';
-      }
-      var parts = [];
-      var solar = fmt('sensor.pv_pv_power');
-      if (solar) parts.push(solar);
-      var bat = states['sensor.pv_battery'];
-      if (bat && !['unavailable', 'unknown'].includes(bat.state)) {
-        parts.push(Math.round(parseFloat(bat.state)) + '%');
-      }
-      var load = fmt('sensor.pv_activepower_load_sys');
-      if (load) parts.push(load);
-      return parts.join(' · ') || '–';
-    ]]]
-  styles:
-    grid:
-      - grid-template-areas: "'i n' 'i l'"
-      - grid-template-columns: 56px 1fr
-      - grid-template-rows: min-content min-content
-      - column-gap: 8px
-    icon:
-      - width: 42px
-    name:
-      - justify-self: start
-      - align-self: end
-      - font-size: 14px
-    label:
-      - justify-self: start
-      - align-self: start
-      - font-size: 10px
-      - line-height: 1.25
-      - white-space: normal
-      - word-break: break-word
-      - opacity: 0.85
-      - padding-right: 4px
+    ulm_card_graph_name: Energie
+    ulm_card_graph_icon: mdi:solar-power-variant
+    ulm_card_graph_color: var(--color-purple)
+    ulm_card_graph_entity: sensor.pv_pv_power
+    ulm_card_graph_type: fill
+    ulm_card_graph_hours: 6

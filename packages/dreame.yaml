@@ -52,7 +52,7 @@ input_number:
 script:
   dreame_reinigen_wohnzimmer:
     alias: "Dreame: Wohnzimmer"
-    icon: mdi:sofa
+    icon: mdi:broom
     mode: single
     sequence:
       - action: dreame_vacuum.vacuum_clean_segment
@@ -63,7 +63,7 @@ script:
 
   dreame_reinigen_esszimmer:
     alias: "Dreame: Esszimmer"
-    icon: mdi:silverware-fork-knife
+    icon: mdi:broom
     mode: single
     sequence:
       - action: dreame_vacuum.vacuum_clean_segment
@@ -74,7 +74,7 @@ script:
 
   dreame_reinigen_kueche:
     alias: "Dreame: Küche"
-    icon: mdi:stove
+    icon: mdi:broom
     mode: single
     sequence:
       - action: dreame_vacuum.vacuum_clean_segment
@@ -85,7 +85,7 @@ script:
 
   dreame_reinigen_flur_eg:
     alias: "Dreame: Flur EG"
-    icon: mdi:stairs-down
+    icon: mdi:broom
     mode: single
     sequence:
       - action: dreame_vacuum.vacuum_clean_segment

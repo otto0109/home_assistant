@@ -1,30 +1,80 @@
-- type: vertical-stack
-  cards:
-    - type: custom:button-card
-      template: card_title
-      name: Esszimmer
-      label: Licht & Klima
+- type: custom:mod-card
+  card_mod:
+    style: |
+      ha-card {
+        margin: 16px auto 24px auto;
+        max-width: 720px;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #root {
+        gap: 14px;
+      }
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:button-card
+        template: card_title
+        name: Esszimmer
+        label: Licht & Klima
 
-    - type: tile
-      entity: light.beleuchtung_bett_leuchte
-      name: Lampe
-      icon: mdi:chandelier
-      features:
-        - type: light-brightness
+      - type: custom:button-card
+        template: card_title
+        name: Beleuchtung
 
-    - type: tile
-      entity: climate.esszimmer_klimaanlage
-      name: Klimaanlage
-      icon: mdi:snowflake
-      features:
-        - type: climate-hvac-modes
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: 20px;
+              overflow: hidden;
+            }
+        card:
+          type: custom:button-card
+          template: card_light
+          entity: light.beleuchtung_bett_leuchte
+          name: Lampe
+          variables:
+            ulm_card_light_enable_slider: true
 
-    - type: custom:button-card
-      template: card_vertical_button
-      entity: script.dreame_reinigen_esszimmer
-      name: Esszimmer reinigen
-      tap_action:
-        action: call-service
-        service: script.turn_on
-        target:
-          entity_id: script.dreame_reinigen_esszimmer
+      - type: custom:button-card
+        template: card_title
+        name: Klima
+
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: 20px;
+              overflow: hidden;
+            }
+        card:
+          type: tile
+          entity: climate.esszimmer_klimaanlage
+          name: Klimaanlage
+          icon: mdi:snowflake
+          features:
+            - type: climate-hvac-modes
+
+      - type: custom:button-card
+        template: card_title
+        name: Dreame
+
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: 20px;
+              overflow: hidden;
+            }
+        card:
+          type: custom:button-card
+          template: card_vertical_button
+          entity: script.dreame_reinigen_esszimmer
+          name: Esszimmer reinigen
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            target:
+              entity_id: script.dreame_reinigen_esszimmer
