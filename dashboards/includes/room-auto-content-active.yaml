@@ -1,4 +1,4 @@
-# Raum-Inhalt für input_text.dashboard_active_area (dynamischer Bereich).
+# Raum-Inhalt für input_text.dashboard_active_area (speichert die Bereichs-ID).
 type: vertical-stack
 cards:
   - type: custom:button-card
@@ -22,7 +22,7 @@ cards:
         {% else %}
           {% set ns = namespace(ids=[]) %}
           {% for e in states.scene %}
-            {% if area_name(area_id(e.entity_id)) == target %}
+            {% if area_id(e.entity_id) == target %}
               {% set ns.ids = ns.ids + [e.entity_id] %}
             {% endif %}
           {% endfor %}
@@ -57,7 +57,7 @@ cards:
             'mdi:led-strip', 'mdi:lamps'
           ] %}
           {% for e in states.light %}
-            {% if area_name(area_id(e.entity_id)) == target %}
+            {% if area_id(e.entity_id) == target %}
               {% set ns.ids = ns.ids + [e.entity_id] %}
             {% endif %}
           {% endfor %}
@@ -98,7 +98,7 @@ cards:
             'mdi:led-strip', 'mdi:lamps'
           ] %}
           {% for e in states.switch %}
-            {% if area_name(area_id(e.entity_id)) == target %}
+            {% if area_id(e.entity_id) == target %}
               {% set eid = e.entity_id | lower %}
               {% set icon = e.attributes.icon | default('') %}
               {% if 'licht' in eid or 'light' in eid or icon in light_icons %}
@@ -136,7 +136,7 @@ cards:
             'mdi:led-strip', 'mdi:lamps'
           ] %}
           {% for e in states.switch %}
-            {% if area_name(area_id(e.entity_id)) == target %}
+            {% if area_id(e.entity_id) == target %}
               {% set eid = e.entity_id | lower %}
               {% set icon = e.attributes.icon | default('') %}
               {% if not ('licht' in eid or 'light' in eid or icon in light_icons) %}
@@ -177,7 +177,7 @@ cards:
         {% else %}
           {% set ns = namespace(ids=[]) %}
           {% for e in states.climate %}
-            {% if area_name(area_id(e.entity_id)) == target %}
+            {% if area_id(e.entity_id) == target %}
               {% set ns.ids = ns.ids + [e.entity_id] %}
             {% endif %}
           {% endfor %}
@@ -225,11 +225,20 @@ cards:
         {% else %}
           {% set ns = namespace(ids=[]) %}
           {% for e in states.script %}
-            {% if area_name(area_id(e.entity_id)) == target %}
+            {% if area_id(e.entity_id) == target %}
               {% set ns.ids = ns.ids + [e.entity_id] %}
             {% endif %}
           {% endfor %}
-          {{ ns.ids }}
+          {% if target == 'wohnzimmer' %}
+            {% set ns.ids = ns.ids + ['script.dreame_reinigen_wohnzimmer'] %}
+          {% elif target == 'esszimmer' %}
+            {% set ns.ids = ns.ids + ['script.dreame_reinigen_esszimmer'] %}
+          {% elif target in ['raum_neben_der_kuche', 'kueche'] %}
+            {% set ns.ids = ns.ids + ['script.dreame_reinigen_kueche'] %}
+          {% elif target == 'flur_eg' %}
+            {% set ns.ids = ns.ids + ['script.dreame_reinigen_flur_eg'] %}
+          {% endif %}
+          {{ ns.ids | unique | list }}
         {% endif %}
     options:
       type: custom:button-card
@@ -266,7 +275,7 @@ cards:
           {% set ns = namespace(ids=[]) %}
           {% for domain in ['fan', 'cover', 'media_player', 'vacuum', 'humidifier', 'water_heater'] %}
             {% for e in states[domain] %}
-              {% if area_name(area_id(e.entity_id)) == target %}
+              {% if area_id(e.entity_id) == target %}
                 {% set ns.ids = ns.ids + [e.entity_id] %}
               {% endif %}
             {% endfor %}

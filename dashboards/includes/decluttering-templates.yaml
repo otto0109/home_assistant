@@ -21,7 +21,8 @@ room_dynamic_page:
       cards:
         - type: markdown
           content: |
-            ## {{ states('input_text.dashboard_active_area') }}
+            {% set aid = states('input_text.dashboard_active_area') %}
+            ## {{ area_name(aid) if aid not in ['unknown', 'unavailable', ''] else 'Raum' }}
           card_mod:
             style: |
               ha-card {

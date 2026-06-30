@@ -37,6 +37,7 @@ input_text:
     icon: mdi:door-open
     max: 120
     initial: ""
+    # Speichert die Bereichs-ID (z. B. wohnzimmer), nicht den Anzeigenamen.
 
 input_select:
   pv_zeitraum:
