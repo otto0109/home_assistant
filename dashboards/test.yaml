@@ -1,77 +1,42 @@
 title: Test
 views:
-  - title: Übersicht
-    path: uebersicht
-    icon: mdi:home-analytics
+  - title: Home
+    path: home
+    icon: mdi:home
     theme: dark
     type: sections
-    max_columns: 4
+    max_columns: 2
     dense_section_placement: true
     sections:
       - type: grid
-        column_span: 4
+        column_span: 2
         cards:
-          - type: horizontal-stack
-            cards:
-              - type: markdown
-                content: >
-                  {% set name = user.split(' ')[0] %}
+          - type: markdown
+            content: >
+              {% set name = user.split(' ')[0] %}
 
-                  # ZUHAUSE
-
-                  <p class="sub">{{ now().strftime('%A, %d. %B') | capitalize }}
-                  · Hallo {{ name }}</p>
-                card_mod:
-                  style: |
-                    ha-card {
-                      background: transparent !important;
-                      box-shadow: none !important;
-                      border: none !important;
-                      padding: 8px 4px 0 8px;
-                    }
-                    h1 {
-                      font-size: clamp(2rem, 5vw, 3.2rem);
-                      font-weight: 200;
-                      letter-spacing: 0.12em;
-                      margin: 0 0 4px 0;
-                      line-height: 1.1;
-                    }
-                    .sub {
-                      margin: 0;
-                      opacity: 0.55;
-                      font-size: 0.95rem;
-                      letter-spacing: 0.04em;
-                      text-transform: uppercase;
-                    }
-              - type: markdown
-                content: |
-                  <p class="clock">{{ now().strftime('%H:%M') }}</p>
-                card_mod:
-                  style: |
-                    ha-card {
-                      background: transparent !important;
-                      box-shadow: none !important;
-                      border: none !important;
-                      text-align: right;
-                      padding: 8px 8px 0 0;
-                    }
-                    .clock {
-                      margin: 0;
-                      font-size: clamp(2.5rem, 6vw, 4rem);
-                      font-weight: 200;
-                      letter-spacing: 0.06em;
-                      line-height: 1;
-                    }
+              ## Hallo, {{ name }}
+            text_only: true
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  padding: 12px 8px 0;
+                }
+                h2 {
+                  margin: 0;
+                  font-weight: 300;
+                  font-size: 1.75rem;
+                  letter-spacing: 0.02em;
+                }
       - type: grid
-        column_span: 4
+        column_span: 2
         cards:
           - type: custom:mushroom-chips-card
             alignment: start
             chips:
-              - type: entity
-                entity: person.thorge
-              - type: entity
-                entity: person.laura
               - type: entity
                 entity: weather.wetter_home
               - type: template
@@ -89,78 +54,58 @@ views:
                   {% for e in lights %}
                     {% if is_state(e, 'on') %}{% set on.c = on.c + 1 %}{% endif %}
                   {% endfor %}
-                  {{ on.c }}/{{ lights | count }} Licht
-                tap_action:
-                  action: navigate
-                  navigation_path: wohnzimmer
-      - type: grid
-        column_span: 4
-        cards:
-          - type: custom:mushroom-chips-card
-            alignment: center
-            chips:
+                  {{ on.c }}/{{ lights | count }}
               - type: template
-                icon: mdi:sofa
-                content: Wohnen
-                tap_action:
-                  action: navigate
-                  navigation_path: wohnzimmer
-              - type: template
-                icon: mdi:stove
-                content: Küche
-                tap_action:
-                  action: navigate
-                  navigation_path: kueche
-              - type: template
-                icon: mdi:bed
-                content: Schlafen
-                tap_action:
-                  action: navigate
-                  navigation_path: schlafzimmer
-              - type: template
-                icon: mdi:door-open
-                content: Flur
-                tap_action:
-                  action: navigate
-                  navigation_path: flur
-              - type: template
-                icon: mdi:flower
-                content: Garten
-                tap_action:
-                  action: navigate
-                  navigation_path: garten
-              - type: template
-                icon: mdi:solar-power
-                content: Energie
+                icon: mdi:solar-power-variant
+                icon_color: amber
+                content: "{{ (states('sensor.pv_pv_power') | float(0) / 1000) | round(1) }} kW"
                 tap_action:
                   action: navigate
                   navigation_path: energie
               - type: template
-                icon: mdi:cog
-                content: Mehr
+                icon: mdi:battery-high
+                content: "{{ states('sensor.pv_battery') }}%"
                 tap_action:
                   action: navigate
-                  navigation_path: einstellungen
+                  navigation_path: energie
       - type: grid
-        column_span: 4
+        column_span: 2
         cards:
-          - type: vertical-stack
-            cards:
-              - type: custom:mushroom-entity-card
-                entity: weather.wetter_home
-                name: Wetter
-                layout: vertical
-                fill_container: true
-              - type: weather-forecast
-                entity: weather.wetter_home
-                forecast_type: daily
-                show_current: false
+          - type: custom:mushroom-entity-card
+            entity: person.thorge
+            layout: vertical
+            fill_container: true
             card_mod:
               style: |
-                ha-card { height: 100%; }
+                ha-card { min-height: 100px; }
           - type: custom:mushroom-entity-card
-            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-            name: Rocky
+            entity: person.laura
+            layout: vertical
+            fill_container: true
+            card_mod:
+              style: |
+                ha-card { min-height: 100px; }
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Räume
+            heading_style: title
+      - type: grid
+        column_span: 2
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Wohnzimmer
+            secondary: >
+              {% set t = state_attr('climate.esszimmer_klimaanlage', 'current_temperature') %}
+              {{ (t ~ '°C') if t not in [none, 'unknown', 'unavailable'] else '—' }}
+            icon: mdi:sofa
+            icon_color: >
+              {% if is_state('light.licht_wohnzimmer', 'on') or is_state('light.beleuchtung_bett_leuchte', 'on') %}
+              amber
+              {% else %}
+              disabled
+              {% endif %}
             layout: vertical
             fill_container: true
             tap_action:
@@ -168,135 +113,127 @@ views:
               navigation_path: wohnzimmer
             card_mod:
               style: |
-                ha-card { height: 100%; min-height: 200px; }
-          - type: custom:auto-entities
-            show_empty: false
-            sort:
-              method: last_changed
-              reverse: true
-            card:
-              type: grid
-              columns: 2
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: scene
-                  options:
-                    type: custom:mushroom-template-card
-                    layout: vertical
-                    fill_container: true
-                    icon_color: amber
-                    card_mod:
-                      style: |
-                        ha-card { min-height: 88px; }
-            grid_options:
-              columns: 2
-          - type: grid
-            columns: 2
-            square: false
-            cards:
-              - type: tile
-                entity: light.licht_wohnzimmer
-                name: Wohnzimmer
-                vertical: true
-                features_position: bottom
-              - type: tile
-                entity: light.beleuchtung_bett_leuchte
-                name: Esszimmer
-                vertical: true
-                features_position: bottom
-              - type: tile
-                entity: switch.flur_licht_shelly
-                name: Flur
-                vertical: true
-              - type: tile
-                entity: switch.automatisch_bewasserung
-                name: Garten
-                vertical: true
+                ha-card { min-height: 128px; }
+                mushroom-shape-icon { --icon-size: 52px; }
+          - type: custom:mushroom-template-card
+            primary: Küche
+            secondary: >
+              {% set t = state_attr('climate.raum_neben_der_kuche_klimaanlage', 'current_temperature') %}
+              {{ (t ~ '°C') if t not in [none, 'unknown', 'unavailable'] else '—' }}
+            icon: mdi:stove
+            icon_color: >
+              {% if is_state('climate.raum_neben_der_kuche_klimaanlage', 'hvac_action') in ['heating', 'cooling'] %}
+              blue
+              {% else %}
+              disabled
+              {% endif %}
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: kueche
             card_mod:
               style: |
-                ha-card { height: 100%; }
-      - type: grid
-        column_span: 4
-        cards:
-          - type: custom:power-flow-card-plus
-            clickable_entities: true
-            use_new_flow_rate_model: true
-            min_flow_rate: 0.75
-            max_flow_rate: 6
-            min_expected_power: 0.01
-            max_expected_power: 11000
-            w_decimals: 0
-            kw_decimals: 2
-            display_zero_lines:
-              mode: transparency
-              transparency: 70
-            entities:
-              solar:
-                entity: sensor.pv_pv_power
-                name: Solar
-                icon: mdi:solar-power-variant
-                color_icon: true
-                display_zero: true
-                secondary_info:
-                  entity: sensor.pv_kwpeak
-                  unit_of_measurement: kWp
-                  decimals: 2
-              grid:
-                entity: sensor.pv_netzleistung
-                name: Netz
-                icon: mdi:transmission-tower
-                display_state: one_way
-                color_circle: color_dynamically
-              battery:
-                entity: sensor.pv_battery_power
-                state_of_charge: sensor.pv_battery
-                name: Speicher
-                display_state: one_way
-                color_circle: color_dynamically
-                state_of_charge_decimals: 0
-              home:
-                entity: sensor.pv_activepower_load_sys
-                name: Haus
-                icon: mdi:home
-                color_icon: true
-                override_state: true
-            grid_options:
-              columns: full
+                ha-card { min-height: 128px; }
+                mushroom-shape-icon { --icon-size: 52px; }
+          - type: custom:mushroom-template-card
+            primary: Schlafzimmer
+            secondary: >
+              {% set t = state_attr('climate.schlafzimmer_klimaanlage', 'current_temperature') %}
+              {{ (t ~ '°C') if t not in [none, 'unknown', 'unavailable'] else '—' }}
+            icon: mdi:bed
+            icon_color: >
+              {% if is_state('climate.schlafzimmer_klimaanlage', 'hvac_action') in ['heating', 'cooling'] %}
+              blue
+              {% else %}
+              disabled
+              {% endif %}
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: schlafzimmer
             card_mod:
               style: |
-                ha-card {
-                  min-height: 260px;
-                  width: 100%;
-                }
+                ha-card { min-height: 128px; }
+                mushroom-shape-icon { --icon-size: 52px; }
+          - type: custom:mushroom-template-card
+            primary: Flur
+            secondary: >
+              {% if is_state('switch.flur_licht_shelly', 'on') or is_state('switch.shelly_1_mini_gen4', 'on') %}
+              Licht an
+              {% else %}
+              Licht aus
+              {% endif %}
+            icon: mdi:door-open
+            icon_color: >
+              {% if is_state('switch.flur_licht_shelly', 'on') or is_state('switch.shelly_1_mini_gen4', 'on') %}
+              amber
+              {% else %}
+              disabled
+              {% endif %}
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: flur
+            card_mod:
+              style: |
+                ha-card { min-height: 128px; }
+                mushroom-shape-icon { --icon-size: 52px; }
+          - type: custom:mushroom-template-card
+            primary: Garten
+            secondary: >
+              {% if is_state('switch.automatisch_bewasserung', 'on') %}
+              Bewässerung aktiv
+              {% else %}
+              Bewässerung aus
+              {% endif %}
+            icon: mdi:flower
+            icon_color: >
+              {% if is_state('switch.automatisch_bewasserung', 'on') %}
+              green
+              {% else %}
+              disabled
+              {% endif %}
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: garten
+            card_mod:
+              style: |
+                ha-card { min-height: 128px; }
+                mushroom-shape-icon { --icon-size: 52px; }
+          - type: custom:mushroom-template-card
+            primary: Energie
+            secondary: "{{ states('sensor.pv_activepower_load_sys') }} W Verbrauch"
+            icon: mdi:solar-power
+            icon_color: amber
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: energie
+            card_mod:
+              style: |
+                ha-card { min-height: 128px; }
+                mushroom-shape-icon { --icon-size: 52px; }
       - type: grid
-        column_span: 4
+        column_span: 2
         cards:
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pixel_7_pro_battery_level
-                below: 20
-            card:
-              type: custom:mushroom-entity-card
-              entity: sensor.pixel_7_pro_battery_level
-              name: Laura — Akku niedrig
-              icon: mdi:battery-alert
-              layout: horizontal
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pixel_9_pro_xl_battery_level
-                below: 20
-            card:
-              type: custom:mushroom-entity-card
-              entity: sensor.pixel_9_pro_xl_battery_level
-              name: Thorge — Akku niedrig
-              icon: mdi:battery-alert
-              layout: horizontal
+          - type: custom:mushroom-template-card
+            primary: Einstellungen
+            secondary: Kalender, Karte, Wetter
+            icon: mdi:cog
+            layout: horizontal
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: einstellungen
   - title: Wohnzimmer
     path: wohnzimmer
+    subview: true
     icon: mdi:sofa
     theme: dark
     type: sections
@@ -430,6 +367,7 @@ views:
             theme: dark
   - title: Küche
     path: kueche
+    subview: true
     icon: mdi:stove
     theme: dark
     type: sections
@@ -535,6 +473,7 @@ views:
               _Platzhalter: `sensor.kueche_*_battery`_
   - title: Schlafzimmer
     path: schlafzimmer
+    subview: true
     icon: mdi:bed
     theme: dark
     type: sections
@@ -640,6 +579,7 @@ views:
               _Platzhalter: `sensor.schlafzimmer_*_battery`_
   - title: Flur
     path: flur
+    subview: true
     icon: mdi:door-open
     theme: dark
     type: sections
@@ -755,6 +695,7 @@ views:
               _Shelly/Batterie-Sensoren: `sensor.flur_*_battery`_
   - title: Garten
     path: garten
+    subview: true
     icon: mdi:flower
     theme: dark
     type: sections
@@ -853,6 +794,7 @@ views:
               _Platzhalter: Außensensoren `sensor.garten_*_battery`_
   - title: Energie
     path: energie
+    subview: true
     icon: mdi:solar-power
     theme: dark
     type: sections
@@ -1161,6 +1103,7 @@ views:
                   name: Klima Schlafzimmer
   - title: Sicherheit
     path: sicherheit
+    subview: true
     icon: mdi:shield-home
     theme: dark
     type: sections
@@ -1223,6 +1166,7 @@ views:
               battery` und state < 20._
   - title: Netzwerk
     path: netzwerk
+    subview: true
     icon: mdi:lan
     theme: dark
     type: sections
@@ -1357,6 +1301,7 @@ views:
                   Uptime_
   - title: Einstellungen
     path: einstellungen
+    subview: true
     icon: mdi:cog
     theme: dark
     type: sections
