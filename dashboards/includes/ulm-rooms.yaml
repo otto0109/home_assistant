@@ -18,6 +18,16 @@
         - yellow_on
       tap_action:
         action: toggle
+    entity_2:
+      entity_id: script.dreame_reinigen_wohnzimmer
+      icon: mdi:broom
+      templates:
+        - green_on
+      tap_action:
+        action: call-service
+        service: script.turn_on
+        service_data:
+          entity_id: script.dreame_reinigen_wohnzimmer
 
 - type: custom:button-card
   template:
