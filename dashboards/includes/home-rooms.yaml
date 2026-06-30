@@ -1,23 +1,50 @@
-# Ein auto-entities-Block: Template liefert vollständige button-cards (kein include in filter).
+# Dynamische Raumkacheln — Icons/Chips serverseitig (Jinja), Navigation per JS.
 type: custom:auto-entities
 show_empty: false
 card_param: cards
 card:
-  type: custom:layout-card
-  layout_type: custom:grid-layout
-  layout:
-    grid-gap: 16px
-    grid-template-columns: repeat(2, 1fr)
-    mediaquery:
-      "(min-width: 900px)":
-        grid-template-columns: repeat(4, 1fr)
-        grid-gap: 20px
+  type: custom:mod-card
+  card_mod:
+    style: |
+      :host {
+        display: block;
+        width: 100%;
+        min-width: 0;
+      }
+      @media (min-width: 900px) {
+        #root {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+      }
+  card:
+    type: grid
+    columns: 2
+    square: false
 filter:
   template: |
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
-    {% set ns = namespace(cards=[]) %}
-    {% for aid in areas() | sort %}
-      {% set aname = area_name(aid) %}
+    {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
+    {% set dreame_by_name = {
+      'Wohnzimmer': 'script.dreame_reinigen_wohnzimmer',
+      'Esszimmer': 'script.dreame_reinigen_esszimmer',
+      'Raum neben der Küche': 'script.dreame_reinigen_kueche',
+      'Küche': 'script.dreame_reinigen_kueche',
+      'Flur EG': 'script.dreame_reinigen_flur_eg'
+    } %}
+    {% set dreame_by_id = {
+      'wohnzimmer': 'script.dreame_reinigen_wohnzimmer',
+      'esszimmer': 'script.dreame_reinigen_esszimmer',
+      'raum_neben_der_kuche': 'script.dreame_reinigen_kueche',
+      'kueche': 'script.dreame_reinigen_kueche',
+      'flur_eg': 'script.dreame_reinigen_flur_eg'
+    } %}
+    {% set ns = namespace(cards=[], sorted=[]) %}
+    {% for aid in areas() %}
+      {% set ns.sorted = ns.sorted + [{'aid': aid, 'name': area_name(aid)}] %}
+    {% endfor %}
+    {% for item in ns.sorted | sort(attribute='name') %}
+      {% set aid = item.aid %}
+      {% set aname = item.name %}
       {% if aname %}
         {% set picked = namespace(e=none) %}
         {% for domain in domains %}
@@ -31,23 +58,73 @@ filter:
         {% endfor %}
         {% if picked.e is not none %}
           {% set dom = picked.e.split('.')[0] %}
+          {% set chips = namespace(list=[]) %}
+          {% for cd in chip_domains %}
+            {% for e in states[cd] | sort(attribute='entity_id') %}
+              {% if area_id(e.entity_id) == aid and chips.list | length < 2 %}
+                {% set eid = e.entity_id %}
+                {% if cd == 'light' %}
+                  {% set chips.list = chips.list + [{
+                    'entity_id': eid,
+                    'icon': state_attr(eid, 'icon') or 'mdi:lightbulb',
+                    'templates': ['yellow_on'],
+                    'tap_action': {'action': 'toggle'}
+                  }] %}
+                {% elif cd == 'climate' %}
+                  {% set chips.list = chips.list + [{
+                    'entity_id': eid,
+                    'icon': state_attr(eid, 'icon') or 'mdi:snowflake',
+                    'templates': ['blue_on'],
+                    'tap_action': {'action': 'more-info'}
+                  }] %}
+                {% elif cd == 'switch' %}
+                  {% set chips.list = chips.list + [{
+                    'entity_id': eid,
+                    'icon': state_attr(eid, 'icon') or 'mdi:light-switch',
+                    'templates': ['grey_on'],
+                    'tap_action': {'action': 'toggle'}
+                  }] %}
+                {% elif cd == 'fan' %}
+                  {% set chips.list = chips.list + [{
+                    'entity_id': eid,
+                    'icon': state_attr(eid, 'icon') or 'mdi:fan',
+                    'templates': ['green_on'],
+                    'tap_action': {'action': 'toggle'}
+                  }] %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+          {% set dreame_eid = dreame_by_name.get(aname) or dreame_by_id.get(aid) %}
+          {% if dreame_eid and dreame_eid in states %}
+            {% set chips.list = chips.list + [{
+              'entity_id': dreame_eid,
+              'icon': state_attr(dreame_eid, 'icon') or 'mdi:broom',
+              'templates': ['green_on'],
+              'tap_action': {
+                'action': 'call-service',
+                'service': 'script.turn_on',
+                'service_data': {'entity_id': dreame_eid}
+              }
+            }] %}
+          {% endif %}
           {% set tap = "[[[ hass.callService('script', 'turn_on', { entity_id: 'script.dashboard_raum_oeffnen', variables: { area: " ~ (aname | tojson) ~ " } }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
-          {% set icon_js = "[[[ const id = entity.entity_id; const aid = hass.entities[id]?.area_id; return (aid && hass.areas[aid]?.icon) || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
-          {% set chip_js = "const areaId = hass.entities[entity.entity_id]?.area_id; if (!areaId) return false; const order = { light: 0, climate: 1, switch: 2, script: 3, fan: 4 }; const chip = (eid) => { const d = eid.split('.')[0]; const ic = hass.states[eid]?.attributes?.icon; if (d === 'climate') return { entity_id: eid, icon: ic || 'mdi:snowflake', templates: ['blue_on'], tap_action: { action: 'more-info' } }; if (d === 'script') return { entity_id: eid, icon: ic || 'mdi:broom', templates: ['green_on'], tap_action: { action: 'call-service', service: 'script.turn_on', service_data: { entity_id: eid } } }; if (d === 'light') return { entity_id: eid, icon: ic || 'mdi:lightbulb', templates: ['yellow_on'], tap_action: { action: 'toggle' } }; if (d === 'switch') return { entity_id: eid, icon: ic || 'mdi:light-switch', templates: ['grey_on'], tap_action: { action: 'toggle' } }; if (d === 'fan') return { entity_id: eid, icon: ic || 'mdi:fan', templates: ['green_on'], tap_action: { action: 'toggle' } }; return false; }; const ids = Object.keys(hass.states).filter((eid) => { const d = eid.split('.')[0]; return order[d] !== undefined && hass.entities[eid]?.area_id === areaId; }).sort((a, b) => order[a.split('.')[0]] - order[b.split('.')[0]] || a.localeCompare(b)).slice(0, 3);" %}
+          {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set ns.cards = ns.cards + [{
             'type': 'custom:button-card',
             'template': ['card_room', 'grey_no_state'],
             'entity': picked.e,
             'name': aname,
-            'icon': icon_js,
+            'icon': icon,
             'double_tap_action': {'action': 'none'},
             'tap_action': tap,
             'variables': {
+              'ulm_room_area_id': aid,
               'label_use_temperature': dom == 'climate' and state_attr(picked.e, 'current_temperature') is not none,
               'label_use_brightness': dom == 'light',
-              'entity_1': "[[[ " ~ chip_js ~ " return ids[0] ? chip(ids[0]) : false; ]]]",
-              'entity_2': "[[[ " ~ chip_js ~ " return ids[1] ? chip(ids[1]) : false; ]]]",
-              'entity_3': "[[[ " ~ chip_js ~ " return ids[2] ? chip(ids[2]) : false; ]]]"
+              'entity_1': chips.list[0] if chips.list | length > 0 else false,
+              'entity_2': chips.list[1] if chips.list | length > 1 else false,
+              'entity_3': chips.list[2] if chips.list | length > 2 else false
             }
           }] %}
         {% endif %}
