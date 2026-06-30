@@ -1,22 +1,22 @@
-# Dynamische Raumkacheln — ein card_room pro HA-Bereich (name/icon/chips per Jinja).
+# Dynamische Raumkacheln — vollständige button-cards in layout-grid (card_param: cards).
 - type: custom:auto-entities
   show_empty: false
-  card_param: card
+  card_param: cards
   card:
-    type: custom:button-card
-    template:
-      - card_room
-      - grey_no_state
-    double_tap_action:
-      action: none
-    variables:
-      label_use_temperature: false
-      label_use_brightness: false
+    type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      grid-gap: 16px
+      grid-template-columns: repeat(2, 1fr)
+      mediaquery:
+        "(min-width: 900px)":
+          grid-template-columns: repeat(4, 1fr)
+          grid-gap: 20px
   filter:
     template: |
       {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
       {% set chip_domains = ['light', 'climate', 'switch', 'script', 'fan'] %}
-      {% set ns = namespace(items=[]) %}
+      {% set ns = namespace(cards=[]) %}
       {% for aid in areas() | sort %}
         {% set aname = area_name(aid) %}
         {% if aname %}
@@ -101,19 +101,48 @@
             {% endfor %}
             {% set tap_js = "[[[ hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: " ~ (aname | tojson) ~ " }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
             {% set icon_js = "[[[ const aid = hass.entities[entity.entity_id]?.area_id; return (aid && hass.areas[aid]?.icon) || 'mdi:home-floor-1'; ]]]" %}
-            {% set ns.items = ns.items + [{
-              'entity_id': picked.e,
-              'options': {
-                'name': aname,
-                'icon': icon_js,
-                'variables': vars.data,
-                'tap_action': tap_js,
-                'double_tap_action': {'action': 'none'}
-              }
+            {% set ns.cards = ns.cards + [{
+              'type': 'custom:button-card',
+              'template': ['card_room', 'grey_no_state'],
+              'entity': picked.e,
+              'name': aname,
+              'icon': icon_js,
+              'double_tap_action': {'action': 'none'},
+              'tap_action': tap_js,
+              'variables': vars.data
             }] %}
           {% endif %}
         {% endif %}
       {% endfor %}
-      {{ ns.items }}
-
-- !include ulm-room-energie.yaml
+      {% set energie = {
+        'type': 'custom:button-card',
+        'template': ['card_room', 'purple_no_state'],
+        'name': 'Energie',
+        'entity': 'sensor.pv_pv_power',
+        'icon': 'mdi:solar-power-variant',
+        'tap_action': {'action': 'navigate', 'navigation_path': 'energie'},
+        'double_tap_action': {'action': 'none'},
+        'variables': {
+          'label_use_temperature': false,
+          'label_use_brightness': false,
+          'entity_1': {
+            'entity_id': 'sensor.pv_battery',
+            'icon': 'mdi:battery-high',
+            'templates': ['green_on'],
+            'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+          },
+          'entity_2': {
+            'entity_id': 'sensor.pv_netzleistung',
+            'icon': 'mdi:transmission-tower',
+            'templates': ['blue_on'],
+            'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+          },
+          'entity_3': {
+            'entity_id': 'sensor.pv_activepower_load_sys',
+            'icon': 'mdi:home-lightning-bolt',
+            'templates': ['yellow_on'],
+            'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+          }
+        }
+      } %}
+      {{ ns.cards + [energie] }}

@@ -51,16 +51,7 @@
         template: card_title
         name: Räume
 
-      - type: custom:layout-card
-        layout_type: custom:grid-layout
-        layout:
-          grid-gap: 16px
-          grid-template-columns: repeat(2, 1fr)
-          mediaquery:
-            "(min-width: 900px)":
-              grid-template-columns: repeat(4, 1fr)
-              grid-gap: 20px
-        cards: !include home-rooms.yaml
+      - !include home-rooms.yaml
 
       - type: custom:button-card
         template: card_vacuum
