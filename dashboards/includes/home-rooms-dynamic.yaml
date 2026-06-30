@@ -1,12 +1,19 @@
-# Dynamische Raumkacheln — eine pro HA-Bereich, Icons aus der Bereichskonfiguration.
-# mushroom-template-card (kompatibel mit Mushroom v2.x auf deinem System).
+# EXPERIMENTELL — auto-entities + layout-card zeigt auf manchen Systemen leer.
+# Aktiv: dashboards/includes/ulm-rooms.yaml (statische ULM-Karten).
+#
+# Zum Testen in home-main.yaml ulm-rooms.yaml durch diese Datei ersetzen.
 type: custom:auto-entities
 show_empty: false
-card_param: card
+card_param: cards
 card:
-  type: custom:mushroom-template-card
-  layout: vertical
-  fill_container: true
+  type: custom:layout-card
+  layout_type: custom:grid-layout
+  layout:
+    grid-gap: 16px
+    grid-template-columns: repeat(2, 1fr)
+    mediaquery:
+      "(min-width: 900px)":
+        grid-template-columns: repeat(3, 1fr)
 filter:
   template: |
     {% set ns = namespace(items=[]) %}
@@ -28,11 +35,15 @@ filter:
     {% endfor %}
     {{ ns.items }}
 options:
-  primary: "{{ area_name(area_id(entity)) }}"
-  secondary: "{{ states(entity) }}"
-  icon: "{{ area_icon(area_id(entity)) or 'mdi:home-floor-1' }}"
+  type: custom:button-card
+  template:
+    - card_room
+    - grey_no_state
+  variables:
+    label_use_temperature: false
+    label_use_brightness: false
   tap_action:
     action: call-service
     service: script.dashboard_raum_oeffnen
     service_data:
-      entity_id: "{{ entity }}"
+      entity_id: "[[[ return entity.entity_id; ]]]"

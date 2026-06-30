@@ -61,7 +61,7 @@
               grid-template-columns: repeat(4, 1fr)
               grid-gap: 20px
         cards:
-          - !include home-rooms-dynamic.yaml
+          - !include ulm-rooms.yaml
           - !include ulm-room-energie.yaml
 
       - type: custom:button-card
