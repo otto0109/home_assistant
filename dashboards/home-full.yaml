@@ -1,0 +1,2102 @@
+# Vollständiges Home-Dashboard (alle Includes eingebettet)
+# Hinweis: button_card_templates muss separat von ULM geladen werden.
+# Datei: dashboards/home-full.yaml — Ersetzt NICHT automatisch test.yaml
+
+button_card_templates: !include_dir_merge_named "../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: Home
+theme: minimalist-desktop
+background: var(--background-image)
+views:
+  - title: Home
+    path: home
+    icon: mdi:home
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            :host {
+              display: block;
+              width: 100%;
+              max-width: 1480px;
+              margin: 0 auto;
+              padding: 8px 20px 36px;
+              box-sizing: border-box;
+            }
+            ha-card {
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+        card:
+          type: custom:layout-card
+          layout_type: custom:grid-layout
+          layout:
+            grid-gap: 20px
+            grid-template-columns: 1fr
+            grid-template-areas: |
+              "persons"
+              "welcome"
+              "rooms"
+              "vacuum"
+            mediaquery:
+              "(min-width: 960px)":
+                grid-template-columns: minmax(340px, 420px) 1fr
+                grid-template-areas: |
+                  "persons persons"
+                  "welcome rooms"
+                  "vacuum vacuum"
+          cards:
+            - type: custom:mod-card
+              view_layout:
+                grid-area: persons
+              card_mod:
+                style: |
+                  @media (min-width: 960px) {
+                    :host {
+                      display: block;
+                      max-width: 580px;
+                      margin-left: auto;
+                      margin-right: auto;
+                    }
+                  }
+              card:
+                type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    template: card_person
+                    entity: person.thorge
+                    variables:
+                      ulm_card_person_entity: person.thorge
+                      ulm_card_person_use_entity_picture: true
+                      ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
+                  - type: custom:button-card
+                    template: card_person
+                    entity: person.laura
+                    variables:
+                      ulm_card_person_entity: person.laura
+                      ulm_card_person_use_entity_picture: true
+                      ulm_card_person_battery: sensor.pixel_7_pro_battery_level
+
+            - type: vertical-stack
+              view_layout:
+                grid-area: welcome
+              cards:
+                - type: markdown
+                  content: |
+                    {% set hour = now().hour %}
+                    {% if hour >= 18 %}
+                      {% set greet = 'Guten Abend' %}
+                    {% elif hour >= 12 %}
+                      {% set greet = 'Guten Tag' %}
+                    {% elif hour >= 5 %}
+                      {% set greet = 'Guten Morgen' %}
+                    {% else %}
+                      {% set greet = 'Hallo' %}
+                    {% endif %}
+                    {% set name = user.split(' ')[0] %}
+                    ## {{ greet }}, {{ name }}!
+                    {% set w = states('weather.wetter_home') %}
+                    {% if w not in ['unknown', 'unavailable'] %}
+                    *{{ state_attr('weather.wetter_home', 'temperature') }}°C · {{ w }}*
+                    {% else %}
+                    *{{ now().strftime('%A, %d. %B') | capitalize }}*
+                    {% endif %}
+                  card_mod:
+                    style: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        padding: 0 4px !important;
+                      }
+                      @media (min-width: 1100px) {
+                        ha-card h2 {
+                          font-size: 1.65rem !important;
+                        }
+                      }
+
+                - type: custom:button-card
+                  template: card_title
+                  name: Szenen
+
+                - type: grid
+                  columns: 3
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      name: Voll
+                      icon: mdi:ceiling-light
+                      show_name: true
+                      show_icon: true
+                      styles:
+                        card:
+                          - border-radius: var(--border-radius)
+                          - box-shadow: var(--box-shadow)
+                          - padding: 10px 0 8px
+                        grid:
+                          - grid-template-areas: "'i' 'n'"
+                        name:
+                          - justify-self: center
+                          - font-weight: bold
+                          - font-size: 14px
+                          - margin-top: 10px
+                        img_cell:
+                          - width: 42px
+                          - height: 42px
+                          - border-radius: 50%
+                          - background-color: rgba(var(--color-yellow), 0.2)
+                        icon:
+                          - color: rgba(var(--color-yellow), 1)
+                          - width: 20px
+                      tap_action:
+                        action: perform-action
+                        perform_action: scene.turn_on
+                        target:
+                          entity_id: scene.wohnzimmer_volle_beluechtung
+                    - type: custom:button-card
+                      name: TV
+                      icon: mdi:television
+                      show_name: true
+                      show_icon: true
+                      styles:
+                        card:
+                          - border-radius: var(--border-radius)
+                          - box-shadow: var(--box-shadow)
+                          - padding: 10px 0 8px
+                        grid:
+                          - grid-template-areas: "'i' 'n'"
+                        name:
+                          - justify-self: center
+                          - font-weight: bold
+                          - font-size: 14px
+                          - margin-top: 10px
+                        img_cell:
+                          - width: 42px
+                          - height: 42px
+                          - border-radius: 50%
+                          - background-color: rgba(var(--color-purple), 0.2)
+                        icon:
+                          - color: rgba(var(--color-purple), 1)
+                          - width: 20px
+                      tap_action:
+                        action: perform-action
+                        perform_action: scene.turn_on
+                        target:
+                          entity_id: scene.wohnzimmer_fehrnsehen
+                    - type: custom:button-card
+                      name: Alle aus
+                      icon: mdi:lightbulb-off-outline
+                      show_name: true
+                      show_icon: true
+                      styles:
+                        card:
+                          - border-radius: var(--border-radius)
+                          - box-shadow: var(--box-shadow)
+                          - padding: 10px 0 8px
+                        grid:
+                          - grid-template-areas: "'i' 'n'"
+                        name:
+                          - justify-self: center
+                          - font-weight: bold
+                          - font-size: 14px
+                          - margin-top: 10px
+                        img_cell:
+                          - width: 42px
+                          - height: 42px
+                          - border-radius: 50%
+                          - background-color: rgba(var(--color-red), 0.2)
+                        icon:
+                          - color: rgba(var(--color-red), 1)
+                          - width: 20px
+                      tap_action:
+                        action: perform-action
+                        perform_action: script.turn_on
+                        target:
+                          entity_id: script.alle_lichter_aus
+
+                - type: custom:button-card
+                  template: card_title
+                  name: Status
+
+                - type: grid
+                  columns: 3
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      name: Solar
+                      icon: mdi:weather-sunny
+                      entity: sensor.pv_pv_power
+                      show_name: true
+                      show_icon: true
+                      show_state: true
+                      styles:
+                        card:
+                          - border-radius: var(--border-radius)
+                          - box-shadow: var(--box-shadow)
+                          - padding: 10px 0 8px
+                        grid:
+                          - grid-template-areas: "'i' 'n' 's'"
+                        name:
+                          - justify-self: center
+                          - font-weight: bold
+                          - font-size: 14px
+                          - margin-top: 10px
+                        state:
+                          - justify-self: center
+                          - font-size: 12px
+                          - opacity: 0.7
+                        img_cell:
+                          - width: 42px
+                          - height: 42px
+                          - border-radius: 50%
+                          - background-color: rgba(var(--color-yellow), 0.2)
+                        icon:
+                          - color: rgba(var(--color-yellow), 1)
+                          - width: 20px
+                      tap_action:
+                        action: navigate
+                        navigation_path: /test-dashboard/energie
+                    - type: custom:button-card
+                      name: Speicher
+                      icon: mdi:battery-high
+                      entity: sensor.pv_battery
+                      show_name: true
+                      show_icon: true
+                      show_state: true
+                      styles:
+                        card:
+                          - border-radius: var(--border-radius)
+                          - box-shadow: var(--box-shadow)
+                          - padding: 10px 0 8px
+                        grid:
+                          - grid-template-areas: "'i' 'n' 's'"
+                        name:
+                          - justify-self: center
+                          - font-weight: bold
+                          - font-size: 14px
+                          - margin-top: 10px
+                        state:
+                          - justify-self: center
+                          - font-size: 12px
+                          - opacity: 0.7
+                        img_cell:
+                          - width: 42px
+                          - height: 42px
+                          - border-radius: 50%
+                          - background-color: rgba(var(--color-green), 0.2)
+                        icon:
+                          - color: rgba(var(--color-green), 1)
+                          - width: 20px
+                      tap_action:
+                        action: navigate
+                        navigation_path: /test-dashboard/energie
+                    - type: custom:button-card
+                      name: Router
+                      icon: mdi:router-wireless
+                      entity: sensor.speedtest_download
+                      show_name: true
+                      show_icon: true
+                      show_state: true
+                      styles:
+                        card:
+                          - border-radius: var(--border-radius)
+                          - box-shadow: var(--box-shadow)
+                          - padding: 10px 0 8px
+                        grid:
+                          - grid-template-areas: "'i' 'n' 's'"
+                        name:
+                          - justify-self: center
+                          - font-weight: bold
+                          - font-size: 14px
+                          - margin-top: 10px
+                        state:
+                          - justify-self: center
+                          - font-size: 12px
+                          - opacity: 0.7
+                        img_cell:
+                          - width: 42px
+                          - height: 42px
+                          - border-radius: 50%
+                          - background-color: rgba(var(--color-blue), 0.2)
+                        icon:
+                          - color: rgba(var(--color-blue), 1)
+                          - width: 20px
+                      tap_action:
+                        action: navigate
+                        navigation_path: /test-dashboard/netzwerk
+
+            - type: custom:mod-card
+              view_layout:
+                grid-area: rooms
+              card_mod:
+                style: |
+                  :host {
+                    display: block;
+                    width: 100%;
+                    min-width: 0;
+                  }
+              card:
+                type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    template: card_title
+                    name: Räume
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - yellow_no_state
+                        name: Wohnzimmer
+                        entity: light.licht_wohnzimmer
+                        icon: mdi:sofa
+                        tap_action:
+                          action: navigate
+                          navigation_path: wohnzimmer
+                        variables:
+                          label_use_temperature: false
+                          label_use_brightness: true
+                          entity_1:
+                            entity_id: light.licht_wohnzimmer
+                            icon: mdi:floor-lamp
+                            templates:
+                              - yellow_on
+                            tap_action:
+                              action: toggle
+                          entity_2:
+                            entity_id: script.dreame_reinigen_wohnzimmer
+                            icon: mdi:broom
+                            templates:
+                              - green_on
+                            tap_action:
+                              action: call-service
+                              service: script.turn_on
+                              service_data:
+                                entity_id: script.dreame_reinigen_wohnzimmer
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - pink_no_state
+                        name: Esszimmer
+                        entity: climate.esszimmer_klimaanlage
+                        icon: mdi:silverware-fork-knife
+                        tap_action:
+                          action: navigate
+                          navigation_path: esszimmer
+                        variables:
+                          label_use_temperature: true
+                          entity_1:
+                            entity_id: light.beleuchtung_bett_leuchte
+                            icon: mdi:chandelier
+                            templates:
+                              - pink_on
+                            tap_action:
+                              action: toggle
+                          entity_2:
+                            entity_id: climate.esszimmer_klimaanlage
+                            icon: mdi:snowflake
+                            templates:
+                              - blue_on
+                            tap_action:
+                              action: more-info
+                          entity_3:
+                            entity_id: script.dreame_reinigen_esszimmer
+                            icon: mdi:broom
+                            templates:
+                              - green_on
+                            tap_action:
+                              action: call-service
+                              service: script.turn_on
+                              service_data:
+                                entity_id: script.dreame_reinigen_esszimmer
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - red_no_state
+                        name: Küche
+                        entity: climate.raum_neben_der_kuche_klimaanlage
+                        icon: mdi:stove
+                        tap_action:
+                          action: navigate
+                          navigation_path: kueche
+                        variables:
+                          label_use_temperature: true
+                          entity_1:
+                            entity_id: climate.raum_neben_der_kuche_klimaanlage
+                            icon: mdi:snowflake
+                            templates:
+                              - blue_on
+                            tap_action:
+                              action: more-info
+                          entity_2:
+                            entity_id: script.dreame_reinigen_kueche
+                            icon: mdi:broom
+                            templates:
+                              - green_on
+                            tap_action:
+                              action: call-service
+                              service: script.turn_on
+                              service_data:
+                                entity_id: script.dreame_reinigen_kueche
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - purple_no_state
+                        name: Schlafzimmer
+                        entity: climate.schlafzimmer_klimaanlage
+                        icon: mdi:bed-king-outline
+                        tap_action:
+                          action: navigate
+                          navigation_path: schlafzimmer
+                        variables:
+                          label_use_temperature: true
+                          entity_1:
+                            entity_id: climate.schlafzimmer_klimaanlage
+                            icon: mdi:snowflake
+                            templates:
+                              - blue_on
+                            tap_action:
+                              action: more-info
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - grey_no_state
+                        name: Flur OG
+                        entity: switch.flur_licht_shelly
+                        icon: mdi:home-floor-a
+                        tap_action:
+                          action: navigate
+                          navigation_path: flur-og
+                        variables:
+                          label_use_temperature: false
+                          label_use_brightness: false
+                          entity_1:
+                            entity_id: switch.flur_licht_shelly
+                            icon: mdi:ceiling-light
+                            templates:
+                              - grey_on
+                            tap_action:
+                              action: toggle
+                          entity_2:
+                            entity_id: switch.licht_sonoff
+                            icon: mdi:warehouse
+                            templates:
+                              - grey_on
+                            tap_action:
+                              action: toggle
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - blue_no_state
+                        name: Flur EG
+                        entity: switch.shelly_1_mini_gen4
+                        icon: mdi:home-floor-b
+                        tap_action:
+                          action: navigate
+                          navigation_path: flur-eg
+                        variables:
+                          label_use_temperature: false
+                          label_use_brightness: false
+                          entity_1:
+                            entity_id: switch.shelly_1_mini_gen4
+                            icon: mdi:ceiling-light
+                            templates:
+                              - blue_on
+                            tap_action:
+                              action: toggle
+                          entity_2:
+                            entity_id: switch.licht_abstellraum_unten_sonoff
+                            icon: mdi:warehouse
+                            templates:
+                              - blue_on
+                            tap_action:
+                              action: toggle
+                          entity_3:
+                            entity_id: script.dreame_reinigen_flur_eg
+                            icon: mdi:broom
+                            templates:
+                              - green_on
+                            tap_action:
+                              action: call-service
+                              service: script.turn_on
+                              service_data:
+                                entity_id: script.dreame_reinigen_flur_eg
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - green_no_state
+                        name: Garten
+                        entity: switch.automatisch_bewasserung
+                        icon: mdi:flower
+                        tap_action:
+                          action: navigate
+                          navigation_path: garten
+                        variables:
+                          label_use_temperature: false
+                          label_use_brightness: false
+                          entity_1:
+                            entity_id: switch.automatisch_bewasserung
+                            icon: mdi:sprinkler-variant
+                            templates:
+                              - green_on
+                            tap_action:
+                              action: toggle
+
+                      - type: custom:button-card
+                        template:
+                          - card_room
+                          - purple_no_state
+                        name: Energie
+                        entity: sensor.pv_pv_power
+                        icon: mdi:solar-power-variant
+                        tap_action:
+                          action: navigate
+                          navigation_path: /test-dashboard/energie
+                        variables:
+                          label_use_temperature: false
+                          label_use_brightness: false
+                    card_mod:
+                      style: |
+                        @media (min-width: 960px) {
+                          #root {
+                            gap: 16px !important;
+                          }
+                        }
+                        @media (min-width: 1200px) {
+                          #root {
+                            grid-template-columns: repeat(2, minmax(280px, 1fr)) !important;
+                          }
+                        }
+
+            - type: custom:button-card
+              view_layout:
+                grid-area: vacuum
+              template: card_vacuum
+              entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+              tap_action:
+                action: navigate
+                navigation_path: dreame
+              variables:
+                ulm_card_vacuum_name: Dreame
+                ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
+                ulm_card_vacuum_camera_toggle: true
+
+  - title: Dreame
+    path: dreame
+    subview: true
+    type: panel
+    icon: mdi:robot-vacuum
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+          - type: custom:button-card
+            template: card_title
+            name: Dreame
+            label: Karte & Steuerung
+
+          - type: custom:dreame-vacuum-map-card
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            map_entity: camera.dreame_bot_d9_max_map
+            theme: dark
+
+          - type: custom:button-card
+            template: card_vacuum
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            variables:
+              ulm_card_vacuum_name: Dreame
+
+          - type: custom:button-card
+            template: card_title
+            name: Räume reinigen
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_wohnzimmer
+                name: Wohnzimmer
+                icon: mdi:sofa
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_wohnzimmer
+              - type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_esszimmer
+                name: Esszimmer
+                icon: mdi:silverware-fork-knife
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_esszimmer
+              - type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_kueche
+                name: Küche
+                icon: mdi:stove
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_kueche
+              - type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_flur_eg
+                name: Flur EG
+                icon: mdi:stairs-down
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_flur_eg
+
+  - title: Wohnzimmer
+    path: wohnzimmer
+    subview: true
+    type: panel
+    icon: mdi:sofa
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Wohnzimmer
+              label: Licht & Szenen
+
+            - type: custom:button-card
+              template: card_title
+              name: Szenen
+
+            - type: grid
+              columns: 2
+              square: false
+              cards:
+                - type: custom:mod-card
+                  card_mod:
+                    style: |
+                      ha-card {
+                        border-radius: 20px;
+                        overflow: hidden;
+                      }
+                  card:
+                    type: custom:button-card
+                    template: card_vertical_button
+                    entity: scene.wohnzimmer_volle_beluechtung
+                    name: Voll
+                    icon: mdi:ceiling-light
+                    tap_action:
+                      action: call-service
+                      service: scene.turn_on
+                      target:
+                        entity_id: scene.wohnzimmer_volle_beluechtung
+                - type: custom:mod-card
+                  card_mod:
+                    style: |
+                      ha-card {
+                        border-radius: 20px;
+                        overflow: hidden;
+                      }
+                  card:
+                    type: custom:button-card
+                    template: card_vertical_button
+                    entity: scene.wohnzimmer_fehrnsehen
+                    name: TV
+                    icon: mdi:television
+                    tap_action:
+                      action: call-service
+                      service: scene.turn_on
+                      target:
+                        entity_id: scene.wohnzimmer_fehrnsehen
+
+            - type: custom:button-card
+              template: card_title
+              name: Beleuchtung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:mushroom-light-card
+                entity: light.licht_wohnzimmer
+                name: Licht Wohnzimmer
+                fill_container: true
+                show_brightness_control: true
+                use_light_color: true
+
+            - type: custom:button-card
+              template: card_title
+              name: Dreame
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_wohnzimmer
+                name: Wohnzimmer reinigen
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_wohnzimmer
+
+  - title: Esszimmer
+    path: esszimmer
+    subview: true
+    type: panel
+    icon: mdi:silverware-fork-knife
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Esszimmer
+              label: Licht & Klima
+
+            - type: custom:button-card
+              template: card_title
+              name: Beleuchtung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:mushroom-light-card
+                entity: light.beleuchtung_bett_leuchte
+                name: Lampe
+                fill_container: true
+                show_brightness_control: true
+                use_light_color: true
+
+            - type: custom:button-card
+              template: card_title
+              name: Klima
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                    background: var(--ha-card-background) !important;
+                  }
+              card:
+                type: custom:button-card
+                template: card_thermostat
+                entity: climate.esszimmer_klimaanlage
+                name: Klimaanlage
+                variables:
+                  ulm_card_thermostat_enable_collapse: false
+                  ulm_card_thermostat_enable_controls: true
+                  ulm_card_thermostat_enable_hvac_modes: true
+                  ulm_card_thermostat_enable_popup: true
+                  ulm_card_thermostat_enable_background_color: false
+                extra_styles: |
+                  ha-card {
+                    background: var(--ha-card-background) !important;
+                  }
+
+            - type: custom:button-card
+              template: card_title
+              name: Dreame
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_esszimmer
+                name: Esszimmer reinigen
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_esszimmer
+
+  - title: Küche
+    path: kueche
+    subview: true
+    type: panel
+    icon: mdi:stove
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Küche
+              label: Licht & Klima
+
+            - type: custom:button-card
+              template: card_title
+              name: Beleuchtung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:auto-entities
+                show_empty: false
+                sort:
+                  method: friendly_name
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  include:
+                    - domain: light
+                      name: "*üche*"
+                      options:
+                        type: custom:mushroom-light-card
+                        fill_container: true
+                        show_brightness_control: true
+                        use_light_color: true
+
+            - type: custom:button-card
+              template: card_title
+              name: Klima
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                    background: var(--ha-card-background) !important;
+                  }
+              card:
+                type: custom:button-card
+                template: card_thermostat
+                entity: climate.raum_neben_der_kuche_klimaanlage
+                name: Klimaanlage
+                variables:
+                  ulm_card_thermostat_enable_collapse: false
+                  ulm_card_thermostat_enable_controls: true
+                  ulm_card_thermostat_enable_hvac_modes: true
+                  ulm_card_thermostat_enable_popup: true
+                  ulm_card_thermostat_enable_background_color: false
+                extra_styles: |
+                  ha-card {
+                    background: var(--ha-card-background) !important;
+                  }
+
+            - type: custom:button-card
+              template: card_title
+              name: Dreame
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_kueche
+                name: Küche reinigen
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_kueche
+
+  - title: Schlafzimmer
+    path: schlafzimmer
+    subview: true
+    type: panel
+    icon: mdi:bed
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Schlafzimmer
+              label: Klima
+
+            - type: custom:button-card
+              template: card_title
+              name: Klima
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                    background: var(--ha-card-background) !important;
+                  }
+              card:
+                type: custom:button-card
+                template: card_thermostat
+                entity: climate.schlafzimmer_klimaanlage
+                name: Klimaanlage
+                variables:
+                  ulm_card_thermostat_enable_collapse: false
+                  ulm_card_thermostat_enable_controls: true
+                  ulm_card_thermostat_enable_hvac_modes: true
+                  ulm_card_thermostat_enable_popup: true
+                  ulm_card_thermostat_enable_background_color: false
+                extra_styles: |
+                  ha-card {
+                    background: var(--ha-card-background) !important;
+                  }
+
+  - title: Flur OG
+    path: flur-og
+    subview: true
+    type: panel
+    icon: mdi:stairs-up
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Flur OG
+              label: Treppenhaus & Abstellraum
+
+            - type: custom:button-card
+              template: card_title
+              name: Beleuchtung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_power_outlet
+                entity: switch.flur_licht_shelly
+                name: Flur + Treppenhaus
+                icon: mdi:ceiling-light
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_power_outlet
+                entity: switch.licht_sonoff
+                name: Abstellraum oben
+                icon: mdi:warehouse
+
+  - title: Flur EG
+    path: flur-eg
+    subview: true
+    type: panel
+    icon: mdi:stairs-down
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Flur EG
+              label: Erdgeschoss
+
+            - type: custom:button-card
+              template: card_title
+              name: Beleuchtung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_power_outlet
+                entity: switch.shelly_1_mini_gen4
+                name: Flur unten
+                icon: mdi:ceiling-light
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_power_outlet
+                entity: switch.licht_abstellraum_unten_sonoff
+                name: Abstellraum unten
+                icon: mdi:warehouse
+
+            - type: custom:button-card
+              template: card_title
+              name: Dreame
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_vertical_button
+                entity: script.dreame_reinigen_flur_eg
+                name: Flur EG reinigen
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.dreame_reinigen_flur_eg
+
+  - title: Garten
+    path: garten
+    subview: true
+    type: panel
+    icon: mdi:flower
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Garten
+              label: Außen & Bewässerung
+
+            - type: custom:button-card
+              template: card_title
+              name: Beleuchtung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:auto-entities
+                show_empty: false
+                sort:
+                  method: friendly_name
+                card:
+                  type: grid
+                  columns: 1
+                  square: false
+                card_param: cards
+                filter:
+                  include:
+                    - domain: light
+                      name: "*Garten*"
+                      options:
+                        type: custom:mushroom-light-card
+                        fill_container: true
+                        show_brightness_control: true
+                        use_light_color: true
+                    - domain: light
+                      name: "*Außen*"
+                      options:
+                        type: custom:mushroom-light-card
+                        fill_container: true
+                        show_brightness_control: true
+                        use_light_color: true
+
+            - type: custom:button-card
+              template: card_title
+              name: Bewässerung
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:button-card
+                template: card_power_outlet
+                entity: switch.automatisch_bewasserung
+                name: Automatisch draußen
+                icon: mdi:sprinkler-variant
+
+  - title: Energie
+    path: energie
+    subview: true
+    type: panel
+    icon: mdi:solar-power-variant
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 920px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 12px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Energie
+              label: Solar, Speicher & Verbrauch
+
+            - type: custom:mod-card
+              card_mod:
+                style: |
+                  ha-card {
+                    margin: 4px 0 8px 0;
+                    border-radius: 20px;
+                    overflow: hidden;
+                  }
+              card:
+                type: custom:power-flow-card-plus
+                clickable_entities: true
+                use_new_flow_rate_model: true
+                min_flow_rate: 0.75
+                max_flow_rate: 6
+                min_expected_power: 0.01
+                max_expected_power: 11000
+                w_decimals: 0
+                kw_decimals: 2
+                display_zero_lines:
+                  mode: transparency
+                  transparency: 70
+                entities:
+                  solar:
+                    entity: sensor.pv_pv_power
+                    name: Solar
+                    icon: mdi:solar-power-variant
+                    color_icon: true
+                    display_zero: true
+                  grid:
+                    entity: sensor.pv_netzleistung
+                    name: Netz
+                    icon: mdi:transmission-tower
+                    display_state: one_way
+                    color_circle: color_dynamically
+                  battery:
+                    entity: sensor.pv_battery_power
+                    state_of_charge: sensor.pv_battery
+                    name: Speicher
+                    display_state: one_way
+                    color_circle: color_dynamically
+                    state_of_charge_decimals: 0
+                  home:
+                    entity: sensor.pv_activepower_load_sys
+                    name: Haus
+                    icon: mdi:home
+                    color_icon: true
+                    override_state: true
+
+            - type: custom:button-card
+              template: card_title
+              name: Verlauf
+
+            - type: grid
+              columns: 3
+              square: false
+              cards:
+                - type: custom:button-card
+                  entity: input_select.pv_zeitraum
+                  name: Live
+                  show_icon: false
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    target:
+                      entity_id: input_select.pv_zeitraum
+                    data:
+                      option: Live
+                  styles:
+                    card:
+                      - height: 42px
+                      - border-radius: 12px
+                  state:
+                    - value: Live
+                      styles:
+                        card:
+                          - background: "rgba(var(--rgb-primary-color), 0.18)"
+                - type: custom:button-card
+                  entity: input_select.pv_zeitraum
+                  name: 24h
+                  show_icon: false
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    target:
+                      entity_id: input_select.pv_zeitraum
+                    data:
+                      option: 24h
+                  styles:
+                    card:
+                      - height: 42px
+                      - border-radius: 12px
+                  state:
+                    - value: 24h
+                      styles:
+                        card:
+                          - background: "rgba(var(--rgb-primary-color), 0.18)"
+                - type: custom:button-card
+                  entity: input_select.pv_zeitraum
+                  name: Woche
+                  show_icon: false
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    target:
+                      entity_id: input_select.pv_zeitraum
+                    data:
+                      option: Woche
+                  styles:
+                    card:
+                      - height: 42px
+                      - border-radius: 12px
+                  state:
+                    - value: Woche
+                      styles:
+                        card:
+                          - background: "rgba(var(--rgb-primary-color), 0.18)"
+                - type: custom:button-card
+                  entity: input_select.pv_zeitraum
+                  name: Monat
+                  show_icon: false
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    target:
+                      entity_id: input_select.pv_zeitraum
+                    data:
+                      option: Monat
+                  styles:
+                    card:
+                      - height: 42px
+                      - border-radius: 12px
+                  state:
+                    - value: Monat
+                      styles:
+                        card:
+                          - background: "rgba(var(--rgb-primary-color), 0.18)"
+                - type: custom:button-card
+                  entity: input_select.pv_zeitraum
+                  name: Jahr
+                  show_icon: false
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    target:
+                      entity_id: input_select.pv_zeitraum
+                    data:
+                      option: Jahr
+                  styles:
+                    card:
+                      - height: 42px
+                      - border-radius: 12px
+                  state:
+                    - value: Jahr
+                      styles:
+                        card:
+                          - background: "rgba(var(--rgb-primary-color), 0.18)"
+                - type: custom:button-card
+                  entity: input_select.pv_zeitraum
+                  name: Gesamt
+                  show_icon: false
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: input_select.select_option
+                    target:
+                      entity_id: input_select.pv_zeitraum
+                    data:
+                      option: Lebenslang
+                  styles:
+                    card:
+                      - height: 42px
+                      - border-radius: 12px
+                  state:
+                    - value: Lebenslang
+                      styles:
+                        card:
+                          - background: "rgba(var(--rgb-primary-color), 0.18)"
+
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.pv_zeitraum
+                  state: Live
+              card:
+                type: custom:mod-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      margin: 8px 0 0 0;
+                      border-radius: 20px;
+                      padding: 8px 4px 4px 4px;
+                    }
+                card:
+                  type: custom:mini-graph-card
+                  name: Live
+                  hours_to_show: 1
+                  points_per_hour: 12
+                  height: 280
+                  line_width: 3
+                  animate: true
+                  lower_bound: 0
+                  show:
+                    labels: false
+                    extrema: false
+                    legend: true
+                    icon: false
+                  entities:
+                    - entity: sensor.pv_pv_power
+                      name: Solar
+                      color: "#f4b400"
+                      show_fill: true
+                    - entity: sensor.pv_activepower_load_sys
+                      name: Verbrauch
+                      color: "#4285f4"
+                      show_fill: true
+                    - entity: sensor.pv_battery_power
+                      name: Batterie
+                      color: "#34a853"
+                      y_axis: secondary
+
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.pv_zeitraum
+                  state: 24h
+              card:
+                type: custom:mod-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      margin: 8px 0 0 0;
+                      border-radius: 20px;
+                      padding: 8px 4px 4px 4px;
+                    }
+                card:
+                  type: custom:mini-graph-card
+                  name: 24 Stunden
+                  hours_to_show: 24
+                  points_per_hour: 4
+                  height: 280
+                  line_width: 2
+                  lower_bound: 0
+                  show:
+                    labels: false
+                    extrema: false
+                    legend: true
+                    icon: false
+                  entities:
+                    - entity: sensor.pv_pv_power
+                      name: Solar
+                      color: "#f4b400"
+                      show_fill: true
+                    - entity: sensor.pv_activepower_load_sys
+                      name: Verbrauch
+                      color: "#4285f4"
+                      show_fill: true
+                    - entity: sensor.pv_battery_power
+                      name: Batterie
+                      color: "#34a853"
+                      y_axis: secondary
+
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.pv_zeitraum
+                  state: Woche
+              card:
+                type: custom:mod-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      margin: 8px 0 0 0;
+                      border-radius: 20px;
+                      padding: 8px 4px 4px 4px;
+                    }
+                card:
+                  type: custom:mini-graph-card
+                  name: Woche
+                  hours_to_show: 168
+                  height: 280
+                  group_by:
+                    duration: 1h
+                    func: avg
+                  line_width: 2
+                  lower_bound: 0
+                  show:
+                    labels: false
+                    extrema: false
+                    legend: true
+                    icon: false
+                  entities:
+                    - entity: sensor.pv_pv_power
+                      name: Solar
+                      color: "#f4b400"
+                    - entity: sensor.pv_activepower_load_sys
+                      name: Verbrauch
+                      color: "#4285f4"
+                    - entity: sensor.pv_battery_power
+                      name: Batterie
+                      color: "#34a853"
+                      y_axis: secondary
+
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.pv_zeitraum
+                  state: Monat
+              card:
+                type: custom:mod-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      margin: 8px 0 0 0;
+                      border-radius: 20px;
+                      padding: 8px 4px 4px 4px;
+                    }
+                card:
+                  type: custom:mini-graph-card
+                  name: Monat
+                  hours_to_show: 720
+                  height: 280
+                  group_by:
+                    duration: 6h
+                    func: avg
+                  line_width: 2
+                  lower_bound: 0
+                  show:
+                    labels: false
+                    extrema: false
+                    legend: true
+                    icon: false
+                  entities:
+                    - entity: sensor.pv_pv_power
+                      name: Solar
+                      color: "#f4b400"
+                    - entity: sensor.pv_activepower_load_sys
+                      name: Verbrauch
+                      color: "#4285f4"
+                    - entity: sensor.pv_battery_power
+                      name: Batterie
+                      color: "#34a853"
+                      y_axis: secondary
+
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.pv_zeitraum
+                  state: Jahr
+              card:
+                type: custom:mod-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      margin: 8px 0 0 0;
+                      border-radius: 20px;
+                      padding: 8px 4px 4px 4px;
+                    }
+                card:
+                  type: custom:mini-graph-card
+                  name: Jahr
+                  hours_to_show: 8760
+                  height: 280
+                  group_by:
+                    duration: 1d
+                    func: avg
+                  line_width: 2
+                  lower_bound: 0
+                  show:
+                    labels: false
+                    extrema: false
+                    legend: true
+                    icon: false
+                  entities:
+                    - entity: sensor.pv_pv_power
+                      name: Solar
+                      color: "#f4b400"
+                    - entity: sensor.pv_activepower_load_sys
+                      name: Verbrauch
+                      color: "#4285f4"
+                    - entity: sensor.pv_battery_power
+                      name: Batterie
+                      color: "#34a853"
+                      y_axis: secondary
+
+            - type: conditional
+              conditions:
+                - condition: state
+                  entity: input_select.pv_zeitraum
+                  state: Lebenslang
+              card:
+                type: custom:mod-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      margin: 8px 0 0 0;
+                      border-radius: 20px;
+                      padding: 8px 4px 4px 4px;
+                    }
+                card:
+                  type: custom:mini-graph-card
+                  name: Gesamt
+                  hours_to_show: 8760
+                  height: 280
+                  group_by:
+                    duration: 1d
+                    func: avg
+                  line_width: 2
+                  lower_bound: 0
+                  show:
+                    labels: false
+                    extrema: false
+                    legend: true
+                    icon: false
+                  entities:
+                    - entity: sensor.pv_pv_power
+                      name: Solar
+                      color: "#f4b400"
+                    - entity: sensor.pv_activepower_load_sys
+                      name: Verbrauch
+                      color: "#4285f4"
+                    - entity: sensor.pv_battery_power
+                      name: Batterie
+                      color: "#34a853"
+                      y_axis: secondary
+
+  - title: Sicherheit
+    path: sicherheit
+    subview: true
+    type: panel
+    icon: mdi:shield-home
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+          - type: custom:button-card
+            template: card_title
+            name: Sicherheit
+            label: Sensoren & Kontakte
+
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: binary_sensor
+                  attributes:
+                    device_class: window
+                  options:
+                    type: custom:button-card
+                    template: card_binary_sensor_alert
+                    variables:
+                      ulm_card_binary_sensor_alert: true
+                - domain: binary_sensor
+                  attributes:
+                    device_class: door
+                  options:
+                    type: custom:button-card
+                    template: card_binary_sensor_alert
+                    variables:
+                      ulm_card_binary_sensor_alert: true
+                - domain: binary_sensor
+                  attributes:
+                    device_class: smoke
+                  options:
+                    type: custom:button-card
+                    template: card_binary_sensor_alert
+                    variables:
+                      ulm_card_binary_sensor_alert: true
+                - domain: binary_sensor
+                  attributes:
+                    device_class: moisture
+                  options:
+                    type: custom:button-card
+                    template: card_binary_sensor_alert
+                    variables:
+                      ulm_card_binary_sensor_alert: true
+                - domain: binary_sensor
+                  attributes:
+                    device_class: motion
+                  options:
+                    type: custom:button-card
+                    template: card_binary_sensor_alert
+                    variables:
+                      ulm_card_binary_sensor_alert: true
+
+          - type: custom:button-card
+            template: card_title
+            name: Batterie niedrig
+            label: Geräte unter 20 %
+
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: sensor
+                  attributes:
+                    device_class: battery
+                  state: "< 20"
+                  options:
+                    type: custom:button-card
+                    template: card_battery
+                    variables:
+                      ulm_card_battery_battery_state_entity_id: this.entity_id
+                      ulm_card_battery_battery_level_danger: 20
+                      ulm_card_battery_battery_level_warning: 50
+
+  - title: Netzwerk
+    path: netzwerk
+    subview: true
+    type: panel
+    icon: mdi:router-wireless
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+          - type: custom:button-card
+            template: card_title
+            name: Netzwerk
+            label: "[[[ return states['sensor.speedtest_download'].state + ' Mbit/s ↓ · ' + states['sensor.speedtest_upload'].state + ' Mbit/s ↑' ]]]"
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: card_graph
+                entity: sensor.speedtest_download
+                variables:
+                  ulm_card_graph_name: Download
+                  ulm_card_graph_icon: mdi:download
+                  ulm_card_graph_color: var(--color-blue)
+                  ulm_card_graph_entity: sensor.speedtest_download
+                  ulm_card_graph_type: fill
+                  ulm_card_graph_hours: 24
+              - type: custom:button-card
+                template: card_graph
+                entity: sensor.speedtest_upload
+                variables:
+                  ulm_card_graph_name: Upload
+                  ulm_card_graph_icon: mdi:upload
+                  ulm_card_graph_color: var(--color-green)
+                  ulm_card_graph_entity: sensor.speedtest_upload
+                  ulm_card_graph_type: fill
+                  ulm_card_graph_hours: 24
+
+          - type: custom:button-card
+            template: card_title
+            name: Verlauf
+            label: "[[[ return states['input_select.router_zeitraum'].state ]]]"
+
+          - type: entities
+            entities:
+              - entity: input_select.router_zeitraum
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: 24h
+            card:
+              type: custom:mini-graph-card
+              name: 24 Stunden
+              hours_to_show: 24
+              height: 200
+              points_per_hour: 2
+              line_width: 2
+              lower_bound: 0
+              show:
+                labels: false
+                extrema: false
+                legend: true
+                icon: false
+              entities:
+                - entity: sensor.speedtest_download
+                  name: Download
+                  color: "#4285f4"
+                  show_fill: true
+                - entity: sensor.speedtest_upload
+                  name: Upload
+                  color: "#34a853"
+                  show_fill: true
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: Woche
+            card:
+              type: custom:mini-graph-card
+              name: Woche
+              hours_to_show: 168
+              height: 200
+              group_by:
+                duration: 1h
+                func: avg
+              line_width: 2
+              lower_bound: 0
+              show:
+                labels: false
+                extrema: false
+                legend: true
+                icon: false
+              entities:
+                - entity: sensor.speedtest_download
+                  name: Download
+                  color: "#4285f4"
+                - entity: sensor.speedtest_upload
+                  name: Upload
+                  color: "#34a853"
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: Monat
+            card:
+              type: custom:mini-graph-card
+              name: Monat
+              hours_to_show: 720
+              height: 200
+              group_by:
+                duration: 6h
+                func: avg
+              line_width: 2
+              lower_bound: 0
+              show:
+                labels: false
+                extrema: false
+                legend: true
+                icon: false
+              entities:
+                - entity: sensor.speedtest_download
+                  name: Download
+                  color: "#4285f4"
+                - entity: sensor.speedtest_upload
+                  name: Upload
+                  color: "#34a853"
+
+  - title: Einstellungen
+    path: einstellungen
+    subview: true
+    type: panel
+    icon: mdi:cog
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards:
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              margin: 16px auto 24px auto;
+              max-width: 720px;
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+            }
+            #root {
+              gap: 14px;
+            }
+        card:
+          type: vertical-stack
+          cards:
+          - type: custom:button-card
+            template: card_title
+            name: Einstellungen
+            label: Personen & System
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:button-card
+                template: card_person
+                entity: person.thorge
+                variables:
+                  ulm_card_person_entity: person.thorge
+                  ulm_card_person_use_entity_picture: true
+                  ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
+              - type: custom:button-card
+                template: card_person
+                entity: person.laura
+                variables:
+                  ulm_card_person_entity: person.laura
+                  ulm_card_person_use_entity_picture: true
+                  ulm_card_person_battery: sensor.pixel_7_pro_battery_level
+
+          - type: custom:button-card
+            template: card_weather
+            entity: weather.wetter_home
+            variables:
+              ulm_card_weather_enable_popup: true
+
+          - type: custom:button-card
+            template: card_title
+            name: Wettervorhersage
+
+          - type: entities
+            entities:
+              - entity: input_select.wetter_ansicht
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.wetter_ansicht
+                state: Stündlich
+            card:
+              type: weather-forecast
+              entity: weather.wetter_home
+              forecast_type: hourly
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.wetter_ansicht
+                state: Täglich
+            card:
+              type: weather-forecast
+              entity: weather.wetter_home
+              forecast_type: daily
+
+          - type: custom:button-card
+            template: card_title
+            name: Standorte
+
+          - type: map
+            entities:
+              - entity: person.thorge
+              - entity: person.laura
+            theme_mode: auto
+            aspect_ratio: "16:9"
+
+          - type: custom:button-card
+            template: card_title
+            name: Kalender
+
+          - type: calendar
+            entities:
+              - calendar.thorge_3_laura
+            initial_view: listWeek
