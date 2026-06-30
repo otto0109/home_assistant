@@ -1,5 +1,4 @@
-# Eine Kachel pro HA-Bereich — neue Bereiche erscheinen automatisch,
-# sobald mindestens eine Entität zugeordnet ist.
+# Eine Kachel pro HA-Bereich — ohne button-card-JS (stabiler mit auto-entities).
 type: custom:auto-entities
 show_empty: false
 card_param: cards
@@ -26,12 +25,35 @@ filter:
     {% endfor %}
     {{ ns.items }}
 options:
-  type: custom:button-card
-  template:
-    - card_room
-    - grey_no_state
-  name: "[[[ const id = entity.entity_id; const aid = hass.entities[id]?.area_id; return aid && hass.areas[aid] ? hass.areas[aid].name : entity.attributes.friendly_name; ]]]"
-  tap_action: "[[[ const id = entity.entity_id; const aid = hass.entities[id]?.area_id; const n = aid && hass.areas[aid] ? hass.areas[aid].name : ''; if (n) hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: n }); return { action: 'navigate', navigation_path: 'raum' }; ]]]"
-  variables:
-    label_use_temperature: "[[[ return entity.entity_id.startsWith('climate.'); ]]]"
-    label_use_brightness: "[[[ return entity.entity_id.startsWith('light.'); ]]]"
+  type: custom:mushroom-template-card
+  layout: vertical
+  fill_container: true
+  primary: "{{ area_name(area_id(entity)) }}"
+  secondary: "{{ states(entity) }}"
+  icon: >-
+    {% set d = entity.split('.')[0] %}
+    {% if d == 'climate' %}mdi:thermometer
+    {% elif d == 'light' %}mdi:lightbulb
+    {% elif d == 'switch' %}mdi:light-switch
+    {% elif d == 'script' %}mdi:script-text
+    {% elif d == 'fan' %}mdi:fan
+    {% elif d == 'cover' %}mdi:window-shutter
+    {% else %}mdi:home-floor-1{% endif %}
+  icon_color: >-
+    {% set d = entity.split('.')[0] %}
+    {% if d == 'climate' %}blue
+    {% elif d == 'light' %}amber
+    {% elif d == 'switch' %}grey
+    {% else %}green{% endif %}
+  card_mod:
+    style: |
+      ha-card {
+        border-radius: var(--border-radius, 20px);
+        min-height: 148px;
+        height: 100%;
+      }
+  tap_action:
+    action: call-service
+    service: script.dashboard_raum_oeffnen
+    data:
+      entity_id: "{{ entity }}"
