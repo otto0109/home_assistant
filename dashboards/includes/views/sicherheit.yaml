@@ -1,5 +1,19 @@
-- type: vertical-stack
-  cards:
+- type: custom:mod-card
+  card_mod:
+    style: |
+      ha-card {
+        margin: 16px auto 24px auto;
+        max-width: 720px;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #root {
+        gap: 14px;
+      }
+  card:
+    type: vertical-stack
+    cards:
     - type: custom:button-card
       template: card_title
       name: Sicherheit

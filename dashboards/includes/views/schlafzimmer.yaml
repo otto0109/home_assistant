@@ -1,5 +1,16 @@
 - type: custom:mod-card
-  !include ../fragments/subview-padding.yaml
+  card_mod:
+    style: |
+      ha-card {
+        margin: 16px auto 24px auto;
+        max-width: 720px;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #root {
+        gap: 14px;
+      }
   card:
     type: vertical-stack
     cards:
@@ -13,7 +24,12 @@
         name: Beleuchtung
 
       - type: custom:mod-card
-        !include ../fragments/light-card-rounded.yaml
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: 20px;
+              overflow: hidden;
+            }
         card:
           type: custom:auto-entities
           show_empty: false
@@ -48,7 +64,12 @@
         name: Klima
 
       - type: custom:mod-card
-        !include ../fragments/light-card-rounded.yaml
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: 20px;
+              overflow: hidden;
+            }
         card:
           type: tile
           entity: climate.schlafzimmer_klimaanlage
