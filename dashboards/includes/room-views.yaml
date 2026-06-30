@@ -1,0 +1,119 @@
+- title: Wohnzimmer
+  path: wohnzimmer
+  subview: true
+  type: panel
+  icon: mdi:sofa
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Wohnzimmer
+        - title: Wohnzimmer
+        - label: Licht & Szenen
+
+- title: Esszimmer
+  path: esszimmer
+  subview: true
+  type: panel
+  icon: mdi:silverware-fork-knife
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Esszimmer
+        - title: Esszimmer
+        - label: Licht & Klima
+
+- title: Küche
+  path: kueche
+  subview: true
+  type: panel
+  icon: mdi:stove
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Küche
+        - title: Küche
+        - label: Licht
+
+- title: Raum neben der Küche
+  path: raum-neben-kueche
+  subview: true
+  type: panel
+  icon: mdi:thermometer-lines
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Raum neben der Küche
+        - title: Raum neben der Küche
+        - label: Klima
+
+- title: Schlafzimmer
+  path: schlafzimmer
+  subview: true
+  type: panel
+  icon: mdi:bed
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Schlafzimmer
+        - title: Schlafzimmer
+        - label: Klima
+
+- title: Flur OG
+  path: flur-og
+  subview: true
+  type: panel
+  icon: mdi:stairs-up
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Flur OG
+        - title: Flur OG
+        - label: Treppenhaus & Abstellraum
+
+- title: Flur EG
+  path: flur-eg
+  subview: true
+  type: panel
+  icon: mdi:stairs-down
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Flur EG
+        - title: Flur EG
+        - label: Erdgeschoss
+
+- title: Garten
+  path: garten
+  subview: true
+  type: panel
+  icon: mdi:flower
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_page
+      variables:
+        - area: Garten
+        - title: Garten
+        - label: Außen & Bewässerung

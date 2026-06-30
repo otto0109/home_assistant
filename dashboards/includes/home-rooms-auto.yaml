@@ -1,0 +1,72 @@
+- type: custom:auto-entities
+  show_empty: false
+  card:
+    type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      grid-gap: 16px
+      grid-template-columns: repeat(2, 1fr)
+      mediaquery:
+        "(min-width: 900px)":
+          grid-template-columns: repeat(4, 1fr)
+          grid-gap: 20px
+  card_param: cards
+  filter:
+    template: |
+      {%- set rooms = [
+        'Wohnzimmer',
+        'Esszimmer',
+        'Küche',
+        'Raum neben der Küche',
+        'Schlafzimmer',
+        'Flur OG',
+        'Flur EG',
+        'Garten'
+      ] -%}
+      {%- set ns = namespace(result=[]) -%}
+      {%- for room in rooms -%}
+        {%- set aid = area_id(room) -%}
+        {%- if aid is not none -%}
+          {%- set ents = area_entities(aid) | list -%}
+          {%- if ents | length > 0 -%}
+            {%- set pick = namespace(e=ents[0]) -%}
+            {%- for eid in ents -%}
+              {%- if eid.startswith('light.') -%}
+                {%- set pick.e = eid -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if not pick.e.startswith('light.') -%}
+              {%- for eid in ents -%}
+                {%- if eid.startswith('climate.') -%}
+                  {%- set pick.e = eid -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if pick.e.startswith('light.') or pick.e.startswith('climate.') -%}
+              {%- set primary = pick.e -%}
+            {%- else -%}
+              {%- set switches = ents | select('search', '^switch\\.') | list -%}
+              {%- set scripts = ents | select('search', '^script\\.') | list -%}
+              {%- set primary = switches[0] if switches else (scripts[0] if scripts else ents[0]) -%}
+            {%- endif -%}
+            {%- set ns.result = ns.result + [primary] -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ ns.result | tojson }}
+  options:
+    type: custom:button-card
+    template:
+      - card_room
+      - "[[[ return variables.ulm_color_template; ]]]"
+    name: "[[[\n      const areaId = hass.entities[entity.entity_id]?.area_id;\n      const area = Object.values(hass.areas || {}).find((a) => a.area_id === areaId);\n      return area?.name || entity.attributes.friendly_name;\n    ]]]"
+    label_use_temperature: "[[[ return entity.entity_id.startsWith('climate.'); ]]]"
+    label_use_brightness: "[[[ return entity.entity_id.startsWith('light.'); ]]]"
+    variables:
+      ulm_color_template: "[[[\n        const MAP = {\n          Wohnzimmer: 'yellow_no_state',\n          Esszimmer: 'pink_no_state',\n          Küche: 'red_no_state',\n          'Raum neben der Küche': 'red_no_state',\n          Schlafzimmer: 'purple_no_state',\n          'Flur OG': 'grey_no_state',\n          'Flur EG': 'blue_no_state',\n          Garten: 'green_no_state',\n        };\n        const areaId = hass.entities[entity.entity_id]?.area_id;\n        const area = Object.values(hass.areas || {}).find((a) => a.area_id === areaId);\n        return MAP[area?.name] || 'purple_no_state';\n      ]]]"
+      entity_1: "[[[\n        const chip = (idx) => {\n          const areaId = hass.entities[entity.entity_id]?.area_id;\n          if (!areaId) return null;\n          const pool = Object.keys(hass.states).filter((id) => {\n            if (id === entity.entity_id) return false;\n            if (hass.entities[id]?.area_id !== areaId) return false;\n            const dom = id.split('.')[0];\n            return ['light', 'switch', 'climate', 'script', 'fan'].includes(dom);\n          });\n          const eid = pool[idx];\n          if (!eid) return null;\n          const dom = eid.split('.')[0];\n          const color = { light: 'yellow', switch: 'grey', climate: 'blue', script: 'green', fan: 'blue' }[dom] || 'purple';\n          const icon = hass.states[eid].attributes.icon || (dom === 'script' ? 'mdi:broom' : dom === 'climate' ? 'mdi:snowflake' : 'mdi:lightbulb');\n          let tap = { action: 'toggle' };\n          if (dom === 'script') tap = { action: 'perform-action', perform_action: 'script.turn_on' };\n          if (dom === 'climate') tap = { action: 'more-info' };\n          return { entity_id: eid, icon, templates: [color + '_on'], tap_action: tap };\n        };\n        return chip(0) || { entity_id: '' };\n      ]]]"
+      entity_2: "[[[\n        const chip = (idx) => {\n          const areaId = hass.entities[entity.entity_id]?.area_id;\n          if (!areaId) return null;\n          const pool = Object.keys(hass.states).filter((id) => {\n            if (id === entity.entity_id) return false;\n            if (hass.entities[id]?.area_id !== areaId) return false;\n            const dom = id.split('.')[0];\n            return ['light', 'switch', 'climate', 'script', 'fan'].includes(dom);\n          });\n          const eid = pool[idx];\n          if (!eid) return null;\n          const dom = eid.split('.')[0];\n          const color = { light: 'yellow', switch: 'grey', climate: 'blue', script: 'green', fan: 'blue' }[dom] || 'purple';\n          const icon = hass.states[eid].attributes.icon || (dom === 'script' ? 'mdi:broom' : dom === 'climate' ? 'mdi:snowflake' : 'mdi:lightbulb');\n          let tap = { action: 'toggle' };\n          if (dom === 'script') tap = { action: 'perform-action', perform_action: 'script.turn_on' };\n          if (dom === 'climate') tap = { action: 'more-info' };\n          return { entity_id: eid, icon, templates: [color + '_on'], tap_action: tap };\n        };\n        return chip(1) || { entity_id: '' };\n      ]]]"
+      entity_3: "[[[\n        const chip = (idx) => {\n          const areaId = hass.entities[entity.entity_id]?.area_id;\n          if (!areaId) return null;\n          const pool = Object.keys(hass.states).filter((id) => {\n            if (id === entity.entity_id) return false;\n            if (hass.entities[id]?.area_id !== areaId) return false;\n            const dom = id.split('.')[0];\n            return ['light', 'switch', 'climate', 'script', 'fan'].includes(dom);\n          });\n          const eid = pool[idx];\n          if (!eid) return null;\n          const dom = eid.split('.')[0];\n          const color = { light: 'yellow', switch: 'grey', climate: 'blue', script: 'green', fan: 'blue' }[dom] || 'purple';\n          const icon = hass.states[eid].attributes.icon || (dom === 'script' ? 'mdi:broom' : dom === 'climate' ? 'mdi:snowflake' : 'mdi:lightbulb');\n          let tap = { action: 'toggle' };\n          if (dom === 'script') tap = { action: 'perform-action', perform_action: 'script.turn_on' };\n          if (dom === 'climate') tap = { action: 'more-info' };\n          return { entity_id: eid, icon, templates: [color + '_on'], tap_action: tap };\n        };\n        return chip(2) || { entity_id: '' };\n      ]]]"
+    tap_action:
+      action: navigate
+      navigation_path: "[[[\n        const PATHS = {\n          Wohnzimmer: 'wohnzimmer',\n          Esszimmer: 'esszimmer',\n          Küche: 'kueche',\n          'Raum neben der Küche': 'raum-neben-kueche',\n          Schlafzimmer: 'schlafzimmer',\n          'Flur OG': 'flur-og',\n          'Flur EG': 'flur-eg',\n          Garten: 'garten',\n        };\n        const areaId = hass.entities[entity.entity_id]?.area_id;\n        const area = Object.values(hass.areas || {}).find((a) => a.area_id === areaId);\n        return PATHS[area?.name] || 'home';\n      ]]]"

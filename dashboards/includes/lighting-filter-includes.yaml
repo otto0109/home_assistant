@@ -1,0 +1,76 @@
+# Beleuchtung: echte Lichter + Lichtschalter (Shelly/Sonoff)
+- domain: light
+  area: "[[area]]"
+  options:
+    type: custom:mushroom-light-card
+    fill_container: true
+    show_brightness_control: true
+    use_light_color: true
+    card_mod:
+      style: |
+        ha-card {
+          border-radius: 20px;
+          overflow: hidden;
+        }
+- domain: switch
+  area: "[[area]]"
+  entity_id: "*licht*"
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  entity_id: "*Licht*"
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  entity_id: "*light*"
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:ceiling-light
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:lightbulb
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:lightbulb-on
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:lightbulb-outline
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:floor-lamp
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:wall-sconce
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:chandelier
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:track-light
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:led-strip
+  options: !include switch-as-light-options.yaml
+- domain: switch
+  area: "[[area]]"
+  attributes:
+    icon: mdi:lamps
+  options: !include switch-as-light-options.yaml

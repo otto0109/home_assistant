@@ -22,68 +22,7 @@ views:
     background: var(--background-image)
     cards: !include includes/views/dreame.yaml
 
-  - title: Wohnzimmer
-    path: wohnzimmer
-    subview: true
-    type: panel
-    icon: mdi:sofa
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/wohnzimmer.yaml
-
-  - title: Esszimmer
-    path: esszimmer
-    subview: true
-    type: panel
-    icon: mdi:silverware-fork-knife
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/esszimmer.yaml
-
-  - title: Küche
-    path: kueche
-    subview: true
-    type: panel
-    icon: mdi:stove
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/kueche.yaml
-
-  - title: Schlafzimmer
-    path: schlafzimmer
-    subview: true
-    type: panel
-    icon: mdi:bed
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/schlafzimmer.yaml
-
-  - title: Flur OG
-    path: flur-og
-    subview: true
-    type: panel
-    icon: mdi:stairs-up
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/flur-og.yaml
-
-  - title: Flur EG
-    path: flur-eg
-    subview: true
-    type: panel
-    icon: mdi:stairs-down
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/flur-eg.yaml
-
-  - title: Garten
-    path: garten
-    subview: true
-    type: panel
-    icon: mdi:flower
-    theme: minimalist-desktop
-    background: var(--background-image)
-    cards: !include includes/views/garten.yaml
+  - !include includes/room-views.yaml
 
   - title: Energie
     path: energie

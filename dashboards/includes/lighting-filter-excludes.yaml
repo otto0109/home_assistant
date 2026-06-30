@@ -1,0 +1,24 @@
+# Von Beleuchtung ausschließen — gleiche Kriterien wie lighting-filter-includes (ohne domain: light)
+- entity_id: "*licht*"
+- entity_id: "*Licht*"
+- entity_id: "*light*"
+- attributes:
+    icon: mdi:ceiling-light
+- attributes:
+    icon: mdi:lightbulb
+- attributes:
+    icon: mdi:lightbulb-on
+- attributes:
+    icon: mdi:lightbulb-outline
+- attributes:
+    icon: mdi:floor-lamp
+- attributes:
+    icon: mdi:wall-sconce
+- attributes:
+    icon: mdi:chandelier
+- attributes:
+    icon: mdi:track-light
+- attributes:
+    icon: mdi:led-strip
+- attributes:
+    icon: mdi:lamps

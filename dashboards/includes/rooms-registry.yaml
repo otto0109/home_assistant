@@ -1,0 +1,50 @@
+# Zentrale Raumliste — area muss exakt dem HA-Bereichsnamen entsprechen.
+# Neue Räume: Eintrag hier + HA-Bereich anlegen und Entitäten zuordnen.
+
+- area: Wohnzimmer
+  path: wohnzimmer
+  icon: mdi:sofa
+  color: yellow_no_state
+  label: Licht & Szenen
+
+- area: Esszimmer
+  path: esszimmer
+  icon: mdi:silverware-fork-knife
+  color: pink_no_state
+  label: Licht & Klima
+
+- area: Küche
+  path: kueche
+  icon: mdi:stove
+  color: red_no_state
+  label: Licht
+
+- area: Raum neben der Küche
+  path: raum-neben-kueche
+  icon: mdi:thermometer-lines
+  color: red_no_state
+  label: Klima
+
+- area: Schlafzimmer
+  path: schlafzimmer
+  icon: mdi:bed-king-outline
+  color: purple_no_state
+  label: Klima
+
+- area: Flur OG
+  path: flur-og
+  icon: mdi:home-floor-a
+  color: grey_no_state
+  label: Treppenhaus & Abstellraum
+
+- area: Flur EG
+  path: flur-eg
+  icon: mdi:home-floor-b
+  color: blue_no_state
+  label: Erdgeschoss
+
+- area: Garten
+  path: garten
+  icon: mdi:flower
+  color: green_no_state
+  label: Außen & Bewässerung

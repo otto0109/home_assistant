@@ -1,6 +1,37 @@
 # Decluttering-Templates für Raum-Subviews.
 # Entitäten in HA den Bereichen zuordnen (Einstellungen → Bereiche & Stockwerke).
 
+room_page:
+  variables:
+    - area
+    - title
+    - label
+  card:
+    type: custom:mod-card
+    card_mod:
+      style: |
+        ha-card {
+          margin: 16px auto 24px auto;
+          max-width: 720px;
+          background: transparent !important;
+          box-shadow: none !important;
+          border: none !important;
+        }
+        #root {
+          gap: 14px;
+        }
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:button-card
+          template: card_title
+          name: "[[title]]"
+          label: "[[label]]"
+        - type: custom:decluttering-card
+          template: room_auto_content
+          variables:
+            - area: "[[area]]"
+
 room_auto_content:
   variables:
     - area
@@ -24,18 +55,7 @@ room_auto_content:
           include:
             - domain: scene
               area: "[[area]]"
-              options:
-                type: custom:button-card
-                template: card_vertical_button
-                card_mod:
-                  style: |
-                    ha-card {
-                      border-radius: 20px;
-                      overflow: hidden;
-                    }
-                tap_action:
-                  action: perform-action
-                  perform_action: scene.turn_on
+              options: !include scene-button-room.yaml
 
       - type: custom:button-card
         template: card_title
@@ -43,6 +63,7 @@ room_auto_content:
 
       - type: custom:auto-entities
         show_empty: false
+        unique: true
         sort:
           method: friendly_name
         card:
@@ -51,20 +72,7 @@ room_auto_content:
           square: false
         card_param: cards
         filter:
-          include:
-            - domain: light
-              area: "[[area]]"
-              options:
-                type: custom:mushroom-light-card
-                fill_container: true
-                show_brightness_control: true
-                use_light_color: true
-                card_mod:
-                  style: |
-                    ha-card {
-                      border-radius: 20px;
-                      overflow: hidden;
-                    }
+          include: !include lighting-filter-includes.yaml
 
       - type: custom:button-card
         template: card_title
@@ -92,6 +100,7 @@ room_auto_content:
                       border-radius: 20px;
                       overflow: hidden;
                     }
+          exclude: !include lighting-filter-excludes.yaml
 
       - type: custom:button-card
         template: card_title
