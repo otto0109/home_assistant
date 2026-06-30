@@ -1,4 +1,4 @@
-# Dynamische Raumkacheln — Bereich, Icon und Shortcut-Chips aus HA-Bereichen.
+# Dynamische Raumkacheln — ein card_room pro HA-Bereich (name/icon/chips per Jinja).
 - type: custom:auto-entities
   show_empty: false
   card_param: card
@@ -14,8 +14,9 @@
       label_use_brightness: false
   filter:
     template: |
-      {% set ns = namespace(items=[]) %}
       {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
+      {% set chip_domains = ['light', 'climate', 'switch', 'script', 'fan'] %}
+      {% set ns = namespace(items=[]) %}
       {% for aid in areas() | sort %}
         {% set aname = area_name(aid) %}
         {% if aname %}
@@ -30,22 +31,89 @@
             {% endif %}
           {% endfor %}
           {% if picked.e is not none %}
-            {% set ns.items = ns.items + [picked.e] %}
+            {% set chips = namespace(ids=[]) %}
+            {% for cd in chip_domains %}
+              {% for e in states[cd] | sort(attribute='entity_id') %}
+                {% if area_id(e.entity_id) == aid and chips.ids | length < 3 %}
+                  {% set chips.ids = chips.ids + [e.entity_id] %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+            {% set vars = namespace(data={
+              'label_use_temperature': picked.e.split('.')[0] == 'climate' and state_attr(picked.e, 'current_temperature') is not none,
+              'label_use_brightness': picked.e.split('.')[0] == 'light'
+            }) %}
+            {% for i in range(chips.ids | length) %}
+              {% set eid = chips.ids[i] %}
+              {% set dom = eid.split('.')[0] %}
+              {% set ic = state_attr(eid, 'icon') | default('', true) %}
+              {% if dom == 'climate' %}
+                {% set chip = {
+                  'entity_id': eid,
+                  'icon': ic if ic else 'mdi:snowflake',
+                  'templates': ['blue_on'],
+                  'tap_action': {'action': 'more-info'}
+                } %}
+              {% elif dom == 'script' %}
+                {% set chip = {
+                  'entity_id': eid,
+                  'icon': ic if ic else 'mdi:broom',
+                  'templates': ['green_on'],
+                  'tap_action': {
+                    'action': 'call-service',
+                    'service': 'script.turn_on',
+                    'service_data': {'entity_id': eid}
+                  }
+                } %}
+              {% elif dom == 'light' %}
+                {% set chip = {
+                  'entity_id': eid,
+                  'icon': ic if ic else 'mdi:lightbulb',
+                  'templates': ['yellow_on'],
+                  'tap_action': {'action': 'toggle'}
+                } %}
+              {% elif dom == 'switch' %}
+                {% set chip = {
+                  'entity_id': eid,
+                  'icon': ic if ic else 'mdi:light-switch',
+                  'templates': ['grey_on'],
+                  'tap_action': {'action': 'toggle'}
+                } %}
+              {% elif dom == 'fan' %}
+                {% set chip = {
+                  'entity_id': eid,
+                  'icon': ic if ic else 'mdi:fan',
+                  'templates': ['green_on'],
+                  'tap_action': {'action': 'toggle'}
+                } %}
+              {% else %}
+                {% set chip = none %}
+              {% endif %}
+              {% if chip is not none %}
+                {% if i == 0 %}
+                  {% set vars.data = vars.data | combine({'entity_1': chip}) %}
+                {% elif i == 1 %}
+                  {% set vars.data = vars.data | combine({'entity_2': chip}) %}
+                {% elif i == 2 %}
+                  {% set vars.data = vars.data | combine({'entity_3': chip}) %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            {% set tap_js = "[[[ hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: " ~ (aname | tojson) ~ " }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
+            {% set icon_js = "[[[ const aid = hass.entities[entity.entity_id]?.area_id; return (aid && hass.areas[aid]?.icon) || 'mdi:home-floor-1'; ]]]" %}
+            {% set ns.items = ns.items + [{
+              'entity_id': picked.e,
+              'options': {
+                'name': aname,
+                'icon': icon_js,
+                'variables': vars.data,
+                'tap_action': tap_js,
+                'double_tap_action': {'action': 'none'}
+              }
+            }] %}
           {% endif %}
         {% endif %}
       {% endfor %}
       {{ ns.items }}
-  options:
-    name: "[[[ const id = entity.entity_id; const aid = hass.entities[id]?.area_id; return aid && hass.areas[aid] ? hass.areas[aid].name : entity.attributes.friendly_name; ]]]"
-    icon: "[[[ const id = entity.entity_id; const aid = hass.entities[id]?.area_id; return (aid && hass.areas[aid]?.icon) || entity.attributes.icon || 'mdi:home-floor-1'; ]]]"
-    variables:
-      label_use_temperature: "[[[ if (!entity.entity_id.startsWith('climate.')) return false; const t = hass.states[entity.entity_id]?.attributes?.current_temperature; return t !== undefined && t !== null && t !== 'unavailable'; ]]]"
-      label_use_brightness: "[[[ return entity.entity_id.startsWith('light.'); ]]]"
-      entity_1: "[[[ const areaId = hass.entities[entity.entity_id]?.area_id; if (!areaId) return false; const order = { light: 0, climate: 1, switch: 2, script: 3, fan: 4 }; const chip = (eid) => { const d = eid.split('.')[0]; const ic = hass.states[eid]?.attributes?.icon; if (d === 'climate') return { entity_id: eid, icon: ic || 'mdi:snowflake', templates: ['blue_on'], tap_action: { action: 'more-info' } }; if (d === 'script') return { entity_id: eid, icon: ic || 'mdi:broom', templates: ['green_on'], tap_action: { action: 'call-service', service: 'script.turn_on', service_data: { entity_id: eid } } }; if (d === 'light') return { entity_id: eid, icon: ic || 'mdi:lightbulb', templates: ['yellow_on'], tap_action: { action: 'toggle' } }; if (d === 'switch') return { entity_id: eid, icon: ic || 'mdi:light-switch', templates: ['grey_on'], tap_action: { action: 'toggle' } }; if (d === 'fan') return { entity_id: eid, icon: ic || 'mdi:fan', templates: ['green_on'], tap_action: { action: 'toggle' } }; return false; }; const ids = Object.keys(hass.states).filter((eid) => { const d = eid.split('.')[0]; return order[d] !== undefined && hass.entities[eid]?.area_id === areaId; }).sort((a, b) => order[a.split('.')[0]] - order[b.split('.')[0]] || a.localeCompare(b)).slice(0, 3); return ids[0] ? chip(ids[0]) : false; ]]]"
-      entity_2: "[[[ const areaId = hass.entities[entity.entity_id]?.area_id; if (!areaId) return false; const order = { light: 0, climate: 1, switch: 2, script: 3, fan: 4 }; const chip = (eid) => { const d = eid.split('.')[0]; const ic = hass.states[eid]?.attributes?.icon; if (d === 'climate') return { entity_id: eid, icon: ic || 'mdi:snowflake', templates: ['blue_on'], tap_action: { action: 'more-info' } }; if (d === 'script') return { entity_id: eid, icon: ic || 'mdi:broom', templates: ['green_on'], tap_action: { action: 'call-service', service: 'script.turn_on', service_data: { entity_id: eid } } }; if (d === 'light') return { entity_id: eid, icon: ic || 'mdi:lightbulb', templates: ['yellow_on'], tap_action: { action: 'toggle' } }; if (d === 'switch') return { entity_id: eid, icon: ic || 'mdi:light-switch', templates: ['grey_on'], tap_action: { action: 'toggle' } }; if (d === 'fan') return { entity_id: eid, icon: ic || 'mdi:fan', templates: ['green_on'], tap_action: { action: 'toggle' } }; return false; }; const ids = Object.keys(hass.states).filter((eid) => { const d = eid.split('.')[0]; return order[d] !== undefined && hass.entities[eid]?.area_id === areaId; }).sort((a, b) => order[a.split('.')[0]] - order[b.split('.')[0]] || a.localeCompare(b)).slice(0, 3); return ids[1] ? chip(ids[1]) : false; ]]]"
-      entity_3: "[[[ const areaId = hass.entities[entity.entity_id]?.area_id; if (!areaId) return false; const order = { light: 0, climate: 1, switch: 2, script: 3, fan: 4 }; const chip = (eid) => { const d = eid.split('.')[0]; const ic = hass.states[eid]?.attributes?.icon; if (d === 'climate') return { entity_id: eid, icon: ic || 'mdi:snowflake', templates: ['blue_on'], tap_action: { action: 'more-info' } }; if (d === 'script') return { entity_id: eid, icon: ic || 'mdi:broom', templates: ['green_on'], tap_action: { action: 'call-service', service: 'script.turn_on', service_data: { entity_id: eid } } }; if (d === 'light') return { entity_id: eid, icon: ic || 'mdi:lightbulb', templates: ['yellow_on'], tap_action: { action: 'toggle' } }; if (d === 'switch') return { entity_id: eid, icon: ic || 'mdi:light-switch', templates: ['grey_on'], tap_action: { action: 'toggle' } }; if (d === 'fan') return { entity_id: eid, icon: ic || 'mdi:fan', templates: ['green_on'], tap_action: { action: 'toggle' } }; return false; }; const ids = Object.keys(hass.states).filter((eid) => { const d = eid.split('.')[0]; return order[d] !== undefined && hass.entities[eid]?.area_id === areaId; }).sort((a, b) => order[a.split('.')[0]] - order[b.split('.')[0]] || a.localeCompare(b)).slice(0, 3); return ids[2] ? chip(ids[2]) : false; ]]]"
-    tap_action: "[[[ const id = entity.entity_id; const aid = hass.entities[id]?.area_id; const n = aid && hass.areas[aid] ? hass.areas[aid].name : ''; if (n) hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: n }); return { action: 'navigate', navigation_path: 'raum' }; ]]]"
-    double_tap_action:
-      action: none
 
 - !include ulm-room-energie.yaml
