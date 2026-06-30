@@ -1,0 +1,568 @@
+title: Übersicht
+views:
+  - type: sections
+    max_columns: 3
+    title: Zuhause Übersicht
+    path: zuhause
+    sections:
+      - type: grid
+        column_span: 3
+        cards:
+          - type: markdown
+            content: >
+              {% set name = user.split(' ')[0] %}
+
+              {% macro days_until(sensor_id) %}
+                {% set state = states(sensor_id) %}
+                {% if state not in ['unknown', 'unavailable', 'Nicht verfügbar'] and state is string and '.' in state %}
+                  {% set date_str = state.split(' ') | last %}
+                  {% set target_date = strptime(date_str, '%d.%m.%Y', none) %}
+                  {% if target_date is not none %}
+                    {% set target_str = target_date.strftime('%Y-%m-%d') %}
+                    {% set today = now().strftime('%Y-%m-%d') %}
+                    {{ ((as_timestamp(target_str) - as_timestamp(today)) / 86400) | int }}
+                  {% else %} 99 {% endif %}
+                {% else %} 99 {% endif %}
+              {% endmacro %}
+
+              {% set rest =
+              days_until('sensor.waste_collection_schedule_restabfall_14_taglich')
+              | int %} {% set bio =
+              days_until('sensor.waste_collection_schedule_bioabfall_14_taglich')
+              | int %} {% set papier =
+              days_until('sensor.waste_collection_schedule_papiertonne_monatlich')
+              | int %} {% set gelb =
+              days_until('sensor.waste_collection_schedule_gelber_sack_14_taglich')
+              | int %}
+
+              {# Listen für Heute und Morgen erstellen #} {% set heute = [] %}
+              {% if rest == 0 %}{% set heute = heute + ['**Restmüll**'] %}{%
+              endif %} {% if bio == 0 %}{% set heute = heute + ['**Bio-Tonne**']
+              %}{% endif %} {% if papier == 0 %}{% set heute = heute +
+              ['**Altpapier**'] %}{% endif %} {% if gelb == 0 %}{% set heute =
+              heute + ['**Gelber Sack**'] %}{% endif %}
+
+              {% set morgen = [] %} {% if rest == 1 %}{% set morgen = morgen +
+              ['**Restmüll**'] %}{% endif %} {% if bio == 1 %}{% set morgen =
+              morgen + ['**Bio-Tonne**'] %}{% endif %} {% if papier == 1 %}{%
+              set morgen = morgen + ['**Altpapier**'] %}{% endif %} {% if gelb
+              == 1 %}{% set morgen = morgen + ['**Gelber Sack**'] %}{% endif %}
+
+              {# Den Satz dynamisch zusammenbauen #} {% set text = "### 👋 Hey "
+              ~ name %} {% if heute | length > 0 and morgen | length > 0 %}
+                {% set text = text ~ ", heute wird " ~ heute|join(' & ') ~ " und morgen " ~ morgen|join(' & ') ~ " abgeholt." %}
+              {% elif heute | length > 0 %}
+                {% set text = text ~ ", heute wird " ~ heute|join(' & ') ~ " abgeholt." %}
+              {% elif morgen | length > 0 %}
+                {% set text = text ~ ", morgen wird " ~ morgen|join(' & ') ~ " abgeholt." %}
+              {% else %}
+                {% set text = text ~ "." %}
+              {% endif %}
+
+              {{ text }}
+            text_only: true
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            heading: Schnellzugriff Durchgangsräume & Außen
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: tile
+                entity: light.licht_wohnzimmer
+                name: Wohnzimmer
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: light.beleuchtung_bett_leuchte
+                name: Esszimmer
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: switch.flur_licht_shelly
+                name: Flur + Treppe
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: switch.shelly_1_mini_gen4
+                name: Flur Unten
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: switch.licht_abstellraum_unten_sonoff
+                name: Abstellraum Unten
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: switch.licht_sonoff
+                name: Abstellraum Oben
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: switch.automatisch_bewasserung
+                name: Bewässerung
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+                features:
+                  - type: vacuum-commands
+            grid_options:
+              columns: full
+              rows: auto
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: 🌤️ Wetter & Aussichten
+          - type: horizontal-stack
+            grid_options:
+              columns: full
+            cards:
+              - type: button
+                name: Stündlich
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.wetter_ansicht
+                  data:
+                    option: Stündlich
+              - type: button
+                name: Täglich
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.wetter_ansicht
+                  data:
+                    option: Täglich
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.wetter_ansicht
+                state: Stündlich
+            card:
+              type: weather-forecast
+              entity: weather.wetter_home
+              forecast_type: hourly
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.wetter_ansicht
+                state: Täglich
+            card:
+              type: weather-forecast
+              entity: weather.wetter_home
+              forecast_type: daily
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: 📅 Termine
+            heading_style: title
+          - type: calendar
+            entities:
+              - calendar.thorge_3_laura
+      - type: grid
+        cards:
+          - type: heading
+            heading: Wohn- & Esszimmer
+            heading_style: title
+          - type: light
+            entity: light.licht_wohnzimmer
+            name: Wohnzimmer Lampe
+          - type: light
+            entity: light.beleuchtung_bett_leuchte
+            name: Esszimmer Lampe
+          - type: tile
+            entity: climate.esszimmer_klimaanlage
+            name: Esszimmer
+            vertical: false
+            features:
+              - type: target-temperature
+            features_position: bottom
+          - type: tile
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            features:
+              - type: vacuum-commands
+      - type: grid
+        cards:
+          - type: heading
+            heading: Küche + Raum
+            heading_style: title
+          - type: tile
+            entity: climate.raum_neben_der_kuche_klimaanlage
+            name: Küche
+            vertical: false
+            features:
+              - type: target-temperature
+            features_position: bottom
+      - type: grid
+        cards:
+          - type: heading
+            heading: Schlafzimmer
+          - type: tile
+            entity: climate.schlafzimmer_klimaanlage
+            vertical: false
+            features:
+              - type: target-temperature
+            features_position: bottom
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            heading: ☀️ Solarman PV-Leistung
+          - type: horizontal-stack
+            grid_options:
+              columns: full
+            cards:
+              - type: button
+                name: Live
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Live
+              - type: button
+                name: 24h
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: 24h
+              - type: button
+                name: Woche
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Woche
+              - type: button
+                name: Monat
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Monat
+              - type: button
+                name: Jahr
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Jahr
+              - type: button
+                name: Gesamt
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Lebenslang
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Live
+            card:
+              type: history-graph
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Aktuelle Produktion
+                - entity: sensor.pv_activepower_load_sys
+                  name: Aktueller Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie laden
+                - entity: sensor.pv_battery
+                  name: Ladestand
+                - entity: sensor.pv_today_energy_import
+                - entity: sensor.pv_today_energy_export
+              hours_to_show: 1
+              refresh_interval: 5
+              show_names: true
+              logarithmic_scale: false
+              expand_legend: false
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: 24h
+            card:
+              type: history-graph
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Aktuelle Produktion
+                - entity: sensor.pv_activepower_load_sys
+                  name: Aktueller Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie laden
+                - entity: sensor.pv_battery
+                  name: Ladestand
+                - entity: sensor.pv_today_energy_import
+                - entity: sensor.pv_today_energy_export
+              hours_to_show: 24
+              refresh_interval: 0
+              show_names: true
+              logarithmic_scale: false
+              expand_legend: false
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Woche
+            card:
+              type: history-graph
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Aktuelle Produktion
+                - entity: sensor.pv_activepower_load_sys
+                  name: Aktueller Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie laden
+                - entity: sensor.pv_battery
+                  name: Ladestand
+                - entity: sensor.pv_today_energy_import
+                - entity: sensor.pv_today_energy_export
+              hours_to_show: 168
+              refresh_interval: 0
+              show_names: true
+              logarithmic_scale: false
+              expand_legend: false
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Monat
+            card:
+              type: statistics-graph
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Aktuelle Produktion
+                - entity: sensor.pv_activepower_load_sys
+                  name: Aktueller Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie laden
+                - entity: sensor.pv_battery
+                  name: Ladestand
+                - entity: sensor.pv_today_energy_import
+                - entity: sensor.pv_today_energy_export
+              days_to_show: 30
+              period: hour
+              chart_type: line
+              stat_types:
+                - state
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Jahr
+            card:
+              type: statistics-graph
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Aktuelle Produktion
+                - entity: sensor.pv_activepower_load_sys
+                  name: Aktueller Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie laden
+                - entity: sensor.pv_battery
+                  name: Ladestand
+                - entity: sensor.pv_today_energy_import
+                - entity: sensor.pv_today_energy_export
+              days_to_show: 365
+              period: day
+              chart_type: line
+              stat_types:
+                - state
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Lebenslang
+            card:
+              type: statistics-graph
+              days_to_show: 1825
+              period: month
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Aktuelle Produktion
+                - entity: sensor.pv_activepower_load_sys
+                  name: Aktueller Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie laden
+                - entity: sensor.pv_battery
+                  name: Ladestand
+                - entity: sensor.pv_today_energy_import
+                - entity: sensor.pv_today_energy_export
+                - entity: sensor.esszimmer_klimaanlage_energieverbrauch
+                  name: Klima Esszimmer
+                - entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
+                  name: Klima Küche
+                - entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
+                  name: Klima Schlafzimmer
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            heading: 📍 Standorte & Geräte
+          - type: map
+            entities:
+              - entity: person.thorge
+              - entity: person.laura
+            theme_mode: auto
+            aspect_ratio: "21:9"
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.pixel_7_pro_battery_level
+                name: Akku Laura
+                vertical: false
+                features_position: bottom
+              - type: tile
+                entity: sensor.pixel_9_pro_xl_battery_level
+                name: Akku Thorge
+                vertical: false
+                features_position: bottom
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            heading: 🌐 Router & Netzwerk-Performance
+          - type: horizontal-stack
+            grid_options:
+              columns: full
+            cards:
+              - type: button
+                name: 24h
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.router_zeitraum
+                  data:
+                    option: 24h
+              - type: button
+                name: Woche
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.router_zeitraum
+                  data:
+                    option: Woche
+              - type: button
+                name: Monat
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.router_zeitraum
+                  data:
+                    option: Monat
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: 24h
+            card:
+              type: statistics-graph
+              days_to_show: 1
+              period: hour
+              chart_type: line
+              stat_types:
+                - mean
+              entities:
+                - sensor.speedtest_download
+                - sensor.speedtest_upload
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: Woche
+            card:
+              type: statistics-graph
+              days_to_show: 7
+              period: hour
+              chart_type: line
+              stat_types:
+                - mean
+              entities:
+                - sensor.speedtest_download
+                - sensor.speedtest_upload
+          - type: conditional
+            grid_options:
+              columns: full
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: Monat
+            card:
+              type: statistics-graph
+              days_to_show: 30
+              period: day
+              chart_type: line
+              stat_types:
+                - mean
+              entities:
+                - sensor.speedtest_download
+                - sensor.speedtest_upload
+  - type: sections
+    max_columns: 4
+    title: Dreame Karte
+    path: dreame-karte
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Neuer Abschnitt
+          - type: custom:dreame-vacuum-map-card
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            map_entity: camera.dreame_bot_d9_max_map
+            theme: dark

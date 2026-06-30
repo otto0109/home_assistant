@@ -1,0 +1,1512 @@
+title: Test
+views:
+  - title: Übersicht
+    path: uebersicht
+    icon: mdi:home-analytics
+    theme: dark
+    type: sections
+    max_columns: 6
+    sections:
+      - type: grid
+        column_span: 6
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: markdown
+                content: >
+                  {% set name = user.split(' ')[0] %}
+
+                  # ZUHAUSE
+
+                  <p class="sub">{{ now().strftime('%A, %d. %B') | capitalize }}
+                  · Hallo {{ name }}</p>
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      padding: 8px 4px 0 8px;
+                    }
+                    h1 {
+                      font-size: clamp(2rem, 5vw, 3.2rem);
+                      font-weight: 200;
+                      letter-spacing: 0.12em;
+                      margin: 0 0 4px 0;
+                      line-height: 1.1;
+                    }
+                    .sub {
+                      margin: 0;
+                      opacity: 0.55;
+                      font-size: 0.95rem;
+                      letter-spacing: 0.04em;
+                      text-transform: uppercase;
+                    }
+              - type: markdown
+                content: |
+                  <p class="clock">{{ now().strftime('%H:%M') }}</p>
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      text-align: right;
+                      padding: 8px 8px 0 0;
+                    }
+                    .clock {
+                      margin: 0;
+                      font-size: clamp(2.5rem, 6vw, 4rem);
+                      font-weight: 200;
+                      letter-spacing: 0.06em;
+                      line-height: 1;
+                    }
+      - type: grid
+        column_span: 6
+        cards:
+          - type: custom:mushroom-chips-card
+            alignment: center
+            chips:
+              - type: template
+                icon: mdi:home
+                content: Start
+                tap_action:
+                  action: navigate
+                  navigation_path: uebersicht
+              - type: template
+                icon: mdi:sofa
+                content: Wohnen
+                tap_action:
+                  action: navigate
+                  navigation_path: wohnzimmer
+              - type: template
+                icon: mdi:stove
+                content: Küche
+                tap_action:
+                  action: navigate
+                  navigation_path: kueche
+              - type: template
+                icon: mdi:bed
+                content: Schlafen
+                tap_action:
+                  action: navigate
+                  navigation_path: schlafzimmer
+              - type: template
+                icon: mdi:door-open
+                content: Flur
+                tap_action:
+                  action: navigate
+                  navigation_path: flur
+              - type: template
+                icon: mdi:flower
+                content: Garten
+                tap_action:
+                  action: navigate
+                  navigation_path: garten
+              - type: template
+                icon: mdi:solar-power
+                content: Energie
+                tap_action:
+                  action: navigate
+                  navigation_path: energie
+              - type: template
+                icon: mdi:calendar-month
+                content: Kalender
+                tap_action:
+                  action: navigate
+                  navigation_path: einstellungen
+              - type: template
+                icon: mdi:cog
+                content: Mehr
+                tap_action:
+                  action: navigate
+                  navigation_path: einstellungen
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.thorge
+              - type: entity
+                entity: person.laura
+              - type: entity
+                entity: weather.wetter_home
+              - type: template
+                icon: mdi:lightbulb-group
+                content: |
+                  {% set lights = [
+                    'light.licht_wohnzimmer',
+                    'light.beleuchtung_bett_leuchte',
+                    'switch.flur_licht_shelly',
+                    'switch.shelly_1_mini_gen4',
+                    'switch.licht_abstellraum_unten_sonoff',
+                    'switch.licht_sonoff'
+                  ] %} {% set on = namespace(c=0) %} {% for e in lights %}
+                    {% if is_state(e, 'on') %}{% set on.c = on.c + 1 %}{% endif %}
+                  {% endfor %} {{ on.c }}/{{ lights | count }} Licht
+                tap_action:
+                  action: navigate
+                  navigation_path: wohnzimmer
+      - type: grid
+        column_span: 3
+        cards:
+          - type: custom:auto-entities
+            show_empty: false
+            sort:
+              method: friendly_name
+            card:
+              type: vertical-stack
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  options:
+                    type: custom:mushroom-entity-card
+                    layout: horizontal
+                    fill_container: true
+                    icon_color: amber
+                    card_mod:
+                      style: |
+                        ha-card { min-height: 76px; }
+                        mushroom-shape-icon { --icon-size: 40px; }
+                        .primary {
+                          font-size: 1.05rem !important;
+                          white-space: normal !important;
+                          line-height: 1.25 !important;
+                        }
+      - type: grid
+        column_span: 3
+        cards:
+          - type: custom:power-flow-card-plus
+            clickable_entities: true
+            use_new_flow_rate_model: true
+            min_flow_rate: 0.75
+            max_flow_rate: 6
+            min_expected_power: 0.01
+            max_expected_power: 11000
+            w_decimals: 0
+            kw_decimals: 2
+            display_zero_lines:
+              mode: transparency
+              transparency: 70
+            entities:
+              solar:
+                entity: sensor.pv_pv_power
+                name: Solar
+                icon: mdi:solar-power-variant
+                color_icon: true
+                display_zero: true
+                secondary_info:
+                  entity: sensor.pv_kwpeak
+                  unit_of_measurement: kWp
+                  decimals: 2
+              grid:
+                entity: sensor.pv_netzleistung
+                name: Netz
+                icon: mdi:transmission-tower
+                display_state: one_way
+                color_circle: color_dynamically
+              battery:
+                entity: sensor.pv_battery_power
+                state_of_charge: sensor.pv_battery
+                name: Speicher
+                display_state: one_way
+                color_circle: color_dynamically
+                state_of_charge_decimals: 0
+              home:
+                entity: sensor.pv_activepower_load_sys
+                name: Haus
+                icon: mdi:home
+                color_icon: true
+                override_state: true
+      - type: grid
+        column_span: 6
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Wohnen
+            icon: mdi:sofa
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: wohnzimmer
+            card_mod:
+              style: |
+                .primary { white-space: normal !important; text-align: center; }
+          - type: custom:mushroom-template-card
+            primary: Küche
+            icon: mdi:stove
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: kueche
+            card_mod:
+              style: |
+                .primary { white-space: normal !important; text-align: center; }
+          - type: custom:mushroom-template-card
+            primary: Schlafen
+            icon: mdi:bed
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: schlafzimmer
+            card_mod:
+              style: |
+                .primary { white-space: normal !important; text-align: center; }
+          - type: custom:mushroom-template-card
+            primary: Flur
+            icon: mdi:door-open
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: flur
+            card_mod:
+              style: |
+                .primary { white-space: normal !important; text-align: center; }
+          - type: custom:mushroom-template-card
+            primary: Garten
+            icon: mdi:flower
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: garten
+            card_mod:
+              style: |
+                .primary { white-space: normal !important; text-align: center; }
+          - type: custom:mushroom-template-card
+            primary: Energie
+            icon: mdi:solar-power
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: energie
+            card_mod:
+              style: |
+                .primary { white-space: normal !important; text-align: center; }
+      - type: grid
+        column_span: 6
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: weather.wetter_home
+            name: Wetter
+            layout: vertical
+            fill_container: true
+          - type: custom:mushroom-template-card
+            entity: sensor.pv_pv_power
+            primary: "{{ states('sensor.pv_pv_power') }} W"
+            secondary: Speicher {{ states('sensor.pv_battery') }}%
+            icon: mdi:solar-power-variant
+            icon_color: amber
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: energie
+          - type: custom:mushroom-entity-card
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            name: Rocky
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: wohnzimmer
+          - type: custom:mushroom-template-card
+            primary: "{{ states('sensor.pv_activepower_load_sys') }} W"
+            secondary: Hausverbrauch
+            icon: mdi:home-lightning-bolt
+            icon_color: pink
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: energie
+      - type: grid
+        column_span: 6
+        cards:
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pixel_7_pro_battery_level
+                below: 20
+            card:
+              type: custom:mushroom-entity-card
+              entity: sensor.pixel_7_pro_battery_level
+              name: Laura — Akku niedrig
+              icon: mdi:battery-alert
+              layout: horizontal
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pixel_9_pro_xl_battery_level
+                below: 20
+            card:
+              type: custom:mushroom-entity-card
+              entity: sensor.pixel_9_pro_xl_battery_level
+              name: Thorge — Akku niedrig
+              icon: mdi:battery-alert
+              layout: horizontal
+  - title: Wohnzimmer
+    path: wohnzimmer
+    icon: mdi:sofa
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Licht-Szenen
+            icon: mdi:palette-swatch
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  name: "*Wohnzimmer*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: scene
+                  name: "*Esszimmer*"
+                  options:
+                    type: tile
+                    vertical: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.licht_wohnzimmer
+                name: Wohnzimmer
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: light.beleuchtung_bett_leuchte
+                name: Esszimmer
+                vertical: true
+                features_position: bottom
+          - type: markdown
+            content: >
+              _Weitere Lampen erscheinen automatisch, sobald sie in HA
+              existieren._
+      - type: grid
+        cards:
+          - type: heading
+            heading: Steckdosen
+            icon: mdi:power-socket-eu
+          - type: markdown
+            content: |
+              _Platzhalter: `switch.wohnzimmer_*`, `switch.esszimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Klima
+            icon: mdi:air-conditioner
+          - type: tile
+            entity: climate.esszimmer_klimaanlage
+            name: Esszimmer
+            features:
+              - type: target-temperature
+            features_position: bottom
+      - type: grid
+        cards:
+          - type: heading
+            heading: Fenster
+            icon: mdi:window-open-variant
+          - type: markdown
+            content: >
+              _Platzhalter: `binary_sensor.fenster_wohnzimmer_*`,
+              `binary_sensor.fenster_esszimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Türen
+            icon: mdi:door
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.tuer_wohnzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensoren
+            icon: mdi:thermometer-lines
+          - type: markdown
+            content: >
+              _Platzhalter: `sensor.wohnzimmer_temperatur`,
+              `sensor.wohnzimmer_luftfeuchtigkeit`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bewegungsmelder
+            icon: mdi:motion-sensor
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.bewegung_wohnzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Batteriestände
+            icon: mdi:battery-medium
+          - type: markdown
+            content: |
+              _Platzhalter: Zigbee/Matter-Geräte mit `sensor.*_battery`_
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Geräte
+            icon: mdi:robot-vacuum
+          - type: tile
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            name: Staubsauger
+            features:
+              - type: vacuum-commands
+          - type: custom:dreame-vacuum-map-card
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            map_entity: camera.dreame_bot_d9_max_map
+            theme: dark
+  - title: Küche
+    path: kueche
+    icon: mdi:stove
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Licht-Szenen
+            icon: mdi:palette-swatch
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  name: "*Küche*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: scene
+                  name: "*kueche*"
+                  options:
+                    type: tile
+                    vertical: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: markdown
+            content: |
+              _Neue Szenen mit „Küche“ im Namen erscheinen oben automatisch._
+      - type: grid
+        cards:
+          - type: heading
+            heading: Steckdosen
+            icon: mdi:power-socket-eu
+          - type: markdown
+            content: |
+              _Platzhalter: `switch.kueche_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Klima
+            icon: mdi:air-conditioner
+          - type: tile
+            entity: climate.raum_neben_der_kuche_klimaanlage
+            name: Küche
+            features:
+              - type: target-temperature
+            features_position: bottom
+          - type: tile
+            entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
+            name: Klima — Verbrauch
+      - type: grid
+        cards:
+          - type: heading
+            heading: Fenster
+            icon: mdi:window-open-variant
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.fenster_kueche_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Türen
+            icon: mdi:door
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.tuer_kueche_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensoren
+            icon: mdi:thermometer-lines
+          - type: markdown
+            content: |
+              _Platzhalter: `sensor.kueche_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bewegungsmelder
+            icon: mdi:motion-sensor
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.bewegung_kueche_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Batteriestände
+            icon: mdi:battery-medium
+          - type: markdown
+            content: |
+              _Platzhalter: `sensor.kueche_*_battery`_
+  - title: Schlafzimmer
+    path: schlafzimmer
+    icon: mdi:bed
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Licht-Szenen
+            icon: mdi:palette-swatch
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  name: "*Schlafzimmer*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: scene
+                  name: "*schlafzimmer*"
+                  options:
+                    type: tile
+                    vertical: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: markdown
+            content: >
+              _Neue Szenen mit „Schlafzimmer“ im Namen erscheinen oben
+              automatisch._
+      - type: grid
+        cards:
+          - type: heading
+            heading: Steckdosen
+            icon: mdi:power-socket-eu
+          - type: markdown
+            content: |
+              _Platzhalter: `switch.schlafzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Klima
+            icon: mdi:air-conditioner
+          - type: tile
+            entity: climate.schlafzimmer_klimaanlage
+            features:
+              - type: target-temperature
+            features_position: bottom
+          - type: tile
+            entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
+            name: Klima — Verbrauch
+      - type: grid
+        cards:
+          - type: heading
+            heading: Fenster
+            icon: mdi:window-open-variant
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.fenster_schlafzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Türen
+            icon: mdi:door
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.tuer_schlafzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensoren
+            icon: mdi:thermometer-lines
+          - type: markdown
+            content: |
+              _Platzhalter: `sensor.schlafzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bewegungsmelder
+            icon: mdi:motion-sensor
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.bewegung_schlafzimmer_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Batteriestände
+            icon: mdi:battery-medium
+          - type: markdown
+            content: |
+              _Platzhalter: `sensor.schlafzimmer_*_battery`_
+  - title: Flur
+    path: flur
+    icon: mdi:door-open
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Licht-Szenen
+            icon: mdi:palette-swatch
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  name: "*Flur*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: scene
+                  name: "*flur*"
+                  options:
+                    type: tile
+                    vertical: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: switch.flur_licht_shelly
+                name: Flur + Treppe
+                vertical: true
+              - type: tile
+                entity: switch.shelly_1_mini_gen4
+                name: Flur unten
+                vertical: true
+              - type: tile
+                entity: switch.licht_abstellraum_unten_sonoff
+                name: Abstellraum unten
+                vertical: true
+              - type: tile
+                entity: switch.licht_sonoff
+                name: Abstellraum oben
+                vertical: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: Steckdosen
+            icon: mdi:power-socket-eu
+          - type: markdown
+            content: |
+              _Platzhalter: `switch.flur_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Klima
+            icon: mdi:air-conditioner
+          - type: markdown
+            content: |
+              _Platzhalter: `climate.flur_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Fenster
+            icon: mdi:window-open-variant
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.fenster_flur_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Türen
+            icon: mdi:door
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.tuer_flur_*`, Haustür_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensoren
+            icon: mdi:thermometer-lines
+          - type: markdown
+            content: |
+              _Platzhalter: `sensor.flur_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bewegungsmelder
+            icon: mdi:motion-sensor
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.bewegung_flur_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Batteriestände
+            icon: mdi:battery-medium
+          - type: markdown
+            content: |
+              _Shelly/Batterie-Sensoren: `sensor.flur_*_battery`_
+  - title: Garten
+    path: garten
+    icon: mdi:flower
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Licht-Szenen
+            icon: mdi:palette-swatch
+          - type: custom:auto-entities
+            show_empty: true
+            sort:
+              method: friendly_name
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: scene
+                  name: "*Garten*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: scene
+                  name: "*garten*"
+                  options:
+                    type: tile
+                    vertical: true
+                - domain: scene
+                  name: "*Außen*"
+                  options:
+                    type: tile
+                    vertical: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Beleuchtung
+            icon: mdi:lightbulb-group
+          - type: markdown
+            content: >
+              _Neue Szenen mit „Garten“ oder „Außen“ im Namen erscheinen oben
+              automatisch._
+      - type: grid
+        cards:
+          - type: heading
+            heading: Steckdosen & Bewässerung
+            icon: mdi:watering-can
+          - type: tile
+            entity: switch.automatisch_bewasserung
+            name: Automatik Bewässerung
+            vertical: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: Klima
+            icon: mdi:weather-partly-cloudy
+          - type: markdown
+            content: |
+              _Platzhalter: Außentemperatur `sensor.garten_*`, Wetterstation_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Fenster / Tore
+            icon: mdi:gate
+          - type: markdown
+            content: |
+              _Platzhalter: `cover.garagentor_*`, `binary_sensor.tor_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensoren
+            icon: mdi:thermometer-lines
+          - type: markdown
+            content: |
+              _Platzhalter: Bodenfeuchte, Regen `sensor.garten_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bewegungsmelder
+            icon: mdi:motion-sensor
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.bewegung_garten_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Batteriestände
+            icon: mdi:battery-medium
+          - type: markdown
+            content: |
+              _Platzhalter: Außensensoren `sensor.garten_*_battery`_
+  - title: Energie
+    path: energie
+    icon: mdi:solar-power
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: custom:power-flow-card-plus
+            clickable_entities: true
+            use_new_flow_rate_model: true
+            min_flow_rate: 0.75
+            max_flow_rate: 6
+            min_expected_power: 0.01
+            max_expected_power: 11000
+            w_decimals: 0
+            kw_decimals: 2
+            display_zero_lines:
+              mode: transparency
+              transparency: 70
+            entities:
+              solar:
+                entity: sensor.pv_pv_power
+                name: Solar
+                icon: mdi:solar-power-variant
+                color_icon: true
+                display_zero: true
+                secondary_info:
+                  entity: sensor.pv_kwpeak
+                  unit_of_measurement: kWp
+                  decimals: 2
+              grid:
+                entity: sensor.pv_netzleistung
+                name: Netz
+                icon: mdi:transmission-tower
+                display_state: one_way
+                color_circle: color_dynamically
+              battery:
+                entity: sensor.pv_battery_power
+                state_of_charge: sensor.pv_battery
+                name: Speicher
+                display_state: one_way
+                color_circle: color_dynamically
+                state_of_charge_decimals: 0
+              home:
+                entity: sensor.pv_activepower_load_sys
+                name: Haus
+                icon: mdi:home
+                color_icon: true
+                override_state: true
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Heute
+            icon: mdi:calendar-today
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: sensor.pv_today_energy_export
+                name: Einspeisung
+                icon: mdi:transmission-tower-export
+              - type: tile
+                entity: sensor.pv_today_energy_import
+                name: Netzbezug
+                icon: mdi:transmission-tower-import
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Verlauf heute
+            icon: mdi:chart-line
+          - type: history-graph
+            hours_to_show: 24
+            refresh_interval: 60
+            show_names: true
+            entities:
+              - entity: sensor.pv_pv_power
+                name: Solar
+              - entity: sensor.pv_activepower_load_sys
+                name: Verbrauch
+              - entity: sensor.pv_battery_power
+                name: Batterie
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Klima — Verbrauch
+            icon: mdi:air-conditioner
+          - type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.esszimmer_klimaanlage_energieverbrauch
+                name: Esszimmer
+              - type: tile
+                entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
+                name: Küche
+              - type: tile
+                entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
+                name: Schlafzimmer
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Zeitraum
+            icon: mdi:chart-timeline-variant
+          - type: horizontal-stack
+            cards:
+              - type: button
+                name: Live
+                icon: mdi:pulse
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Live
+              - type: button
+                name: 24h
+                icon: mdi:clock-outline
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: 24h
+              - type: button
+                name: Woche
+                icon: mdi:calendar-week
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Woche
+              - type: button
+                name: Monat
+                icon: mdi:calendar-month
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Monat
+              - type: button
+                name: Jahr
+                icon: mdi:calendar
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Jahr
+              - type: button
+                name: Gesamt
+                icon: mdi:chart-areaspline
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.pv_zeitraum
+                  data:
+                    option: Lebenslang
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Live
+            card:
+              type: history-graph
+              hours_to_show: 1
+              refresh_interval: 5
+              show_names: true
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Solar
+                - entity: sensor.pv_activepower_load_sys
+                  name: Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie
+                - entity: sensor.pv_battery
+                  name: Ladestand
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: 24h
+            card:
+              type: statistics-graph
+              chart_type: line
+              days_to_show: 1
+              period: 5minute
+              stat_types:
+                - mean
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Solar
+                - entity: sensor.pv_activepower_load_sys
+                  name: Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Woche
+            card:
+              type: statistics-graph
+              chart_type: line
+              days_to_show: 7
+              period: hour
+              stat_types:
+                - mean
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Solar
+                - entity: sensor.pv_activepower_load_sys
+                  name: Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie
+                - entity: sensor.pv_today_energy_import
+                  name: Import
+                - entity: sensor.pv_today_energy_export
+                  name: Export
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Monat
+            card:
+              type: statistics-graph
+              chart_type: line
+              days_to_show: 30
+              period: hour
+              stat_types:
+                - mean
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Solar
+                - entity: sensor.pv_activepower_load_sys
+                  name: Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie
+                - entity: sensor.pv_today_energy_import
+                  name: Import
+                - entity: sensor.pv_today_energy_export
+                  name: Export
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Jahr
+            card:
+              type: statistics-graph
+              chart_type: line
+              days_to_show: 365
+              period: day
+              stat_types:
+                - mean
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Solar
+                - entity: sensor.pv_activepower_load_sys
+                  name: Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie
+                - entity: sensor.pv_today_energy_import
+                  name: Import
+                - entity: sensor.pv_today_energy_export
+                  name: Export
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.pv_zeitraum
+                state: Lebenslang
+            card:
+              type: statistics-graph
+              chart_type: line
+              days_to_show: 1825
+              period: month
+              stat_types:
+                - mean
+              entities:
+                - entity: sensor.pv_pv_power
+                  name: Solar
+                - entity: sensor.pv_activepower_load_sys
+                  name: Verbrauch
+                - entity: sensor.pv_battery_power
+                  name: Batterie
+                - entity: sensor.pv_today_energy_import
+                  name: Import
+                - entity: sensor.pv_today_energy_export
+                  name: Export
+                - entity: sensor.esszimmer_klimaanlage_energieverbrauch
+                  name: Klima Esszimmer
+                - entity: sensor.raum_neben_der_kuche_klimaanlage_energieverbrauch
+                  name: Klima Küche
+                - entity: sensor.schlafzimmer_klimaanlage_energieverbrauch
+                  name: Klima Schlafzimmer
+  - title: Sicherheit
+    path: sicherheit
+    icon: mdi:shield-home
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Fensterkontakte
+            icon: mdi:window-open-variant
+          - type: markdown
+            content: >
+              _Platzhalter: `binary_sensor.fenster_*` — bei vielen Geräten
+              `custom:auto-entities` Card empfohlen._
+      - type: grid
+        cards:
+          - type: heading
+            heading: Türkontakte
+            icon: mdi:door-closed-lock
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.tuer_*`, `binary_sensor.haustuer`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Rauchmelder
+            icon: mdi:smoke-detector
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.rauch_*`, `binary_sensor.smoke_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Wassersensoren
+            icon: mdi:water-alert
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.wasser_*`, `binary_sensor.leak_*`_
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bewegungsmelder
+            icon: mdi:motion-sensor
+          - type: markdown
+            content: |
+              _Platzhalter: `binary_sensor.bewegung_*`_
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Batteriewarnungen
+            icon: mdi:battery-alert
+          - type: markdown
+            content: >
+              _Platzhalter: Template-Sensor `sensor.geraete_batterie_niedrig`
+              oder
+
+              `custom:auto-entities` mit Filter `attributes.device_class:
+              battery` und state < 20._
+  - title: Netzwerk
+    path: netzwerk
+    icon: mdi:lan
+    theme: dark
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Speedtest
+            icon: mdi:speedometer
+          - type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: sensor.speedtest_download
+                name: Download
+              - type: tile
+                entity: sensor.speedtest_upload
+                name: Upload
+          - type: horizontal-stack
+            cards:
+              - type: button
+                name: 24h
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.router_zeitraum
+                  data:
+                    option: 24h
+              - type: button
+                name: Woche
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.router_zeitraum
+                  data:
+                    option: Woche
+              - type: button
+                name: Monat
+                show_icon: false
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.router_zeitraum
+                  data:
+                    option: Monat
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: 24h
+            card:
+              type: statistics-graph
+              days_to_show: 1
+              period: hour
+              chart_type: line
+              stat_types:
+                - mean
+              entities:
+                - sensor.speedtest_download
+                - sensor.speedtest_upload
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: Woche
+            card:
+              type: statistics-graph
+              days_to_show: 7
+              period: hour
+              chart_type: line
+              stat_types:
+                - mean
+              entities:
+                - sensor.speedtest_download
+                - sensor.speedtest_upload
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.router_zeitraum
+                state: Monat
+            card:
+              type: statistics-graph
+              days_to_show: 30
+              period: day
+              chart_type: line
+              stat_types:
+                - mean
+              entities:
+                - sensor.speedtest_download
+                - sensor.speedtest_upload
+      - type: grid
+        cards:
+          - type: heading
+            heading: Infrastruktur
+            icon: mdi:server-network
+          - type: grid
+            columns: 2
+            cards:
+              - type: markdown
+                content: |
+                  **Router**
+                  _Platzhalter: `sensor.router_*`, `device_tracker.*`_
+              - type: markdown
+                content: |
+                  **NAS**
+                  _Platzhalter: `sensor.nas_*`, `binary_sensor.nas_online`_
+              - type: markdown
+                content: >
+                  **Server**
+
+                  _Platzhalter: `sensor.server_*`, Ping
+                  `binary_sensor.server_online`_
+              - type: markdown
+                content: |
+                  **Switch**
+                  _Platzhalter: `sensor.switch_*_port_*`_
+              - type: markdown
+                content: |
+                  **USV**
+                  _Platzhalter: `sensor.usv_*`, `binary_sensor.usv_on_battery`_
+              - type: markdown
+                content: >
+                  **Home Assistant**
+
+                  _Platzhalter: `sensor.home_assistant_*`, CPU, Speicher,
+                  Uptime_
+  - title: Einstellungen
+    path: einstellungen
+    icon: mdi:cog
+    theme: dark
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Dashboard-Steuerung
+            icon: mdi:tune
+          - type: tile
+            entity: input_select.wetter_ansicht
+            name: Wetter-Ansicht
+          - type: tile
+            entity: input_select.pv_zeitraum
+            name: PV-Zeitraum
+          - type: tile
+            entity: input_select.router_zeitraum
+            name: Router-Zeitraum
+      - type: grid
+        cards:
+          - type: heading
+            heading: Personen & Geräte
+            icon: mdi:account-group
+          - type: tile
+            entity: person.thorge
+          - type: tile
+            entity: person.laura
+          - type: tile
+            entity: sensor.pixel_9_pro_xl_battery_level
+            name: Thorge — Akku
+          - type: tile
+            entity: sensor.pixel_7_pro_battery_level
+            name: Laura — Akku
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Standorte
+            icon: mdi:map-marker-radius
+          - type: map
+            entities:
+              - entity: person.thorge
+              - entity: person.laura
+            theme_mode: auto
+            aspect_ratio: "16:9"
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Kalender
+            icon: mdi:calendar-month
+          - type: calendar
+            entities:
+              - calendar.thorge_3_laura
+            initial_view: listWeek
+      - type: grid
+        cards:
+          - type: heading
+            heading: Wetter (Detail)
+            icon: mdi:weather-partly-cloudy
+          - type: horizontal-stack
+            cards:
+              - type: button
+                name: Stündlich
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.wetter_ansicht
+                  data:
+                    option: Stündlich
+              - type: button
+                name: Täglich
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  target:
+                    entity_id: input_select.wetter_ansicht
+                  data:
+                    option: Täglich
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.wetter_ansicht
+                state: Stündlich
+            card:
+              type: weather-forecast
+              entity: weather.wetter_home
+              forecast_type: hourly
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.wetter_ansicht
+                state: Täglich
+            card:
+              type: weather-forecast
+              entity: weather.wetter_home
+              forecast_type: daily
