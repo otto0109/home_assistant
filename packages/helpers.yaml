@@ -1,0 +1,92 @@
+# =============================================================================
+# NAVIQ — Helfer & Energie-Sensoren (eine Datei)
+#
+# Einbindung (empfohlen, eine Zeile in configuration.yaml):
+#
+#   homeassistant:
+#     packages: !include_dir_named packages
+#
+# Diese Datei nach:  config/packages/naviq.yaml  kopieren
+# Fertig. Kein input_select: !include — das war die Fehlerquelle.
+#
+# Vor dem ersten Import: gleichnamige UI-Helfer löschen (Einstellungen → Helfer).
+#
+# patternWarning in Studio Code Server = Schema-Bug der HA-Extension, kein echter
+# Konfigurationsfehler. YAML prüfen unter Entwicklerwerkzeuge ist maßgeblich.
+# =============================================================================
+
+input_boolean:
+  klima_pv_esszimmer:
+    name: Klima PV Esszimmer
+    icon: mdi:air-conditioner
+    initial: false
+
+  klima_pv_kuche:
+    name: Klima PV Küche
+    icon: mdi:air-conditioner
+    initial: false
+
+  klima_pv_schlafzimmer:
+    name: Klima PV Schlafzimmer
+    icon: mdi:air-conditioner
+    initial: false
+
+input_select:
+  pv_zeitraum:
+    name: PV Zeitraum
+    icon: mdi:solar-power
+    options:
+      - Live
+      - 24h
+      - Woche
+      - Monat
+      - Jahr
+      - Lebenslang
+    initial: 24h
+
+  router_zeitraum:
+    name: Router Zeitraum
+    icon: mdi:router-wireless
+    options:
+      - 24h
+      - Woche
+      - Monat
+    initial: 24h
+
+  wetter_ansicht:
+    name: Wetter Ansicht
+    icon: mdi:weather-partly-cloudy
+    options:
+      - Stündlich
+      - Täglich
+    initial: Täglich
+
+template:
+  - trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id:
+          - sensor.pv_activepower_load_sys
+          - sensor.pv_pv_power
+          - sensor.pv_battery_power
+      - platform: time_pattern
+        minutes: "/1"
+    sensor:
+      - name: PV Netzleistung
+        unique_id: pv_netzleistung
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:transmission-tower
+        state: >
+          {% set load = states('sensor.pv_activepower_load_sys') | float(0) %}
+          {% set solar = states('sensor.pv_pv_power') | float(0) %}
+          {% set battery = states('sensor.pv_battery_power') | float(0) %}
+          {{ (load + battery - solar) | round(0) }}
+
+      - name: PV Anlagenleistung
+        unique_id: pv_kwpeak
+        unit_of_measurement: kWp
+        icon: mdi:solar-power-variant
+        state: "29.93"

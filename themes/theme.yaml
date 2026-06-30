@@ -1,0 +1,19 @@
+dark:
+  modes:
+    dark:
+      primary-color: "#8ab4f8"
+      accent-color: "#c58af9"
+      ha-card-background: "rgba(28, 30, 36, 0.72)"
+      ha-card-box-shadow: "0 4px 24px rgba(0, 0, 0, 0.35)"
+      ha-card-border-radius: "20px"
+      ha-card-border-width: "0px"
+      app-header-background-color: "rgba(12, 13, 16, 0.9)"
+      lovelace-background: "center / cover no-repeat fixed url('')"
+      primary-background-color: "#0c0d10"
+      secondary-background-color: "#14161c"
+      divider-color: "rgba(255, 255, 255, 0.08)"
+      chip-background-color: "rgba(255, 255, 255, 0.06)"
+      mush-rgb-state-entity: "138, 180, 248"
+      mush-rgb-green: "129, 201, 149"
+      mush-rgb-orange: "255, 183, 77"
+      mush-rgb-red: "255, 138, 128"
