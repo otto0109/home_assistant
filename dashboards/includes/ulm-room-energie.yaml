@@ -1,0 +1,40 @@
+type: custom:mod-card
+card_mod:
+  style: |
+    ha-card {
+      margin: 0;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      cursor: pointer;
+    }
+  tap_action:
+    action: navigate
+    navigation_path: energie
+card:
+  type: custom:mini-graph-card
+  name: Energie
+  icon: mdi:solar-power-variant
+  hours_to_show: 8
+  points_per_hour: 6
+  height: 130
+  line_width: 2
+  animate: true
+  lower_bound: 0
+  font_size: 75
+  show:
+    name: true
+    icon: true
+    state: true
+    labels: false
+    extrema: false
+    legend: true
+  entities:
+    - entity: sensor.pv_pv_power
+      name: Solar
+      color: "#f4b400"
+      show_fill: true
+    - entity: sensor.pv_activepower_load_sys
+      name: Haus
+      color: "#4285f4"
+      show_fill: true

@@ -1,0 +1,142 @@
+- type: custom:button-card
+  name: Solar
+  icon: mdi:weather-sunny
+  entity: sensor.pv_pv_power
+  show_name: true
+  show_icon: true
+  show_state: true
+  styles:
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 14px 0 10px
+    grid:
+      - grid-template-areas: "'i' 'n' 's'"
+    name:
+      - justify-self: center
+      - font-weight: bold
+      - font-size: 14px
+      - margin-top: 10px
+    state:
+      - justify-self: center
+      - font-size: 12px
+      - opacity: 0.85
+    img_cell:
+      - width: 46px
+      - height: 46px
+      - border-radius: 50%
+      - background-color: rgba(var(--color-yellow), 0.2)
+    icon:
+      - color: rgba(var(--color-yellow), 1)
+      - width: 22px
+
+- type: custom:button-card
+  name: Speicher
+  icon: mdi:battery-high
+  entity: sensor.pv_battery
+  show_name: true
+  show_icon: true
+  show_state: true
+  styles:
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 14px 0 10px
+    grid:
+      - grid-template-areas: "'i' 'n' 's'"
+    name:
+      - justify-self: center
+      - font-weight: bold
+      - font-size: 14px
+      - margin-top: 10px
+    state:
+      - justify-self: center
+      - font-size: 12px
+      - opacity: 0.85
+    img_cell:
+      - width: 46px
+      - height: 46px
+      - border-radius: 50%
+      - background-color: rgba(var(--color-green), 0.2)
+    icon:
+      - color: rgba(var(--color-green), 1)
+      - width: 22px
+
+- type: custom:button-card
+  name: Netz
+  icon: mdi:transmission-tower
+  entity: sensor.pv_netzleistung
+  show_name: true
+  show_icon: true
+  show_state: true
+  styles:
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 14px 0 10px
+    grid:
+      - grid-template-areas: "'i' 'n' 's'"
+    name:
+      - justify-self: center
+      - font-weight: bold
+      - font-size: 14px
+      - margin-top: 10px
+    state:
+      - justify-self: center
+      - font-size: 12px
+      - opacity: 0.85
+    img_cell:
+      - width: 46px
+      - height: 46px
+      - border-radius: 50%
+      - background-color: rgba(var(--color-blue), 0.2)
+    icon:
+      - color: rgba(var(--color-blue), 1)
+      - width: 22px
+  state:
+    - operator: ">"
+      value: 50
+      styles:
+        icon:
+          - color: rgba(var(--color-red), 1)
+        img_cell:
+          - background-color: rgba(var(--color-red), 0.2)
+    - operator: "<"
+      value: -50
+      styles:
+        icon:
+          - color: rgba(var(--color-green), 1)
+        img_cell:
+          - background-color: rgba(var(--color-green), 0.2)
+
+- type: custom:button-card
+  name: Verbrauch
+  icon: mdi:home-lightning-bolt
+  entity: sensor.pv_activepower_load_sys
+  show_name: true
+  show_icon: true
+  show_state: true
+  styles:
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 14px 0 10px
+    grid:
+      - grid-template-areas: "'i' 'n' 's'"
+    name:
+      - justify-self: center
+      - font-weight: bold
+      - font-size: 14px
+      - margin-top: 10px
+    state:
+      - justify-self: center
+      - font-size: 12px
+      - opacity: 0.85
+    img_cell:
+      - width: 46px
+      - height: 46px
+      - border-radius: 50%
+      - background-color: rgba(var(--color-purple), 0.2)
+    icon:
+      - color: rgba(var(--color-purple), 1)
+      - width: 22px

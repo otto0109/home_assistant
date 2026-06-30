@@ -203,16 +203,4 @@
       tap_action:
         action: toggle
 
-- type: custom:button-card
-  template:
-    - card_room
-    - purple_no_state
-  name: Energie
-  entity: sensor.pv_pv_power
-  icon: mdi:solar-power-variant
-  tap_action:
-    action: navigate
-    navigation_path: /test-dashboard/energie
-  variables:
-    label_use_temperature: false
-    label_use_brightness: false
+- !include ulm-room-energie.yaml
