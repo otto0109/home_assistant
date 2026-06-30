@@ -5,10 +5,11 @@ views:
     icon: mdi:home-analytics
     theme: dark
     type: sections
-    max_columns: 6
+    max_columns: 4
+    dense_section_placement: true
     sections:
       - type: grid
-        column_span: 6
+        column_span: 4
         cards:
           - type: horizontal-stack
             cards:
@@ -62,17 +63,42 @@ views:
                       line-height: 1;
                     }
       - type: grid
-        column_span: 6
+        column_span: 4
+        cards:
+          - type: custom:mushroom-chips-card
+            alignment: start
+            chips:
+              - type: entity
+                entity: person.thorge
+              - type: entity
+                entity: person.laura
+              - type: entity
+                entity: weather.wetter_home
+              - type: template
+                icon: mdi:lightbulb-group
+                content: |
+                  {% set lights = [
+                    'light.licht_wohnzimmer',
+                    'light.beleuchtung_bett_leuchte',
+                    'switch.flur_licht_shelly',
+                    'switch.shelly_1_mini_gen4',
+                    'switch.licht_abstellraum_unten_sonoff',
+                    'switch.licht_sonoff'
+                  ] %}
+                  {% set on = namespace(c=0) %}
+                  {% for e in lights %}
+                    {% if is_state(e, 'on') %}{% set on.c = on.c + 1 %}{% endif %}
+                  {% endfor %}
+                  {{ on.c }}/{{ lights | count }} Licht
+                tap_action:
+                  action: navigate
+                  navigation_path: wohnzimmer
+      - type: grid
+        column_span: 4
         cards:
           - type: custom:mushroom-chips-card
             alignment: center
             chips:
-              - type: template
-                icon: mdi:home
-                content: Start
-                tap_action:
-                  action: navigate
-                  navigation_path: uebersicht
               - type: template
                 icon: mdi:sofa
                 content: Wohnen
@@ -110,70 +136,89 @@ views:
                   action: navigate
                   navigation_path: energie
               - type: template
-                icon: mdi:calendar-month
-                content: Kalender
-                tap_action:
-                  action: navigate
-                  navigation_path: einstellungen
-              - type: template
                 icon: mdi:cog
                 content: Mehr
                 tap_action:
                   action: navigate
                   navigation_path: einstellungen
-          - type: custom:mushroom-chips-card
-            chips:
-              - type: entity
-                entity: person.thorge
-              - type: entity
-                entity: person.laura
-              - type: entity
-                entity: weather.wetter_home
-              - type: template
-                icon: mdi:lightbulb-group
-                content: |
-                  {% set lights = [
-                    'light.licht_wohnzimmer',
-                    'light.beleuchtung_bett_leuchte',
-                    'switch.flur_licht_shelly',
-                    'switch.shelly_1_mini_gen4',
-                    'switch.licht_abstellraum_unten_sonoff',
-                    'switch.licht_sonoff'
-                  ] %} {% set on = namespace(c=0) %} {% for e in lights %}
-                    {% if is_state(e, 'on') %}{% set on.c = on.c + 1 %}{% endif %}
-                  {% endfor %} {{ on.c }}/{{ lights | count }} Licht
-                tap_action:
-                  action: navigate
-                  navigation_path: wohnzimmer
       - type: grid
-        column_span: 3
+        column_span: 4
         cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: weather.wetter_home
+                name: Wetter
+                layout: vertical
+                fill_container: true
+              - type: weather-forecast
+                entity: weather.wetter_home
+                forecast_type: daily
+                show_current: false
+            card_mod:
+              style: |
+                ha-card { height: 100%; }
+          - type: custom:mushroom-entity-card
+            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+            name: Rocky
+            layout: vertical
+            fill_container: true
+            tap_action:
+              action: navigate
+              navigation_path: wohnzimmer
+            card_mod:
+              style: |
+                ha-card { height: 100%; min-height: 200px; }
           - type: custom:auto-entities
             show_empty: false
             sort:
-              method: friendly_name
+              method: last_changed
+              reverse: true
             card:
-              type: vertical-stack
+              type: grid
+              columns: 2
+              square: false
             card_param: cards
             filter:
               include:
                 - domain: scene
                   options:
-                    type: custom:mushroom-entity-card
-                    layout: horizontal
+                    type: custom:mushroom-template-card
+                    layout: vertical
                     fill_container: true
                     icon_color: amber
                     card_mod:
                       style: |
-                        ha-card { min-height: 76px; }
-                        mushroom-shape-icon { --icon-size: 40px; }
-                        .primary {
-                          font-size: 1.05rem !important;
-                          white-space: normal !important;
-                          line-height: 1.25 !important;
-                        }
+                        ha-card { min-height: 88px; }
+            grid_options:
+              columns: 2
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: light.licht_wohnzimmer
+                name: Wohnzimmer
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: light.beleuchtung_bett_leuchte
+                name: Esszimmer
+                vertical: true
+                features_position: bottom
+              - type: tile
+                entity: switch.flur_licht_shelly
+                name: Flur
+                vertical: true
+              - type: tile
+                entity: switch.automatisch_bewasserung
+                name: Garten
+                vertical: true
+            card_mod:
+              style: |
+                ha-card { height: 100%; }
       - type: grid
-        column_span: 3
+        column_span: 4
         cards:
           - type: custom:power-flow-card-plus
             clickable_entities: true
@@ -217,114 +262,16 @@ views:
                 icon: mdi:home
                 color_icon: true
                 override_state: true
+            grid_options:
+              columns: full
+            card_mod:
+              style: |
+                ha-card {
+                  min-height: 260px;
+                  width: 100%;
+                }
       - type: grid
-        column_span: 6
-        cards:
-          - type: custom:mushroom-template-card
-            primary: Wohnen
-            icon: mdi:sofa
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: wohnzimmer
-            card_mod:
-              style: |
-                .primary { white-space: normal !important; text-align: center; }
-          - type: custom:mushroom-template-card
-            primary: Küche
-            icon: mdi:stove
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: kueche
-            card_mod:
-              style: |
-                .primary { white-space: normal !important; text-align: center; }
-          - type: custom:mushroom-template-card
-            primary: Schlafen
-            icon: mdi:bed
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: schlafzimmer
-            card_mod:
-              style: |
-                .primary { white-space: normal !important; text-align: center; }
-          - type: custom:mushroom-template-card
-            primary: Flur
-            icon: mdi:door-open
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: flur
-            card_mod:
-              style: |
-                .primary { white-space: normal !important; text-align: center; }
-          - type: custom:mushroom-template-card
-            primary: Garten
-            icon: mdi:flower
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: garten
-            card_mod:
-              style: |
-                .primary { white-space: normal !important; text-align: center; }
-          - type: custom:mushroom-template-card
-            primary: Energie
-            icon: mdi:solar-power
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: energie
-            card_mod:
-              style: |
-                .primary { white-space: normal !important; text-align: center; }
-      - type: grid
-        column_span: 6
-        cards:
-          - type: custom:mushroom-entity-card
-            entity: weather.wetter_home
-            name: Wetter
-            layout: vertical
-            fill_container: true
-          - type: custom:mushroom-template-card
-            entity: sensor.pv_pv_power
-            primary: "{{ states('sensor.pv_pv_power') }} W"
-            secondary: Speicher {{ states('sensor.pv_battery') }}%
-            icon: mdi:solar-power-variant
-            icon_color: amber
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: energie
-          - type: custom:mushroom-entity-card
-            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-            name: Rocky
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: wohnzimmer
-          - type: custom:mushroom-template-card
-            primary: "{{ states('sensor.pv_activepower_load_sys') }} W"
-            secondary: Hausverbrauch
-            icon: mdi:home-lightning-bolt
-            icon_color: pink
-            layout: vertical
-            fill_container: true
-            tap_action:
-              action: navigate
-              navigation_path: energie
-      - type: grid
-        column_span: 6
+        column_span: 4
         cards:
           - type: conditional
             conditions:
