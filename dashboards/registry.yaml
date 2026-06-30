@@ -1,6 +1,11 @@
 # Registrierung der YAML-Dashboards (wird von configuration.yaml eingebunden)
-# Einziges Dashboard in Git — HA-Standard (Übersicht, Landkarte, …) und
-# ULM-Beispieldashboards in der UI ausblenden (siehe Hinweise unten).
+#
+# Sidebar aufräumen (einmalig auf dem HA-Server):
+# • ULM: Einstellungen → Geräte & Dienste → UI Lovelace Minimalist → Konfigurieren
+#   → Dashboard- & Adaptive-Eintrag in der Seitenleiste AUS → Neustart
+# • Eingebaut: Einstellungen → Dashboards → Übersicht & Landkarte → „Zur Seitenleiste“ AUS
+# • Standard: „Home“ (dieses Dashboard) → Als Standard festlegen
+# • Optional: HACS „Custom Sidebar“ + sidebar-config.yaml (siehe configuration.yaml)
 test-dashboard:
   mode: yaml
   title: Home

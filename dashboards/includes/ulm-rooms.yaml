@@ -209,45 +209,43 @@
     label_use_brightness: false
   label: |
     [[[
-      function fmtPower(entityId) {
-        var e = states[entityId];
+      function fmt(id) {
+        var e = states[id];
         if (!e || ['unavailable', 'unknown'].includes(e.state)) return null;
         var v = parseFloat(e.state);
         if (isNaN(v)) return null;
         if (Math.abs(v) >= 1000) return (Math.abs(v) / 1000).toFixed(1) + ' kW';
         return Math.round(Math.abs(v)) + ' W';
       }
-      var solar = fmtPower('sensor.pv_pv_power');
-      var load = fmtPower('sensor.pv_activepower_load_sys');
+      var parts = [];
+      var solar = fmt('sensor.pv_pv_power');
+      if (solar) parts.push(solar);
       var bat = states['sensor.pv_battery'];
-      var batPct =
-        bat && !['unavailable', 'unknown'].includes(bat.state)
-          ? Math.round(parseFloat(bat.state)) + '%'
-          : null;
-      var gridE = states['sensor.pv_netzleistung'];
-      var gridLine = null;
-      if (gridE && !['unavailable', 'unknown'].includes(gridE.state)) {
-        var g = parseFloat(gridE.state);
-        if (!isNaN(g) && Math.abs(g) >= 50) {
-          gridLine = g > 0 ? 'Einspeisung ' + fmtPower('sensor.pv_netzleistung') : 'Bezug ' + fmtPower('sensor.pv_netzleistung');
-        }
+      if (bat && !['unavailable', 'unknown'].includes(bat.state)) {
+        parts.push(Math.round(parseFloat(bat.state)) + '%');
       }
-      var headline = solar ? 'Solar ' + solar : '–';
-      var details = [
-        batPct ? 'Speicher ' + batPct : null,
-        load ? 'Haus ' + load : null,
-        gridLine,
-      ]
-        .filter(Boolean)
-        .join(' · ');
-      return details ? headline + '\n' + details : headline;
+      var load = fmt('sensor.pv_activepower_load_sys');
+      if (load) parts.push(load);
+      return parts.join(' · ') || '–';
     ]]]
   styles:
-    label:
-      - font-size: 11px
-      - line-height: 1.45
-      - white-space: pre-line
-      - opacity: 0.9
+    grid:
+      - grid-template-areas: "'i n' 'i l'"
+      - grid-template-columns: 56px 1fr
+      - grid-template-rows: min-content min-content
+      - column-gap: 8px
+    icon:
+      - width: 42px
+    name:
       - justify-self: start
-      - text-align: left
-      - padding-top: 2px
+      - align-self: end
+      - font-size: 14px
+    label:
+      - justify-self: start
+      - align-self: start
+      - font-size: 10px
+      - line-height: 1.25
+      - white-space: normal
+      - word-break: break-word
+      - opacity: 0.85
+      - padding-right: 4px

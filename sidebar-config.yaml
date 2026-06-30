@@ -1,0 +1,44 @@
+# Custom Sidebar — blendet doppelte Dashboards aus (HACS: „Custom Sidebar“).
+# Nach Installation des Plugins: HA neu starten.
+#
+# Unser Dashboard bleibt sichtbar: /test-dashboard/home (Titel „Home“ in registry.yaml)
+
+order:
+  # Eingebaute HA-Dashboards (Übersicht / Home)
+  - match: href
+    href: /lovelace
+    exact: true
+    hide: true
+  - match: href
+    href: /lovelace/home
+    hide: true
+  - match: href
+    href: /home
+    exact: true
+    hide: true
+
+  # Landkarte
+  - match: href
+    href: /map
+    hide: true
+  - item: map
+    hide: true
+
+  # UI Lovelace Minimalist (Beispiel- & Adaptive-Dashboard)
+  - match: href
+    href: /ui-lovelace-minimalist
+    hide: true
+  - match: href
+    href: /adaptive-dash
+    hide: true
+  - item: UI Lovelace Minimalist
+    hide: true
+  - item: Lovelace UI • Minimalist
+    hide: true
+  - item: Adaptive
+    hide: true
+
+  # Unser YAML-Dashboard oben in der Leiste
+  - match: href
+    href: /test-dashboard/home
+    order: 1
