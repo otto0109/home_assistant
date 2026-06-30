@@ -4,8 +4,8 @@
       :host {
         display: block;
         width: 100%;
-        max-width: none;
-        margin: 0;
+        max-width: 1600px;
+        margin: 0 auto;
         padding: 8px 16px 36px;
         box-sizing: border-box;
       }
@@ -13,16 +13,6 @@
         background: transparent !important;
         box-shadow: none !important;
         border: none !important;
-      }
-      @media (min-width: 1100px) {
-        :host {
-          padding: 12px 28px 40px;
-        }
-      }
-      @media (min-width: 1500px) {
-        :host {
-          padding: 16px 40px 48px;
-        }
       }
   card:
     type: vertical-stack
@@ -35,19 +25,6 @@
               max-width: 640px;
               margin-left: auto;
               margin-right: auto;
-            }
-            @media (min-width: 1100px) {
-              :host {
-                max-width: 760px;
-              }
-            }
-            @media (min-width: 1500px) {
-              :host {
-                max-width: 900px;
-              }
-              button-card $ ha-card$ {
-                min-height: 88px !important;
-              }
             }
         card:
           type: horizontal-stack
@@ -74,91 +51,24 @@
         template: card_title
         name: Räume
 
-      - type: custom:mod-card
-        card_mod:
-          style: |
-            @media (min-width: 1100px) {
-              button-card $ ha-card$ {
-                min-height: 168px !important;
-                padding: 10px 8px !important;
-              }
-              button-card $ #name$ {
-                font-size: 1.2em !important;
-              }
-              button-card $ #state$,
-              button-card $ #label$ {
-                font-size: 1.05em !important;
-              }
-              button-card $ #img-cell$,
-              button-card $ #icon$ {
-                width: 64px !important;
-                height: 64px !important;
-              }
-              button-card $ ha-icon$ {
-                width: 32px !important;
-                height: 32px !important;
-              }
-            }
-            @media (min-width: 1500px) {
-              button-card $ ha-card$ {
-                min-height: 188px !important;
-              }
-              button-card $ #img-cell$,
-              button-card $ #icon$ {
-                width: 72px !important;
-                height: 72px !important;
-              }
-              button-card $ ha-icon$ {
-                width: 36px !important;
-                height: 36px !important;
-              }
-            }
-        card:
-          type: grid
-          columns: 2
-          square: false
-          cards: !include ulm-rooms.yaml
-          card_mod:
-            style: |
-              #root {
-                gap: 16px !important;
-              }
-              @media (min-width: 900px) {
-                #root {
-                  grid-template-columns: repeat(4, 1fr) !important;
-                  gap: 20px !important;
-                }
-              }
-              @media (min-width: 1400px) {
-                #root {
-                  gap: 24px !important;
-                }
-              }
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-gap: 16px
+          grid-template-columns: repeat(2, 1fr)
+          mediaquery:
+            "(min-width: 900px)":
+              grid-template-columns: repeat(4, 1fr)
+              grid-gap: 20px
+        cards: !include ulm-rooms.yaml
 
-      - type: custom:mod-card
-        card_mod:
-          style: |
-            @media (min-width: 1100px) {
-              button-card $ ha-card$ {
-                min-height: 120px !important;
-              }
-              button-card $ #name$ {
-                font-size: 1.15em !important;
-              }
-            }
-            @media (min-width: 1500px) {
-              button-card $ ha-card$ {
-                min-height: 140px !important;
-              }
-            }
-        card:
-          type: custom:button-card
-          template: card_vacuum
-          entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-          tap_action:
-            action: navigate
-            navigation_path: dreame
-          variables:
-            ulm_card_vacuum_name: Dreame
-            ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
-            ulm_card_vacuum_camera_toggle: true
+      - type: custom:button-card
+        template: card_vacuum
+        entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        tap_action:
+          action: navigate
+          navigation_path: dreame
+        variables:
+          ulm_card_vacuum_name: Dreame
+          ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
+          ulm_card_vacuum_camera_toggle: true

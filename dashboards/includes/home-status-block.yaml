@@ -1,0 +1,110 @@
+- type: custom:button-card
+  template: card_title
+  name: Status
+
+- type: grid
+  columns: 3
+  square: false
+  cards:
+    - type: custom:button-card
+      name: Solar
+      icon: mdi:weather-sunny
+      entity: sensor.pv_pv_power
+      show_name: true
+      show_icon: true
+      show_state: true
+      styles:
+        card:
+          - border-radius: var(--border-radius)
+          - box-shadow: var(--box-shadow)
+          - padding: 14px 0 10px
+        grid:
+          - grid-template-areas: "'i' 'n' 's'"
+        name:
+          - justify-self: center
+          - font-weight: bold
+          - font-size: 15px
+          - margin-top: 12px
+        state:
+          - justify-self: center
+          - font-size: 13px
+          - opacity: 0.7
+        img_cell:
+          - width: 50px
+          - height: 50px
+          - border-radius: 50%
+          - background-color: rgba(var(--color-yellow), 0.2)
+        icon:
+          - color: rgba(var(--color-yellow), 1)
+          - width: 24px
+      tap_action:
+        action: navigate
+        navigation_path: /test-dashboard/energie
+    - type: custom:button-card
+      name: Speicher
+      icon: mdi:battery-high
+      entity: sensor.pv_battery
+      show_name: true
+      show_icon: true
+      show_state: true
+      styles:
+        card:
+          - border-radius: var(--border-radius)
+          - box-shadow: var(--box-shadow)
+          - padding: 14px 0 10px
+        grid:
+          - grid-template-areas: "'i' 'n' 's'"
+        name:
+          - justify-self: center
+          - font-weight: bold
+          - font-size: 15px
+          - margin-top: 12px
+        state:
+          - justify-self: center
+          - font-size: 13px
+          - opacity: 0.7
+        img_cell:
+          - width: 50px
+          - height: 50px
+          - border-radius: 50%
+          - background-color: rgba(var(--color-green), 0.2)
+        icon:
+          - color: rgba(var(--color-green), 1)
+          - width: 24px
+      tap_action:
+        action: navigate
+        navigation_path: /test-dashboard/energie
+    - type: custom:button-card
+      name: Router
+      icon: mdi:router-wireless
+      entity: sensor.speedtest_download
+      show_name: true
+      show_icon: true
+      show_state: true
+      styles:
+        card:
+          - border-radius: var(--border-radius)
+          - box-shadow: var(--box-shadow)
+          - padding: 14px 0 10px
+        grid:
+          - grid-template-areas: "'i' 'n' 's'"
+        name:
+          - justify-self: center
+          - font-weight: bold
+          - font-size: 15px
+          - margin-top: 12px
+        state:
+          - justify-self: center
+          - font-size: 13px
+          - opacity: 0.7
+        img_cell:
+          - width: 50px
+          - height: 50px
+          - border-radius: 50%
+          - background-color: rgba(var(--color-blue), 0.2)
+        icon:
+          - color: rgba(var(--color-blue), 1)
+          - width: 24px
+      tap_action:
+        action: navigate
+        navigation_path: /test-dashboard/netzwerk

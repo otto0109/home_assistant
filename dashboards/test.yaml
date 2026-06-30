@@ -7,23 +7,9 @@ views:
   - title: Home
     path: home
     icon: mdi:home
+    type: panel
+    theme: minimalist-desktop
     cards: !include includes/home-main.yaml
-    card_mod:
-      style: |
-        @media (min-width: 600px) {
-          #view {
-            max-width: none !important;
-            padding-left: 16px !important;
-            padding-right: 16px !important;
-          }
-          hui-masonry-view,
-          hui-view-layout,
-          .container {
-            max-width: none !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-          }
-        }
 
   - title: Dreame
     path: dreame
