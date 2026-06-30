@@ -1,5 +1,254 @@
 type: custom:button-card
 template: card_welcome_home
+templates:
+  card_info_pill_welcome:
+    template: card_scenes_pill_welcome
+    variables:
+      state: "on"
+    state:
+      - operator: template
+        value: "[[[ return false ]]]"
+    styles:
+      card:
+        - opacity: "1"
+    custom_fields:
+      item1:
+        card:
+          type: custom:button-card
+          styles:
+            icon:
+              - color: >
+                  [[[
+                    var color = variables?.color || 'blue';
+                    if (hass.themes.darkMode && color === 'yellow') {
+                      return '#1c1c1e';
+                    }
+                    if (hass.themes.darkMode) {
+                      return '#FAFAFA';
+                    }
+                    return `rgba(var(--color-${color}), 1)`;
+                  ]]]
+  card_info_row_welcome:
+    show_icon: false
+    show_name: false
+    show_label: false
+    variables:
+      info_1:
+        entity_id: ""
+      info_2:
+        entity_id: ""
+      info_3:
+        entity_id: ""
+    styles:
+      grid:
+        - grid-template-areas: >
+            [[[
+              var pills = [];
+              [variables.info_1, variables.info_2, variables.info_3].forEach(function(item) {
+                if (item && item.entity_id) {
+                  pills.push('item' + (pills.length + 1));
+                }
+              });
+              return pills.join(' ') || 'item1';
+            ]]]
+        - display: flex
+        - justify-content: space-evenly
+      card:
+        - border-radius: none
+        - box-shadow: none
+        - padding: 4px
+        - margin-top: 4px
+    custom_fields:
+      item1:
+        card:
+          type: custom:button-card
+          template: card_info_pill_welcome
+          variables: "[[[ return variables.info_1 ]]]"
+          entity: "[[[ return variables.info_1.entity_id ]]]"
+          custom_fields:
+            item1:
+              card:
+                type: custom:button-card
+                entity: "[[[ return variables.info_1.entity_id ]]]"
+                icon: "[[[ return variables.info_1.icon ]]]"
+            item2:
+              card:
+                type: custom:button-card
+                entity: "[[[ return variables.info_1.entity_id ]]]"
+                name: "[[[ return variables.info_1.name ]]]"
+      item2:
+        card:
+          type: custom:button-card
+          template: card_info_pill_welcome
+          variables: "[[[ return variables.info_2 ]]]"
+          entity: "[[[ return variables.info_2.entity_id ]]]"
+          custom_fields:
+            item1:
+              card:
+                type: custom:button-card
+                entity: "[[[ return variables.info_2.entity_id ]]]"
+                icon: "[[[ return variables.info_2.icon ]]]"
+            item2:
+              card:
+                type: custom:button-card
+                entity: "[[[ return variables.info_2.entity_id ]]]"
+                name: "[[[ return variables.info_2.name ]]]"
+      item3:
+        card:
+          type: custom:button-card
+          template: card_info_pill_welcome
+          variables: "[[[ return variables.info_3 ]]]"
+          entity: "[[[ return variables.info_3.entity_id ]]]"
+          custom_fields:
+            item1:
+              card:
+                type: custom:button-card
+                entity: "[[[ return variables.info_3.entity_id ]]]"
+                icon: "[[[ return variables.info_3.icon ]]]"
+            item2:
+              card:
+                type: custom:button-card
+                entity: "[[[ return variables.info_3.entity_id ]]]"
+                name: "[[[ return variables.info_3.name ]]]"
+  card_welcome_home:
+    variables:
+      ulm_weather: "[[[ return variables.ulm_weather ]]]"
+      ulm_language: "[[[ return variables.ulm_language || hass['language']; ]]]"
+      scene_1:
+        entity_id: ""
+      scene_2:
+        entity_id: ""
+      scene_3:
+        entity_id: ""
+      scene_4:
+        entity_id: ""
+      scene_5:
+        entity_id: ""
+      lights_off:
+        entity_id: ""
+        icon: mdi:lightbulb-off-outline
+        name: Alle aus
+        color: red
+        state: "on"
+      info_1:
+        entity_id: ""
+      info_2:
+        entity_id: ""
+      info_3:
+        entity_id: ""
+    template:
+      - ulm_language_variables
+      - ulm_translation_engine
+    show_icon: false
+    show_name: false
+    show_label: true
+    styles:
+      grid:
+        - grid-template-areas: "'item1' 'item2' 'item3' 'item4' 'item5'"
+        - grid-template-columns: 1fr
+        - grid-template-rows: min-content min-content
+        - row-gap: 0px
+      card:
+        - border-radius: var(--border-radius)
+        - box-shadow: var(--box-shadow)
+        - padding: 10px
+    custom_fields:
+      item1:
+        card:
+          type: custom:button-card
+          template: card_topbar_welcome
+          variables:
+            ulm_weather: "[[[ return variables.ulm_weather ]]]"
+            ulm_language: "[[[ return variables.ulm_language ]]]"
+          styles:
+            card:
+              - border-radius: none
+              - box-shadow: none
+              - padding: 4px
+      item2:
+        card:
+          type: custom:button-card
+          show_icon: false
+          show_label: false
+          show_name: true
+          name: |
+            [[[
+              var today = new Date();
+              var time = today.getHours();
+              let welcome = '';
+              if (time >= 18) {
+                welcome = variables.ulm_evening;
+              } else if (time >= 12) {
+                welcome = variables.ulm_afternoon;
+              } else if (time >= 5) {
+                welcome = variables.ulm_morning;
+              } else {
+                welcome = variables.ulm_hello;
+              }
+              return welcome + ', ' + user.name + '!';
+            ]]]
+          styles:
+            name:
+              - align-self: start
+              - justify-self: start
+              - font-weight: bold
+              - font-size: 24px
+              - margin-left: 16px
+            grid:
+              - grid-template-areas: "'i n' 'i l'"
+              - grid-template-columns: min-content auto
+              - grid-template-rows: min-content min-content
+              - text-align: start
+            card:
+              - box-shadow: none
+              - padding-bottom: 8px
+      item3:
+        card:
+          type: custom:button-card
+          show_icon: false
+          show_label: true
+          show_name: true
+          name: "[[[ return variables.ulm_translation_scenes ]]]"
+          styles:
+            name:
+              - align-self: start
+              - justify-self: start
+              - font-weight: bold
+              - font-size: 18px
+              - margin-left: 16px
+            grid:
+              - grid-template-areas: "'n'"
+              - grid-template-columns: 1fr
+              - text-align: start
+            card:
+              - box-shadow: none
+              - padding-bottom: 0px
+      item4:
+        card:
+          type: custom:button-card
+          template: card_scenes_welcome
+          styles:
+            card:
+              - border-radius: none
+              - box-shadow: none
+              - padding: 4px
+          variables:
+            entity_1: "[[[ return variables.scene_1 ]]]"
+            entity_2: "[[[ return variables.scene_2 ]]]"
+            entity_3: "[[[ return variables.lights_off ]]]"
+            entity_4: "[[[ return variables.scene_3 ]]]"
+            entity_5: "[[[ return variables.scene_4 ]]]"
+            entity_6: "[[[ return variables.scene_5 ]]]"
+            entity_7:
+              entity_id: ""
+      item5:
+        card:
+          type: custom:button-card
+          template: card_info_row_welcome
+          variables:
+            info_1: "[[[ return variables.info_1 ]]]"
+            info_2: "[[[ return variables.info_2 ]]]"
+            info_3: "[[[ return variables.info_3 ]]]"
 variables:
   ulm_weather: weather.wetter_home
   scene_1:
