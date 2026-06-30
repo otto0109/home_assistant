@@ -1,4 +1,4 @@
-button_card_templates: !include_dir_merge_named "../custom_components/ui_lovelace_minimalist/lovelace/ulm_templates/"
+button_card_templates: !include_dir_merge_named "../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
 
 title: Test
 theme: minimalist-desktop
@@ -18,7 +18,7 @@ views:
             icon: mdi:solar-power-variant
             name: Solar
             color: yellow
-            _            _nav_path: energie
+            _nav_path: energie
           entity_2:
             entity_id: sensor.pv_battery
             icon: mdi:battery-high
