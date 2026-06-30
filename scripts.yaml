@@ -6,3 +6,21 @@ alle_lichter_aus:
     - action: light.turn_off
       target:
         entity_id: all
+
+dashboard_raum_oeffnen:
+  alias: Dashboard Raum öffnen
+  icon: mdi:door-open
+  mode: parallel
+  fields:
+    area:
+      name: Bereich
+      description: Anzeigename des HA-Bereichs für die Raum-Detailseite
+      required: true
+      selector:
+        text:
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.dashboard_active_area
+      data:
+        value: "{{ area }}"

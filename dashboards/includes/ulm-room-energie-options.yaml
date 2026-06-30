@@ -1,0 +1,38 @@
+type: custom:button-card
+template:
+  - card_room
+  - purple_no_state
+name: Energie
+icon: mdi:solar-power-variant
+double_tap_action:
+  action: none
+tap_action:
+  action: navigate
+  navigation_path: energie
+variables:
+  label_use_temperature: false
+  label_use_brightness: false
+  entity_1:
+    entity_id: sensor.pv_battery
+    icon: mdi:battery-high
+    templates:
+      - green_on
+    tap_action:
+      action: navigate
+      navigation_path: energie
+  entity_2:
+    entity_id: sensor.pv_netzleistung
+    icon: mdi:transmission-tower
+    templates:
+      - blue_on
+    tap_action:
+      action: navigate
+      navigation_path: energie
+  entity_3:
+    entity_id: sensor.pv_activepower_load_sys
+    icon: mdi:home-lightning-bolt
+    templates:
+      - yellow_on
+    tap_action:
+      action: navigate
+      navigation_path: energie
