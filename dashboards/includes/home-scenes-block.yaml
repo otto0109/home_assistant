@@ -2,97 +2,46 @@
   template: card_title
   name: Szenen
 
-- type: grid
-  columns: 3
-  square: false
-  cards:
-    - type: custom:button-card
-      name: Voll
-      icon: mdi:ceiling-light
-      show_name: true
-      show_icon: true
-      styles:
-        card:
-          - border-radius: var(--border-radius)
-          - box-shadow: var(--box-shadow)
-          - padding: 14px 0 10px
-        grid:
-          - grid-template-areas: "'i' 'n'"
-        name:
-          - justify-self: center
-          - font-weight: bold
-          - font-size: 15px
-          - margin-top: 12px
-        img_cell:
-          - width: 50px
-          - height: 50px
-          - border-radius: 50%
-          - background-color: rgba(var(--color-yellow), 0.2)
-        icon:
-          - color: rgba(var(--color-yellow), 1)
-          - width: 24px
-      tap_action:
-        action: perform-action
-        perform_action: scene.turn_on
-        target:
-          entity_id: scene.wohnzimmer_volle_beluechtung
-    - type: custom:button-card
-      name: TV
-      icon: mdi:television
-      show_name: true
-      show_icon: true
-      styles:
-        card:
-          - border-radius: var(--border-radius)
-          - box-shadow: var(--box-shadow)
-          - padding: 14px 0 10px
-        grid:
-          - grid-template-areas: "'i' 'n'"
-        name:
-          - justify-self: center
-          - font-weight: bold
-          - font-size: 15px
-          - margin-top: 12px
-        img_cell:
-          - width: 50px
-          - height: 50px
-          - border-radius: 50%
-          - background-color: rgba(var(--color-purple), 0.2)
-        icon:
-          - color: rgba(var(--color-purple), 1)
-          - width: 24px
-      tap_action:
-        action: perform-action
-        perform_action: scene.turn_on
-        target:
-          entity_id: scene.wohnzimmer_fehrnsehen
-    - type: custom:button-card
-      name: Alle aus
-      icon: mdi:lightbulb-off-outline
-      show_name: true
-      show_icon: true
-      styles:
-        card:
-          - border-radius: var(--border-radius)
-          - box-shadow: var(--box-shadow)
-          - padding: 14px 0 10px
-        grid:
-          - grid-template-areas: "'i' 'n'"
-        name:
-          - justify-self: center
-          - font-weight: bold
-          - font-size: 15px
-          - margin-top: 12px
-        img_cell:
-          - width: 50px
-          - height: 50px
-          - border-radius: 50%
-          - background-color: rgba(var(--color-red), 0.2)
-        icon:
-          - color: rgba(var(--color-red), 1)
-          - width: 24px
-      tap_action:
-        action: perform-action
-        perform_action: script.turn_on
-        target:
-          entity_id: script.alle_lichter_aus
+- type: custom:auto-entities
+  show_empty: false
+  sort:
+    method: friendly_name
+  limit: 5
+  card:
+    type: grid
+    columns: 3
+    square: false
+  card_param: cards
+  filter:
+    include:
+      - domain: scene
+  options:
+    type: custom:button-card
+    show_name: true
+    show_icon: true
+    styles:
+      card:
+        - border-radius: var(--border-radius)
+        - box-shadow: var(--box-shadow)
+        - padding: 14px 0 10px
+      grid:
+        - grid-template-areas: "'i' 'n'"
+      name:
+        - justify-self: center
+        - font-weight: bold
+        - font-size: 15px
+        - margin-top: 12px
+      img_cell:
+        - width: 50px
+        - height: 50px
+        - border-radius: 50%
+        - background-color: rgba(var(--color-yellow), 0.2)
+      icon:
+        - color: rgba(var(--color-yellow), 1)
+        - width: 24px
+    tap_action:
+      action: perform-action
+      perform_action: scene.turn_on
+
+- type: custom:decluttering-card
+  template: alle_aus_button_home

@@ -27,7 +27,7 @@
           mediaquery:
             "(min-width: 700px)":
               grid-template-columns: repeat(4, 1fr)
-        cards: !include energie-stats-row.yaml
+        cards: !include ../energie-stats-row.yaml
 
       - type: custom:mod-card
         card_mod:

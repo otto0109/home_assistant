@@ -1,0 +1,246 @@
+# Decluttering-Templates für Raum-Subviews.
+# Voraussetzung: Entitäten in HA den Bereichen zuordnen (Einstellungen → Bereiche & Stockwerke).
+# Bereichsnamen müssen exakt passen (z. B. „Wohnzimmer“, „Flur OG“).
+
+room_auto_content:
+  variables:
+    - area
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:button-card
+        template: card_title
+        name: Szenen
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: scene
+              area: "[[area]]"
+        options:
+          type: custom:mod-card
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+          card:
+            type: custom:button-card
+            template: card_vertical_button
+            tap_action:
+              action: perform-action
+              perform_action: scene.turn_on
+
+      - type: custom:button-card
+        template: card_title
+        name: Beleuchtung
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: light
+              area: "[[area]]"
+        options:
+          type: custom:mod-card
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+          card:
+            type: custom:mushroom-light-card
+            fill_container: true
+            show_brightness_control: true
+            use_light_color: true
+
+      - type: custom:button-card
+        template: card_title
+        name: Schalter
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: switch
+              area: "[[area]]"
+        options:
+          type: custom:mod-card
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+          card:
+            type: custom:button-card
+            template: card_power_outlet
+
+      - type: custom:button-card
+        template: card_title
+        name: Klima
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: climate
+              area: "[[area]]"
+        options:
+          type: custom:mod-card
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+                background: var(--ha-card-background) !important;
+              }
+          card:
+            type: custom:button-card
+            template: card_thermostat
+            variables:
+              ulm_card_thermostat_enable_collapse: false
+              ulm_card_thermostat_enable_controls: true
+              ulm_card_thermostat_enable_hvac_modes: true
+              ulm_card_thermostat_enable_popup: true
+              ulm_card_thermostat_enable_background_color: false
+            extra_styles: |
+              ha-card {
+                background: var(--ha-card-background) !important;
+              }
+
+      - type: custom:button-card
+        template: card_title
+        name: Aktionen
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: script
+              area: "[[area]]"
+        options:
+          type: custom:mod-card
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+          card:
+            type: custom:button-card
+            template: card_vertical_button
+            tap_action:
+              action: perform-action
+              perform_action: script.turn_on
+
+      - type: custom:button-card
+        template: card_title
+        name: Geräte
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: fan
+              area: "[[area]]"
+            - domain: cover
+              area: "[[area]]"
+            - domain: media_player
+              area: "[[area]]"
+            - domain: vacuum
+              area: "[[area]]"
+            - domain: humidifier
+              area: "[[area]]"
+            - domain: water_heater
+              area: "[[area]]"
+        options:
+          type: custom:mod-card
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+          card:
+            type: custom:mushroom-entity-card
+            tap_action:
+              action: toggle
+
+alle_aus_button_home:
+  card:
+    type: custom:button-card
+    name: Alle aus
+    icon: mdi:lightbulb-off-outline
+    show_name: true
+    show_icon: true
+    styles:
+      card:
+        - border-radius: var(--border-radius)
+        - box-shadow: var(--box-shadow)
+        - padding: 14px 0 10px
+      grid:
+        - grid-template-areas: "'i' 'n'"
+      name:
+        - justify-self: center
+        - font-weight: bold
+        - font-size: 15px
+        - margin-top: 12px
+      img_cell:
+        - width: 50px
+        - height: 50px
+        - border-radius: 50%
+        - background-color: rgba(var(--color-red), 0.2)
+      icon:
+        - color: rgba(var(--color-red), 1)
+        - width: 24px
+    tap_action:
+      action: perform-action
+      perform_action: script.turn_on
+      target:
+        entity_id: script.alle_lichter_aus

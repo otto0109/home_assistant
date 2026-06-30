@@ -19,34 +19,7 @@
         name: Flur OG
         label: Treppenhaus & Abstellraum
 
-      - type: custom:button-card
-        template: card_title
-        name: Beleuchtung
-
-      - type: custom:mod-card
-        card_mod:
-          style: |
-            ha-card {
-              border-radius: 20px;
-              overflow: hidden;
-            }
-        card:
-          type: custom:button-card
-          template: card_power_outlet
-          entity: switch.flur_licht_shelly
-          name: Flur + Treppenhaus
-          icon: mdi:ceiling-light
-
-      - type: custom:mod-card
-        card_mod:
-          style: |
-            ha-card {
-              border-radius: 20px;
-              overflow: hidden;
-            }
-        card:
-          type: custom:button-card
-          template: card_power_outlet
-          entity: switch.licht_sonoff
-          name: Abstellraum oben
-          icon: mdi:warehouse
+      - type: custom:decluttering-card
+        template: room_auto_content
+        variables:
+          - area: Flur OG
