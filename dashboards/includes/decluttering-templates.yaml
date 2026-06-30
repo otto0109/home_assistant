@@ -19,13 +19,22 @@ room_dynamic_page:
     card:
       type: vertical-stack
       cards:
-        - type: custom:button-card
-          template: card_title
-          name: |
-            [[[
-              const s = states['input_text.dashboard_active_area']?.state;
-              return s && s !== 'unknown' && s !== 'unavailable' ? s : 'Raum';
-            ]]]
+        - type: markdown
+          content: |
+            ## {{ states('input_text.dashboard_active_area') }}
+          card_mod:
+            style: |
+              ha-card {
+                background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 0 4px 0;
+              }
+              h2 {
+                margin: 0;
+                font-size: 1.35rem;
+                font-weight: 600;
+              }
         - !include room-auto-content-active.yaml
 
 room_page:
