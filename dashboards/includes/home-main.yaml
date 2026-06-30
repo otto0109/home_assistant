@@ -4,9 +4,9 @@
       :host {
         display: block;
         width: 100%;
-        max-width: 1320px;
+        max-width: 1480px;
         margin: 0 auto;
-        padding: 8px 16px 32px;
+        padding: 8px 20px 36px;
         box-sizing: border-box;
       }
       ha-card {
@@ -15,15 +15,33 @@
         border: none !important;
       }
   card:
-    type: vertical-stack
+    type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      grid-gap: 20px
+      grid-template-columns: 1fr
+      grid-template-areas: |
+        "persons"
+        "welcome"
+        "rooms"
+        "vacuum"
+      mediaquery:
+        "(min-width: 960px)":
+          grid-template-columns: minmax(340px, 420px) 1fr
+          grid-template-areas: |
+            "persons persons"
+            "welcome rooms"
+            "vacuum vacuum"
     cards:
       - type: custom:mod-card
+        view_layout:
+          grid-area: persons
         card_mod:
           style: |
-            @media (min-width: 768px) {
+            @media (min-width: 960px) {
               :host {
                 display: block;
-                max-width: 540px;
+                max-width: 580px;
                 margin-left: auto;
                 margin-right: auto;
               }
@@ -46,51 +64,53 @@
                 ulm_card_person_use_entity_picture: true
                 ulm_card_person_battery: sensor.pixel_7_pro_battery_level
 
+      - type: vertical-stack
+        view_layout:
+          grid-area: welcome
+        cards: !include home-welcome-stack.yaml
+
       - type: custom:mod-card
+        view_layout:
+          grid-area: rooms
         card_mod:
           style: |
-            @media (min-width: 960px) {
-              :host {
-                display: block;
-                max-width: 720px;
-                margin-left: auto;
-                margin-right: auto;
-              }
+            :host {
+              display: block;
+              width: 100%;
+              min-width: 0;
             }
         card:
           type: vertical-stack
-          cards: !include home-welcome-stack.yaml
+          cards:
+            - type: custom:button-card
+              template: card_title
+              name: Räume
+            - type: grid
+              columns: 2
+              square: false
+              cards: !include ulm-rooms.yaml
+              card_mod:
+                style: |
+                  @media (min-width: 960px) {
+                    #root {
+                      gap: 16px !important;
+                    }
+                  }
+                  @media (min-width: 1200px) {
+                    #root {
+                      grid-template-columns: repeat(2, minmax(280px, 1fr)) !important;
+                    }
+                  }
 
       - type: custom:button-card
-        template: card_title
-        name: Räume
-
-      - type: custom:layout-card
-        layout:
-          width: 165
-          max_cols: 4
-          max_width: 400
-        cards: !include ulm-rooms.yaml
-
-      - type: custom:mod-card
-        card_mod:
-          style: |
-            @media (min-width: 768px) {
-              :host {
-                display: block;
-                max-width: 900px;
-                margin-left: auto;
-                margin-right: auto;
-              }
-            }
-        card:
-          type: custom:button-card
-          template: card_vacuum
-          entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-          tap_action:
-            action: navigate
-            navigation_path: dreame
-          variables:
-            ulm_card_vacuum_name: Dreame
-            ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
-            ulm_card_vacuum_camera_toggle: true
+        view_layout:
+          grid-area: vacuum
+        template: card_vacuum
+        entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        tap_action:
+          action: navigate
+          navigation_path: dreame
+        variables:
+          ulm_card_vacuum_name: Dreame
+          ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
+          ulm_card_vacuum_camera_toggle: true
