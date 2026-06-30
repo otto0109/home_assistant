@@ -1,0 +1,56 @@
+- id: '1782809604579'
+  name: Wohnzimmer volle Beluechtung
+  entities:
+    light.licht_wohnzimmer:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: color_temp
+      brightness: 254
+      color_temp_kelvin: 6535
+      hs_color:
+      - 54.768
+      - 1.6
+      rgb_color:
+      - 255
+      - 255
+      - 251
+      xy_color:
+      - 0.325
+      - 0.333
+      off_with_transition: false
+      off_brightness:
+      friendly_name: Licht Wohnzimmer
+      supported_features: 40
+      state: 'on'
+  metadata: {}
+- id: '1782809639455'
+  name: Wohnzimmer Fehrnsehen
+  entities:
+    light.licht_wohnzimmer:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: color_temp
+      brightness: 26
+      color_temp_kelvin: 6535
+      hs_color:
+      - 54.768
+      - 1.6
+      rgb_color:
+      - 255
+      - 255
+      - 251
+      xy_color:
+      - 0.325
+      - 0.333
+      off_with_transition: false
+      off_brightness:
+      friendly_name: Licht Wohnzimmer
+      supported_features: 40
+      state: 'on'
+  metadata: {}
