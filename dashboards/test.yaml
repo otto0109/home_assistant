@@ -22,7 +22,7 @@ views:
     background: var(--background-image)
     cards: !include includes/views/dreame.yaml
 
-  - !include includes/room-views.yaml
+  - !include includes/room-dynamic-view.yaml
 
   - title: Energie
     path: energie

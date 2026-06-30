@@ -1,0 +1,84 @@
+# Eine Kachel pro HA-Bereich — neue Bereiche erscheinen automatisch,
+# sobald mindestens eine Entität zugeordnet ist.
+type: custom:auto-entities
+show_empty: false
+card_param: cards
+filter:
+  template: |
+    {% set ns = namespace(items=[]) %}
+    {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
+    {% set area_names = areas() | map('area_name') | list | sort %}
+    {% for aname in area_names %}
+      {% if aname %}
+        {% set aid = namespace(id=none) %}
+        {% for candidate in areas() %}
+          {% if area_name(candidate) == aname %}
+            {% set aid.id = candidate %}
+          {% endif %}
+        {% endfor %}
+        {% if aid.id is not none %}
+          {% set found = namespace(e=none) %}
+          {% for domain in domains %}
+            {% if found.e is none %}
+              {% for e in states[domain] | sort(attribute='entity_id') %}
+                {% if area_id(e.entity_id) == aid.id %}
+                  {% set found.e = e.entity_id %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+          {% if found.e is not none %}
+            {% set ns.items = ns.items + [found.e] %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {{ ns.items }}
+options:
+  type: custom:button-card
+  template:
+    - card_room
+    - grey_no_state
+  icon: |
+    [[[
+      if (entity.attributes.icon) return entity.attributes.icon;
+      const d = entity.entity_id.split('.')[0];
+      if (d === 'climate') return 'mdi:thermometer';
+      if (d === 'light') return 'mdi:lightbulb';
+      if (d === 'switch') return 'mdi:light-switch';
+      if (d === 'script') return 'mdi:script-text';
+      if (d === 'fan') return 'mdi:fan';
+      if (d === 'cover') return 'mdi:window-shutter';
+      return 'mdi:home-floor-1';
+    ]]]
+  name: |
+    [[[
+      const eid = entity.entity_id;
+      const areaId = hass.entities[eid]?.area_id;
+      return areaId && hass.areas[areaId] ? hass.areas[areaId].name : entity.attributes.friendly_name;
+    ]]]
+  variables:
+    label_use_temperature: |
+      [[[
+        return entity.entity_id.startsWith('climate.');
+      ]]]
+    label_use_brightness: |
+      [[[
+        return entity.entity_id.startsWith('light.');
+      ]]]
+  tap_action: |
+    [[[
+      const eid = entity.entity_id;
+      const areaId = hass.entities[eid]?.area_id;
+      const area = areaId && hass.areas[areaId] ? hass.areas[areaId].name : '';
+      if (area) {
+        hass.callService('input_text', 'set_value', {
+          entity_id: 'input_text.dashboard_active_area',
+          value: area,
+        });
+      }
+      return {
+        action: 'navigate',
+        navigation_path: 'raum',
+      };
+    ]]]

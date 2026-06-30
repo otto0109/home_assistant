@@ -1,6 +1,33 @@
 # Decluttering-Templates für Raum-Subviews.
 # Entitäten in HA den Bereichen zuordnen (Einstellungen → Bereiche & Stockwerke).
 
+room_dynamic_page:
+  card:
+    type: custom:mod-card
+    card_mod:
+      style: |
+        ha-card {
+          margin: 16px auto 24px auto;
+          max-width: 720px;
+          background: transparent !important;
+          box-shadow: none !important;
+          border: none !important;
+        }
+        #root {
+          gap: 14px;
+        }
+    card:
+      type: vertical-stack
+      cards:
+        - type: custom:button-card
+          template: card_title
+          name: |
+            [[[
+              const s = states['input_text.dashboard_active_area']?.state;
+              return s && s !== 'unknown' && s !== 'unavailable' ? s : 'Raum';
+            ]]]
+        - !include room-auto-content-active.yaml
+
 room_page:
   variables:
     - area

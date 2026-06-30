@@ -1,0 +1,10 @@
+- title: Raum
+  path: raum
+  subview: true
+  type: panel
+  icon: mdi:door-open
+  theme: minimalist-desktop
+  background: var(--background-image)
+  cards:
+    - type: custom:decluttering-card
+      template: room_dynamic_page

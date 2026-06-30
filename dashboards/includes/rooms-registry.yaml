@@ -1,5 +1,8 @@
-# Zentrale Raumliste — area muss exakt dem HA-Bereichsnamen entsprechen.
-# Neue Räume: Eintrag hier + HA-Bereich anlegen und Entitäten zuordnen.
+# Optionale Referenz (Icons, Chips) — das Dashboard liest Räume direkt aus HA-Bereichen.
+# Pflege hier nur, wenn du später wieder statische Karten erzeugen willst.
+#
+# Dynamisch: dashboards/includes/home-rooms-dynamic.yaml
+# Raum-Detail: View „raum“ + input_text.dashboard_active_area
 
 - area: Wohnzimmer
   path: wohnzimmer
@@ -20,6 +23,7 @@
   label: Licht
 
 - area: Raum neben der Küche
+  title: Neben Küche
   path: raum-neben-kueche
   icon: mdi:thermometer-lines
   color: red_no_state
@@ -35,13 +39,27 @@
   path: flur-og
   icon: mdi:home-floor-a
   color: grey_no_state
-  label: Treppenhaus & Abstellraum
+  label: Treppenhaus
+
+- area: Abstellraum OG
+  title: Abstellraum oben
+  path: abstellraum-og
+  icon: mdi:warehouse
+  color: grey_no_state
+  label: Abstellraum oben
 
 - area: Flur EG
   path: flur-eg
   icon: mdi:home-floor-b
   color: blue_no_state
   label: Erdgeschoss
+
+- area: Abstellraum EG
+  title: Abstellraum unten
+  path: abstellraum-eg
+  icon: mdi:warehouse
+  color: blue_no_state
+  label: Abstellraum unten
 
 - area: Garten
   path: garten

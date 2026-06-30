@@ -31,6 +31,13 @@ input_boolean:
     icon: mdi:air-conditioner
     initial: false
 
+input_text:
+  dashboard_active_area:
+    name: Dashboard aktiver Raum
+    icon: mdi:door-open
+    max: 120
+    initial: ""
+
 input_select:
   pv_zeitraum:
     name: PV Zeitraum
