@@ -5,6 +5,7 @@ test-dashboard:
   icon: mdi:home
   filename: dashboards/test.yaml
   show_in_sidebar: true
+  resource_mode: storage
 uebersicht-dashboard:
   mode: yaml
   title: Übersicht

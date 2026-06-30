@@ -1,4 +1,4 @@
-button_card_templates: !include_dir_merge_named "../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+button_card_templates: !include_dir_merge_named "../custom_components/ui_lovelace_minimalist/lovelace/ulm_templates/"
 
 title: Test
 theme: minimalist-desktop
@@ -12,13 +12,13 @@ views:
         template: card_welcome_scenes
         variables:
           ulm_weather: weather.wetter_home
-          ulm_language: de
+          ulm_language: de-DE
           entity_1:
             entity_id: sensor.pv_pv_power
             icon: mdi:solar-power-variant
             name: Solar
             color: yellow
-            _nav_path: energie
+            _            _nav_path: energie
           entity_2:
             entity_id: sensor.pv_battery
             icon: mdi:battery-high
@@ -35,12 +35,14 @@ views:
         cards:
           - type: custom:button-card
             template: card_person
+            entity: person.thorge
             variables:
               ulm_card_person_entity: person.thorge
               ulm_card_person_use_entity_picture: true
               ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
           - type: custom:button-card
             template: card_person
+            entity: person.laura
             variables:
               ulm_card_person_entity: person.laura
               ulm_card_person_use_entity_picture: true
