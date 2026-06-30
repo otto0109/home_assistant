@@ -1,6 +1,5 @@
 # Decluttering-Templates für Raum-Subviews.
-# Voraussetzung: Entitäten in HA den Bereichen zuordnen (Einstellungen → Bereiche & Stockwerke).
-# Bereichsnamen müssen exakt passen (z. B. „Wohnzimmer“, „Flur OG“).
+# Entitäten in HA den Bereichen zuordnen (Einstellungen → Bereiche & Stockwerke).
 
 room_auto_content:
   variables:
@@ -25,20 +24,18 @@ room_auto_content:
           include:
             - domain: scene
               area: "[[area]]"
-        options:
-          type: custom:mod-card
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
-          card:
-            type: custom:button-card
-            template: card_vertical_button
-            tap_action:
-              action: perform-action
-              perform_action: scene.turn_on
+              options:
+                type: custom:button-card
+                template: card_vertical_button
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
+                tap_action:
+                  action: perform-action
+                  perform_action: scene.turn_on
 
       - type: custom:button-card
         template: card_title
@@ -57,19 +54,17 @@ room_auto_content:
           include:
             - domain: light
               area: "[[area]]"
-        options:
-          type: custom:mod-card
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
-          card:
-            type: custom:mushroom-light-card
-            fill_container: true
-            show_brightness_control: true
-            use_light_color: true
+              options:
+                type: custom:mushroom-light-card
+                fill_container: true
+                show_brightness_control: true
+                use_light_color: true
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
 
       - type: custom:button-card
         template: card_title
@@ -88,17 +83,15 @@ room_auto_content:
           include:
             - domain: switch
               area: "[[area]]"
-        options:
-          type: custom:mod-card
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
-          card:
-            type: custom:button-card
-            template: card_power_outlet
+              options:
+                type: custom:button-card
+                template: card_power_outlet
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
 
       - type: custom:button-card
         template: card_title
@@ -117,28 +110,26 @@ room_auto_content:
           include:
             - domain: climate
               area: "[[area]]"
-        options:
-          type: custom:mod-card
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-                background: var(--ha-card-background) !important;
-              }
-          card:
-            type: custom:button-card
-            template: card_thermostat
-            variables:
-              ulm_card_thermostat_enable_collapse: false
-              ulm_card_thermostat_enable_controls: true
-              ulm_card_thermostat_enable_hvac_modes: true
-              ulm_card_thermostat_enable_popup: true
-              ulm_card_thermostat_enable_background_color: false
-            extra_styles: |
-              ha-card {
-                background: var(--ha-card-background) !important;
-              }
+              options:
+                type: custom:button-card
+                template: card_thermostat
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                      background: var(--ha-card-background) !important;
+                    }
+                variables:
+                  ulm_card_thermostat_enable_collapse: false
+                  ulm_card_thermostat_enable_controls: true
+                  ulm_card_thermostat_enable_hvac_modes: true
+                  ulm_card_thermostat_enable_popup: true
+                  ulm_card_thermostat_enable_background_color: false
+                extra_styles: |
+                  ha-card {
+                    background: var(--ha-card-background) !important;
+                  }
 
       - type: custom:button-card
         template: card_title
@@ -157,20 +148,18 @@ room_auto_content:
           include:
             - domain: script
               area: "[[area]]"
-        options:
-          type: custom:mod-card
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
-          card:
-            type: custom:button-card
-            template: card_vertical_button
-            tap_action:
-              action: perform-action
-              perform_action: script.turn_on
+              options:
+                type: custom:button-card
+                template: card_vertical_button
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
+                tap_action:
+                  action: perform-action
+                  perform_action: script.turn_on
 
       - type: custom:button-card
         template: card_title
@@ -189,28 +178,64 @@ room_auto_content:
           include:
             - domain: fan
               area: "[[area]]"
+              options:
+                type: custom:mushroom-entity-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
             - domain: cover
               area: "[[area]]"
+              options:
+                type: custom:mushroom-entity-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
             - domain: media_player
               area: "[[area]]"
+              options:
+                type: custom:mushroom-entity-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
             - domain: vacuum
               area: "[[area]]"
+              options:
+                type: custom:mushroom-entity-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
             - domain: humidifier
               area: "[[area]]"
+              options:
+                type: custom:mushroom-entity-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
             - domain: water_heater
               area: "[[area]]"
-        options:
-          type: custom:mod-card
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
-          card:
-            type: custom:mushroom-entity-card
-            tap_action:
-              action: toggle
+              options:
+                type: custom:mushroom-entity-card
+                card_mod:
+                  style: |
+                    ha-card {
+                      border-radius: 20px;
+                      overflow: hidden;
+                    }
 
 alle_aus_button_home:
   card:
@@ -240,7 +265,7 @@ alle_aus_button_home:
         - color: rgba(var(--color-red), 1)
         - width: 24px
     tap_action:
-      action: perform-action
-      perform_action: script.turn_on
+      action: call-service
+      service: script.turn_on
       target:
         entity_id: script.alle_lichter_aus
