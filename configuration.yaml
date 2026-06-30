@@ -1,6 +1,26 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
+# YAML-Dashboards: Änderungen hier erfordern einen vollen HA-Neustart
+# (nicht „Konfiguration neu laden“). Einstellungen → System → Home Assistant neu starten
+lovelace:
+  mode: storage
+  dashboards: !include dashboards/registry.yaml
+  # Nach HACS-Installation: einmalig HA neu starten
+  resources:
+    - url: /hacsfiles/button-card/button-card.js
+      type: module
+    - url: /hacsfiles/lovelace-card-mod/card-mod.js
+      type: module
+    - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
+      type: module
+    - url: /hacsfiles/mini-graph-card/mini-graph-card-bundle.js
+      type: module
+    - url: /hacsfiles/lovelace-layout-card/layout-card.js
+      type: module
+    - url: /hacsfiles/decluttering-card/decluttering-card.js
+      type: module
+
 homeassistant:
   packages: !include_dir_named packages
 
@@ -10,8 +30,6 @@ alexa:
 # Load frontend themes from the themes folder
 frontend:
   themes: !include_dir_merge_named themes
-
-lovelace: !include lovelace.yaml
 
 automation: !include automations.yaml
 script: !include scripts.yaml
