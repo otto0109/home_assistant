@@ -1,0 +1,106 @@
+- type: custom:mod-card
+  card_mod:
+    style: |
+      :host {
+        display: block;
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 0 12px 24px;
+        box-sizing: border-box;
+      }
+      ha-card {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+  card:
+    type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      grid-gap: 16px
+      grid-template-columns: 1fr
+      grid-template-areas: |
+        "persons"
+        "welcome"
+        "rooms_title"
+        "rooms"
+        "vacuum"
+      mediaquery:
+        "(min-width: 1100px)":
+          grid-template-columns: minmax(320px, 400px) 1fr
+          grid-template-areas: |
+            "persons persons"
+            "welcome rooms_title"
+            "welcome rooms"
+            "welcome vacuum"
+    cards:
+      - type: horizontal-stack
+        view_layout:
+          grid-area: persons
+        card_mod:
+          style: |
+            @media (min-width: 1100px) {
+              ha-card {
+                max-width: 520px;
+              }
+            }
+        cards:
+          - type: custom:button-card
+            template: card_person
+            entity: person.thorge
+            variables:
+              ulm_card_person_entity: person.thorge
+              ulm_card_person_use_entity_picture: true
+              ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
+          - type: custom:button-card
+            template: card_person
+            entity: person.laura
+            variables:
+              ulm_card_person_entity: person.laura
+              ulm_card_person_use_entity_picture: true
+              ulm_card_person_battery: sensor.pixel_7_pro_battery_level
+
+      - type: vertical-stack
+        view_layout:
+          grid-area: welcome
+        cards: !include home-welcome-stack.yaml
+
+      - type: custom:button-card
+        view_layout:
+          grid-area: rooms_title
+        template: card_title
+        name: Räume
+
+      - type: custom:layout-card
+        view_layout:
+          grid-area: rooms
+        layout_type: custom:grid-layout
+        layout:
+          grid-gap: 12px
+          grid-template-columns: repeat(4, 1fr)
+          mediaquery:
+            "(max-width: 699px)":
+              grid-template-columns: repeat(2, 1fr)
+            "(max-width: 1099px)":
+              grid-template-columns: repeat(3, 1fr)
+        cards: !include ulm-rooms.yaml
+
+      - type: custom:button-card
+        view_layout:
+          grid-area: vacuum
+        template: card_vacuum
+        entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+        tap_action:
+          action: navigate
+          navigation_path: dreame
+        variables:
+          ulm_card_vacuum_name: Dreame
+          ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
+          ulm_card_vacuum_camera_toggle: true
+        card_mod:
+          style: |
+            @media (min-width: 1100px) {
+              ha-card {
+                max-width: 100%;
+              }
+            }

@@ -1,0 +1,57 @@
+# Custom Sidebar — nur YAML-Dashboard „Home“ in der Leiste
+# Datei muss in config/www/ liegen (nicht im Config-Root).
+# Nach Änderung: HA neu starten, Browser-Cache leeren.
+
+default_path: /test-dashboard/home
+
+order:
+  # Eingebaut: Übersicht
+  - item: overview
+    hide: true
+  - item: Übersicht
+    hide: true
+  - match: href
+    href: /lovelace
+    exact: true
+    hide: true
+
+  # Eingebautes „Home“ (nicht unser Dashboard unter /test-dashboard)
+  - match: href
+    href: /lovelace/home
+    hide: true
+  - match: href
+    href: /home
+    exact: true
+    hide: true
+  - item: Home
+    match: href
+    href: /lovelace
+    hide: true
+
+  # Landkarte
+  - item: map
+    hide: true
+  - item: Landkarte
+    hide: true
+  - match: href
+    href: /map
+    hide: true
+
+  # UI Lovelace Minimalist (Beispiel + Adaptive)
+  - match: href
+    href: /ui-lovelace-minimalist
+    hide: true
+  - match: href
+    href: /adaptive-dash
+    hide: true
+  - item: UI Lovelace Minimalist
+    hide: true
+  - item: Lovelace UI • Minimalist
+    hide: true
+  - item: Adaptive
+    hide: true
+
+  # Unser Dashboard oben
+  - match: href
+    href: /test-dashboard/home
+    order: 1

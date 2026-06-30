@@ -7,44 +7,7 @@ views:
   - title: Home
     path: home
     icon: mdi:home
-    cards:
-      - type: vertical-stack
-        cards:
-          - type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                template: card_person
-                entity: person.thorge
-                variables:
-                  ulm_card_person_entity: person.thorge
-                  ulm_card_person_use_entity_picture: true
-                  ulm_card_person_battery: sensor.pixel_9_pro_xl_battery_level
-              - type: custom:button-card
-                template: card_person
-                entity: person.laura
-                variables:
-                  ulm_card_person_entity: person.laura
-                  ulm_card_person_use_entity_picture: true
-                  ulm_card_person_battery: sensor.pixel_7_pro_battery_level
-          - type: vertical-stack
-            cards: !include includes/home-welcome-stack.yaml
-          - type: custom:button-card
-            template: card_title
-            name: Räume
-          - type: grid
-            columns: 2
-            square: false
-            cards: !include includes/ulm-rooms.yaml
-          - type: custom:button-card
-            template: card_vacuum
-            entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
-            tap_action:
-              action: navigate
-              navigation_path: dreame
-            variables:
-              ulm_card_vacuum_name: Dreame
-              ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
-              ulm_card_vacuum_camera_toggle: true
+    cards: !include includes/home-main.yaml
 
   - title: Dreame
     path: dreame

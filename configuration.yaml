@@ -34,7 +34,8 @@ alexa:
 frontend:
   themes: !include_dir_merge_named themes
   extra_module_url:
-    - /hacsfiles/custom-sidebar/custom-sidebar.js
+    # YAML-Config: www/custom-sidebar-config.yaml
+    - /hacsfiles/custom-sidebar/custom-sidebar-plugin.js
 
 automation: !include automations.yaml
 script: !include scripts.yaml

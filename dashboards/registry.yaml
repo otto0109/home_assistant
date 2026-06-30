@@ -1,12 +1,25 @@
 # Registrierung der YAML-Dashboards (wird von configuration.yaml eingebunden)
 #
-# Sidebar aufräumen (einmalig auf dem HA-Server):
-# • ULM: Einstellungen → Geräte & Dienste → UI Lovelace Minimalist → Konfigurieren
-#   → Dashboard- & Adaptive-Eintrag in der Seitenleiste AUS → Neustart
-# • Eingebaut: Einstellungen → Dashboards → Übersicht & Landkarte → „Zur Seitenleiste“ AUS
-# • Standard: „Home“ (dieses Dashboard) → Als Standard festlegen
-# • Optional: HACS „Custom Sidebar“ + sidebar-config.yaml (siehe configuration.yaml)
-# • Lampen-Slider (ULM card_light): HACS „My Cards“ (AnthonMS/my-cards) — bereits in configuration.yaml als Ressource
+# ═══ Nur „Home“ in der Sidebar ═══
+#
+# 1) Custom Sidebar (automatisch via Git):
+#    • www/custom-sidebar-config.yaml
+#    • configuration.yaml → custom-sidebar-plugin.js
+#    → HA neu starten, Browser hart neu laden
+#
+# 2) ULM-Integration (einmalig in der HA-UI):
+#    Einstellungen → Geräte & Dienste → UI Lovelace Minimalist → Konfigurieren
+#    → „Dashboard in der Seitenleiste“ AUS
+#    → „Adaptive Dashboard“ AUS → Speichern → Neustart
+#
+# 3) Eingebaute Dashboards (einmalig in der HA-UI):
+#    Einstellungen → Dashboards → Übersicht & Landkarte
+#    → „Zur Seitenleiste hinzufügen“ AUS
+#
+# 4) Standard-Dashboard:
+#    Einstellungen → Dashboards → „Home“ → Als Standard festlegen
+#    (oder default_path in custom-sidebar-config.yaml)
+#
 test-dashboard:
   mode: yaml
   title: Home

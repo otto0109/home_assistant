@@ -26,6 +26,11 @@
         border: none !important;
         padding: 0 4px !important;
       }
+      @media (min-width: 1100px) {
+        ha-card h2 {
+          font-size: 1.65rem !important;
+        }
+      }
 
 - type: custom:button-card
   template: card_title

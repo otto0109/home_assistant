@@ -60,6 +60,7 @@
             ha-card {
               border-radius: 20px;
               overflow: hidden;
+              background: var(--ha-card-background) !important;
             }
         card:
           type: custom:button-card
@@ -72,6 +73,10 @@
             ulm_card_thermostat_enable_hvac_modes: true
             ulm_card_thermostat_enable_popup: true
             ulm_card_thermostat_enable_background_color: false
+          extra_styles: |
+            ha-card {
+              background: var(--ha-card-background) !important;
+            }
 
       - type: custom:button-card
         template: card_title
