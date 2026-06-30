@@ -24,20 +24,6 @@ filter:
   template: |
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
     {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
-    {% set dreame_by_name = {
-      'Wohnzimmer': 'script.dreame_reinigen_wohnzimmer',
-      'Esszimmer': 'script.dreame_reinigen_esszimmer',
-      'Raum neben der Küche': 'script.dreame_reinigen_kueche',
-      'Küche': 'script.dreame_reinigen_kueche',
-      'Flur EG': 'script.dreame_reinigen_flur_eg'
-    } %}
-    {% set dreame_by_id = {
-      'wohnzimmer': 'script.dreame_reinigen_wohnzimmer',
-      'esszimmer': 'script.dreame_reinigen_esszimmer',
-      'raum_neben_der_kuche': 'script.dreame_reinigen_kueche',
-      'kueche': 'script.dreame_reinigen_kueche',
-      'flur_eg': 'script.dreame_reinigen_flur_eg'
-    } %}
     {% set ns = namespace(cards=[], sorted=[]) %}
     {% for aid in areas() %}
       {% set ns.sorted = ns.sorted + [{'aid': aid, 'name': area_name(aid)}] %}
@@ -95,16 +81,25 @@ filter:
               {% endif %}
             {% endfor %}
           {% endfor %}
-          {% set dreame_eid = dreame_by_name.get(aname) or dreame_by_id.get(aid) %}
-          {% if dreame_eid and dreame_eid in states %}
+          {% set dreame = namespace(eid='') %}
+          {% if aname == 'Wohnzimmer' or aid == 'wohnzimmer' %}
+            {% set dreame.eid = 'script.dreame_reinigen_wohnzimmer' %}
+          {% elif aname == 'Esszimmer' or aid == 'esszimmer' %}
+            {% set dreame.eid = 'script.dreame_reinigen_esszimmer' %}
+          {% elif aname in ['Raum neben der Küche', 'Küche'] or aid in ['raum_neben_der_kuche', 'kueche'] %}
+            {% set dreame.eid = 'script.dreame_reinigen_kueche' %}
+          {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
+            {% set dreame.eid = 'script.dreame_reinigen_flur_eg' %}
+          {% endif %}
+          {% if dreame.eid %}
             {% set chips.list = chips.list + [{
-              'entity_id': dreame_eid,
-              'icon': state_attr(dreame_eid, 'icon') or 'mdi:broom',
+              'entity_id': dreame.eid,
+              'icon': state_attr(dreame.eid, 'icon') or 'mdi:broom',
               'templates': ['green_on'],
               'tap_action': {
                 'action': 'call-service',
                 'service': 'script.turn_on',
-                'service_data': {'entity_id': dreame_eid}
+                'service_data': {'entity_id': dreame.eid}
               }
             }] %}
           {% endif %}
