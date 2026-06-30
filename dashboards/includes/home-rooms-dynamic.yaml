@@ -1,9 +1,12 @@
-# Eine Kachel pro HA-Bereich — ohne button-card-JS (stabiler mit auto-entities).
+# Dynamische Raumkacheln — eine pro HA-Bereich, Icons aus der Bereichskonfiguration.
+# mushroom-template-card (kompatibel mit Mushroom v2.x auf deinem System).
 type: custom:auto-entities
 show_empty: false
-card_param: cards
+card_param: card
 card:
-  type: vertical-stack
+  type: custom:mushroom-template-card
+  layout: vertical
+  fill_container: true
 filter:
   template: |
     {% set ns = namespace(items=[]) %}
@@ -25,35 +28,11 @@ filter:
     {% endfor %}
     {{ ns.items }}
 options:
-  type: custom:mushroom-template-card
-  layout: vertical
-  fill_container: true
   primary: "{{ area_name(area_id(entity)) }}"
   secondary: "{{ states(entity) }}"
-  icon: >-
-    {% set d = entity.split('.')[0] %}
-    {% if d == 'climate' %}mdi:thermometer
-    {% elif d == 'light' %}mdi:lightbulb
-    {% elif d == 'switch' %}mdi:light-switch
-    {% elif d == 'script' %}mdi:script-text
-    {% elif d == 'fan' %}mdi:fan
-    {% elif d == 'cover' %}mdi:window-shutter
-    {% else %}mdi:home-floor-1{% endif %}
-  icon_color: >-
-    {% set d = entity.split('.')[0] %}
-    {% if d == 'climate' %}blue
-    {% elif d == 'light' %}amber
-    {% elif d == 'switch' %}grey
-    {% else %}green{% endif %}
-  card_mod:
-    style: |
-      ha-card {
-        border-radius: var(--border-radius, 20px);
-        min-height: 148px;
-        height: 100%;
-      }
+  icon: "{{ area_icon(area_id(entity)) or 'mdi:home-floor-1' }}"
   tap_action:
     action: call-service
     service: script.dashboard_raum_oeffnen
-    data:
+    service_data:
       entity_id: "{{ entity }}"

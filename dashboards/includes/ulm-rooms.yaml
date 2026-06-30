@@ -1,0 +1,129 @@
+# Statische Fallback-Karten (falls auto-entities Probleme macht).
+# tap_action: navigate — kein Script, kompatibel mit älterem button-card.
+- type: custom:button-card
+  template:
+    - card_room
+    - yellow_no_state
+  name: Wohnzimmer
+  entity: light.licht_wohnzimmer
+  icon: mdi:sofa
+  tap_action:
+    action: navigate
+    navigation_path: raum
+
+- type: custom:button-card
+  template:
+    - card_room
+    - pink_no_state
+  name: Esszimmer
+  entity: climate.esszimmer_klimaanlage
+  icon: mdi:silverware-fork-knife
+  tap_action:
+    action: navigate
+    navigation_path: raum
+  variables:
+    label_use_temperature: true
+    entity_1:
+      entity_id: climate.esszimmer_klimaanlage
+      icon: mdi:snowflake
+      templates:
+        - blue_on
+      tap_action:
+        action: more-info
+
+- type: custom:button-card
+  template:
+    - card_room
+    - red_no_state
+  name: Küche
+  entity: script.dreame_reinigen_kueche
+  icon: mdi:stove
+  tap_action:
+    action: navigate
+    navigation_path: raum
+  variables:
+    label_use_temperature: false
+    label_use_brightness: false
+
+- type: custom:button-card
+  template:
+    - card_room
+    - purple_no_state
+  name: Schlafzimmer
+  entity: climate.schlafzimmer_klimaanlage
+  icon: mdi:bed-king-outline
+  tap_action:
+    action: navigate
+    navigation_path: raum
+  variables:
+    label_use_temperature: true
+    entity_1:
+      entity_id: climate.schlafzimmer_klimaanlage
+      icon: mdi:snowflake
+      templates:
+        - blue_on
+      tap_action:
+        action: more-info
+
+- type: custom:button-card
+  template:
+    - card_room
+    - grey_no_state
+  name: Flur OG
+  entity: switch.flur_licht_shelly
+  icon: mdi:home-floor-a
+  tap_action:
+    action: navigate
+    navigation_path: raum
+  variables:
+    label_use_temperature: false
+    label_use_brightness: false
+    entity_1:
+      entity_id: switch.flur_licht_shelly
+      icon: mdi:ceiling-light
+      templates:
+        - grey_on
+      tap_action:
+        action: toggle
+
+- type: custom:button-card
+  template:
+    - card_room
+    - blue_no_state
+  name: Flur EG
+  entity: switch.shelly_1_mini_gen4
+  icon: mdi:home-floor-b
+  tap_action:
+    action: navigate
+    navigation_path: raum
+  variables:
+    label_use_temperature: false
+    label_use_brightness: false
+    entity_1:
+      entity_id: switch.shelly_1_mini_gen4
+      icon: mdi:ceiling-light
+      templates:
+        - blue_on
+      tap_action:
+        action: toggle
+
+- type: custom:button-card
+  template:
+    - card_room
+    - green_no_state
+  name: Garten
+  entity: switch.automatisch_bewasserung
+  icon: mdi:flower
+  tap_action:
+    action: navigate
+    navigation_path: raum
+  variables:
+    label_use_temperature: false
+    label_use_brightness: false
+    entity_1:
+      entity_id: switch.automatisch_bewasserung
+      icon: mdi:sprinkler-variant
+      templates:
+        - green_on
+      tap_action:
+        action: toggle
