@@ -8,6 +8,8 @@ icon: mdi:solar-power-variant
 tap_action:
   action: navigate
   navigation_path: energie
+double_tap_action:
+  action: none
 variables:
   label_use_temperature: false
   label_use_brightness: false
