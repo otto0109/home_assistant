@@ -123,28 +123,15 @@
               #root {
                 gap: 16px !important;
               }
-              @media (min-width: 700px) {
+              @media (min-width: 900px) {
                 #root {
-                  grid-template-columns: repeat(2, 1fr) !important;
+                  grid-template-columns: repeat(4, 1fr) !important;
                   gap: 20px !important;
-                }
-              }
-              @media (min-width: 1000px) {
-                #root {
-                  grid-template-columns: repeat(3, 1fr) !important;
-                  gap: 22px !important;
                 }
               }
               @media (min-width: 1400px) {
                 #root {
-                  grid-template-columns: repeat(3, minmax(400px, 1fr)) !important;
                   gap: 24px !important;
-                }
-              }
-              @media (min-width: 1800px) {
-                #root {
-                  grid-template-columns: repeat(4, minmax(380px, 1fr)) !important;
-                  gap: 28px !important;
                 }
               }
 
