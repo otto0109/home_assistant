@@ -1,25 +1,17 @@
-# Dynamische Raumkacheln — Icons/Chips serverseitig (Jinja), Navigation per JS.
+# Dynamische Raumkacheln — card_param:cards → layout-card (nicht mod-card!).
 type: custom:auto-entities
 show_empty: false
 card_param: cards
 card:
-  type: custom:mod-card
-  card_mod:
-    style: |
-      :host {
-        display: block;
-        width: 100%;
-        min-width: 0;
-      }
-      @media (min-width: 900px) {
-        #root {
-          grid-template-columns: repeat(4, 1fr) !important;
-        }
-      }
-  card:
-    type: grid
-    columns: 2
-    square: false
+  type: custom:layout-card
+  layout_type: custom:grid-layout
+  layout:
+    grid-gap: 16px
+    grid-template-columns: repeat(2, 1fr)
+    mediaquery:
+      "(min-width: 900px)":
+        grid-template-columns: repeat(4, 1fr)
+        grid-gap: 20px
 filter:
   template: |
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
@@ -86,7 +78,7 @@ filter:
             {% set dreame.eid = 'script.dreame_reinigen_wohnzimmer' %}
           {% elif aname == 'Esszimmer' or aid == 'esszimmer' %}
             {% set dreame.eid = 'script.dreame_reinigen_esszimmer' %}
-          {% elif aname in ['Raum neben der Küche', 'Küche'] or aid in ['raum_neben_der_kuche', 'kueche'] %}
+          {% elif aname == 'Raum neben der Küche' or aname == 'Küche' or aid == 'raum_neben_der_kuche' or aid == 'kueche' %}
             {% set dreame.eid = 'script.dreame_reinigen_kueche' %}
           {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
             {% set dreame.eid = 'script.dreame_reinigen_flur_eg' %}
@@ -115,7 +107,7 @@ filter:
             'tap_action': tap,
             'variables': {
               'ulm_room_area_id': aid,
-              'label_use_temperature': dom == 'climate' and state_attr(picked.e, 'current_temperature') is not none,
+              'label_use_temperature': dom == 'climate',
               'label_use_brightness': dom == 'light',
               'entity_1': chips.list[0] if chips.list | length > 0 else false,
               'entity_2': chips.list[1] if chips.list | length > 1 else false,
