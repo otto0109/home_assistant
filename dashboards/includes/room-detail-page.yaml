@@ -1,0 +1,34 @@
+- type: custom:mod-card
+  card_mod:
+    style: |
+      ha-card {
+        margin: 16px auto 24px auto;
+        max-width: 720px;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #root {
+        gap: 14px;
+      }
+  card:
+    type: vertical-stack
+    cards:
+      - type: markdown
+        content: |
+          {% set aid = states('input_text.dashboard_active_area') %}
+          ## {{ area_name(aid) if aid not in ['unknown', 'unavailable', ''] else 'Raum' }}
+        card_mod:
+          style: |
+            ha-card {
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+              padding: 0 0 4px 0;
+            }
+            h2 {
+              margin: 0;
+              font-size: 1.35rem;
+              font-weight: 600;
+            }
+      - !include room-auto-content-active.yaml
