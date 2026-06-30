@@ -1,13 +1,13 @@
 lovelace:
   mode: storage
   dashboards:
-    test:
+    test-dashboard:
       mode: yaml
       title: Test
       icon: mdi:home-analytics
       filename: dashboards/test.yaml
       show_in_sidebar: true
-    uebersicht:
+    uebersicht-dashboard:
       mode: yaml
       title: Übersicht
       icon: mdi:view-dashboard
