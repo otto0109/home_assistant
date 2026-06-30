@@ -5,10 +5,6 @@
       name: Küche
       label: Licht & Klima
 
-    - type: custom:button-card
-      template: card_title
-      name: Beleuchtung
-
     - type: custom:auto-entities
       show_empty: false
       sort:
@@ -21,33 +17,24 @@
       filter:
         include:
           - domain: light
-            name: "*Küche*"
+            name: "*üche*"
             options:
-              type: custom:button-card
-              template: card_light
-              entity: "[[[ return entity.entity_id ]]]"
-              variables:
-                ulm_card_light_enable_slider: true
-          - domain: light
-            name: "*kueche*"
-            options:
-              type: custom:button-card
-              template: card_light
-              entity: "[[[ return entity.entity_id ]]]"
-              variables:
-                ulm_card_light_enable_slider: true
+              type: tile
+              icon: mdi:ceiling-light
+              features:
+                - type: light-brightness
 
-    - type: custom:button-card
-      template: card_title
-      name: Klima
-
-    - !include fragments/climate-kueche.yaml
+    - type: tile
+      entity: climate.raum_neben_der_kuche_klimaanlage
+      name: Klimaanlage
+      icon: mdi:snowflake
+      features:
+        - type: climate-hvac-modes
 
     - type: custom:button-card
       template: card_vertical_button
       entity: script.dreame_reinigen_kueche
       name: Küche reinigen
-      icon: mdi:broom
       tap_action:
         action: call-service
         service: script.turn_on

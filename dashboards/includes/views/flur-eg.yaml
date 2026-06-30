@@ -25,7 +25,6 @@
       template: card_vertical_button
       entity: script.dreame_reinigen_flur_eg
       name: Flur EG reinigen
-      icon: mdi:broom
       tap_action:
         action: call-service
         service: script.turn_on

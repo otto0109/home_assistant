@@ -5,28 +5,24 @@
       name: Esszimmer
       label: Licht & Klima
 
-    - type: custom:button-card
-      template: card_title
-      name: Beleuchtung
-
-    - type: custom:button-card
-      template: card_light
+    - type: tile
       entity: light.beleuchtung_bett_leuchte
-      variables:
-        ulm_card_light_enable_slider: true
-        ulm_card_light_enable_color: true
+      name: Lampe
+      icon: mdi:chandelier
+      features:
+        - type: light-brightness
 
-    - type: custom:button-card
-      template: card_title
-      name: Klima
-
-    - !include fragments/climate-esszimmer.yaml
+    - type: tile
+      entity: climate.esszimmer_klimaanlage
+      name: Klimaanlage
+      icon: mdi:snowflake
+      features:
+        - type: climate-hvac-modes
 
     - type: custom:button-card
       template: card_vertical_button
       entity: script.dreame_reinigen_esszimmer
       name: Esszimmer reinigen
-      icon: mdi:broom
       tap_action:
         action: call-service
         service: script.turn_on

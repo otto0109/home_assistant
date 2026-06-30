@@ -9,15 +9,26 @@
       template: card_title
       name: Szenen
 
-    - !include fragments/wohnzimmer-szenen.yaml
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+        - type: tile
+          entity: scene.wohnzimmer_volle_beluechtung
+          name: Voll
+          icon: mdi:ceiling-light
+        - type: tile
+          entity: scene.wohnzimmer_fehrnsehen
+          name: TV
+          icon: mdi:television
 
     - type: custom:button-card
       template: card_title
       name: Beleuchtung
 
-    - type: custom:button-card
-      template: card_light
+    - type: tile
       entity: light.licht_wohnzimmer
-      variables:
-        ulm_card_light_enable_slider: true
-        ulm_card_light_enable_color: true
+      name: Licht Wohnzimmer
+      icon: mdi:floor-lamp
+      features:
+        - type: light-brightness

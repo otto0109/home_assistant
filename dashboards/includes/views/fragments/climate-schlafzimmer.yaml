@@ -1,6 +1,0 @@
-- type: tile
-  entity: climate.schlafzimmer_klimaanlage
-  name: Klimaanlage
-  icon: mdi:snowflake
-  features:
-    - type: climate-hvac-modes
