@@ -1,58 +1,76 @@
-# Dynamische Raumkacheln — include/options (wie Szenen) + exclude für 1 Karte pro Bereich.
-- type: custom:auto-entities
-  show_empty: false
-  card_param: cards
-  card:
-    type: custom:layout-card
-    layout_type: custom:grid-layout
-    layout:
-      grid-gap: 16px
-      grid-template-columns: repeat(2, 1fr)
-      mediaquery:
-        "(min-width: 900px)":
-          grid-template-columns: repeat(4, 1fr)
-          grid-gap: 20px
-  filter:
-    include:
-      - domain: light
-        options: !include home-room-card-options.yaml
-      - domain: climate
-        options: !include home-room-card-options.yaml
-      - domain: switch
-        options: !include home-room-card-options.yaml
-      - domain: script
-        options: !include home-room-card-options.yaml
-      - domain: fan
-        options: !include home-room-card-options.yaml
-      - domain: cover
-        options: !include home-room-card-options.yaml
-      - entity_id: sensor.pv_pv_power
-        options: !include ulm-room-energie-options.yaml
-    exclude:
-      template: |
-        {% set pick_domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
-        {% set picked = namespace(ids=[]) %}
-        {% for aid in areas() | sort %}
-          {% set pe = namespace(e=none) %}
-          {% for domain in pick_domains %}
-            {% if pe.e is none %}
-              {% for e in states[domain] | sort(attribute='entity_id') %}
-                {% if area_id(e.entity_id) == aid %}
-                  {% set pe.e = e.entity_id %}
-                {% endif %}
-              {% endfor %}
-            {% endif %}
-          {% endfor %}
-          {% if pe.e is not none %}
-            {% set picked.ids = picked.ids + [pe.e] %}
+# Ein auto-entities-Block: Template liefert vollständige button-cards (kein include in filter).
+type: custom:auto-entities
+show_empty: false
+card_param: cards
+card:
+  type: grid
+  columns: 2
+  square: false
+filter:
+  template: |
+    {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
+    {% set ns = namespace(cards=[]) %}
+    {% for aid in areas() | sort %}
+      {% set aname = area_name(aid) %}
+      {% if aname %}
+        {% set picked = namespace(e=none) %}
+        {% for domain in domains %}
+          {% if picked.e is none %}
+            {% for e in states[domain] | sort(attribute='entity_id') %}
+              {% if area_id(e.entity_id) == aid %}
+                {% set picked.e = e.entity_id %}
+              {% endif %}
+            {% endfor %}
           {% endif %}
         {% endfor %}
-        {% set ex = namespace(ids=[]) %}
-        {% for domain in pick_domains %}
-          {% for e in states[domain] %}
-            {% if e.entity_id not in picked.ids %}
-              {% set ex.ids = ex.ids + [e.entity_id] %}
-            {% endif %}
-          {% endfor %}
-        {% endfor %}
-        {{ ex.ids }}
+        {% if picked.e is not none %}
+          {% set dom = picked.e.split('.')[0] %}
+          {% set tap = "[[[ hass.callService('script', 'turn_on', { entity_id: 'script.dashboard_raum_oeffnen', variables: { area: " ~ (aname | tojson) ~ " } }); return { action: 'navigate', navigation_path: 'raum' }; ]]]" %}
+          {% set ns.cards = ns.cards + [{
+            'type': 'custom:button-card',
+            'template': ['card_room', 'grey_no_state'],
+            'entity': picked.e,
+            'name': aname,
+            'icon': 'mdi:home-floor-1',
+            'double_tap_action': {'action': 'none'},
+            'tap_action': tap,
+            'variables': {
+              'label_use_temperature': dom == 'climate' and state_attr(picked.e, 'current_temperature') is not none,
+              'label_use_brightness': dom == 'light'
+            }
+          }] %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% set energie = {
+      'type': 'custom:button-card',
+      'template': ['card_room', 'purple_no_state'],
+      'name': 'Energie',
+      'entity': 'sensor.pv_pv_power',
+      'icon': 'mdi:solar-power-variant',
+      'double_tap_action': {'action': 'none'},
+      'tap_action': {'action': 'navigate', 'navigation_path': 'energie'},
+      'variables': {
+        'label_use_temperature': false,
+        'label_use_brightness': false,
+        'entity_1': {
+          'entity_id': 'sensor.pv_battery',
+          'icon': 'mdi:battery-high',
+          'templates': ['green_on'],
+          'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+        },
+        'entity_2': {
+          'entity_id': 'sensor.pv_netzleistung',
+          'icon': 'mdi:transmission-tower',
+          'templates': ['blue_on'],
+          'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+        },
+        'entity_3': {
+          'entity_id': 'sensor.pv_activepower_load_sys',
+          'icon': 'mdi:home-lightning-bolt',
+          'templates': ['yellow_on'],
+          'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
+        }
+      }
+    } %}
+    {{ ns.cards + [energie] }}

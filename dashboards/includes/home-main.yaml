@@ -52,7 +52,6 @@
         name: Räume
 
       - !include home-rooms.yaml
-
       - type: custom:button-card
         template: card_vacuum
         entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
