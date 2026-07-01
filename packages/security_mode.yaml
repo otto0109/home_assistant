@@ -1,0 +1,311 @@
+# Anwesenheitssimulation: sichtbare Lampen (Dashboard-Logik) ab Sonnenuntergang bis Home-Zone.
+
+input_boolean:
+  sicherheitsmodus_aktiv:
+    name: Sicherheitsmodus
+    icon: mdi:shield-home
+
+input_number:
+  sicherheitsmodus_licht_min:
+    name: Sicherheitsmodus Licht an (Min)
+    min: 5
+    max: 120
+    step: 5
+    initial: 15
+    unit_of_measurement: min
+    icon: mdi:timer-outline
+  sicherheitsmodus_licht_max:
+    name: Sicherheitsmodus Licht an (Max)
+    min: 10
+    max: 180
+    step: 5
+    initial: 45
+    unit_of_measurement: min
+    icon: mdi:timer
+  sicherheitsmodus_pause_min:
+    name: Sicherheitsmodus Pause (Min)
+    min: 3
+    max: 60
+    step: 1
+    initial: 8
+    unit_of_measurement: min
+    icon: mdi:pause
+  sicherheitsmodus_pause_max:
+    name: Sicherheitsmodus Pause (Max)
+    min: 5
+    max: 90
+    step: 1
+    initial: 25
+    unit_of_measurement: min
+    icon: mdi:pause-circle
+
+input_text:
+  sicherheitsmodus_aktives_licht:
+    name: Sicherheitsmodus aktives Licht
+    max: 120
+    initial: ""
+    icon: mdi:lightbulb
+
+template:
+  - trigger:
+      - platform: homeassistant
+        event: start
+      - platform: event
+        event_type: entity_registry_updated
+      - platform: time_pattern
+        minutes: "/10"
+      - platform: state
+        entity_id:
+          - light
+          - switch
+    sensor:
+      - name: Sicherheitsmodus Lichter
+        unique_id: sicherheitsmodus_lichter
+        icon: mdi:lightbulb-group
+        state: >
+          {% set cfg_id = [
+            '_netzwerk', '_network', '_turbo', '_relais', '_relay', '_detach',
+            '_inching', '_child_lock', '_rssi', '_ssid', '_startup', '_sensitivity'
+          ] %}
+          {% set cfg_fn = [
+            'netzwerk', 'network', 'turbo', 'relais', 'relay', 'detach', 'abtrennen',
+            'inching', 'child lock', 'rssi', 'ssid', 'startup', 'sensitivity'
+          ] %}
+          {% set light_icons = [
+            'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
+            'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
+            'mdi:led-strip', 'mdi:lamps'
+          ] %}
+          {% set ns = namespace(ids=[]) %}
+          {% for e in states.light %}
+            {% set eid = e.entity_id %}
+            {% if area_id(eid) and not is_hidden_entity(eid) and states(eid) != 'unavailable' %}
+              {% set el = eid | lower %}
+              {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
+              {% set ok = namespace(v=true) %}
+              {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
+              {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
+              {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+            {% endif %}
+          {% endfor %}
+          {% for e in states.switch %}
+            {% set eid = e.entity_id %}
+            {% if area_id(eid) and not is_hidden_entity(eid) and states(eid) != 'unavailable' %}
+              {% set el = eid | lower %}
+              {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
+              {% set icon = state_attr(eid, 'icon') | default('') %}
+              {% if 'licht' in el or 'light' in el or icon in light_icons %}
+                {% set ok = namespace(v=true) %}
+                {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
+                {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
+                {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ (ns.ids | unique | list) | length }}
+        attributes:
+          entity_ids: >
+            {% set cfg_id = [
+              '_netzwerk', '_network', '_turbo', '_relais', '_relay', '_detach',
+              '_inching', '_child_lock', '_rssi', '_ssid', '_startup', '_sensitivity'
+            ] %}
+            {% set cfg_fn = [
+              'netzwerk', 'network', 'turbo', 'relais', 'relay', 'detach', 'abtrennen',
+              'inching', 'child lock', 'rssi', 'ssid', 'startup', 'sensitivity'
+            ] %}
+            {% set light_icons = [
+              'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
+              'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
+              'mdi:led-strip', 'mdi:lamps'
+            ] %}
+            {% set ns = namespace(ids=[]) %}
+            {% for e in states.light %}
+              {% set eid = e.entity_id %}
+              {% if area_id(eid) and not is_hidden_entity(eid) and states(eid) != 'unavailable' %}
+                {% set el = eid | lower %}
+                {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
+                {% set ok = namespace(v=true) %}
+                {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
+                {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
+                {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+              {% endif %}
+            {% endfor %}
+            {% for e in states.switch %}
+              {% set eid = e.entity_id %}
+              {% if area_id(eid) and not is_hidden_entity(eid) and states(eid) != 'unavailable' %}
+                {% set el = eid | lower %}
+                {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
+                {% set icon = state_attr(eid, 'icon') | default('') %}
+                {% if 'licht' in el or 'light' in el or icon in light_icons %}
+                  {% set ok = namespace(v=true) %}
+                  {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
+                  {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
+                  {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.ids | unique | list }}
+
+script:
+  sicherheitsmodus_zyklus:
+    alias: Sicherheitsmodus Zyklus
+    icon: mdi:shield-sync
+    mode: restart
+    sequence:
+      - repeat:
+          while:
+            - condition: state
+              entity_id: input_boolean.sicherheitsmodus_aktiv
+              state: "on"
+          sequence:
+            - variables:
+                licht_liste: "{{ state_attr('sensor.sicherheitsmodus_lichter', 'entity_ids') or [] }}"
+                licht: "{{ licht_liste | random if licht_liste | length > 0 else '' }}"
+                dauer_min: "{{ states('input_number.sicherheitsmodus_licht_min') | int(15) }}"
+                dauer_max: "{{ states('input_number.sicherheitsmodus_licht_max') | int(45) }}"
+                pause_min: "{{ states('input_number.sicherheitsmodus_pause_min') | int(8) }}"
+                pause_max: "{{ states('input_number.sicherheitsmodus_pause_max') | int(25) }}"
+                dauer: "{{ range(dauer_min, dauer_max + 1) | random }}"
+                pause: "{{ range(pause_min, pause_max + 1) | random }}"
+                helligkeit: "{{ range(40, 76) | random }}"
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ licht != '' }}"
+                  sequence:
+                    - action: input_text.set_value
+                      target:
+                        entity_id: input_text.sicherheitsmodus_aktives_licht
+                      data:
+                        value: "{{ licht }}"
+                    - choose:
+                        - conditions:
+                            - condition: template
+                              value_template: "{{ licht.startswith('light.') }}"
+                          sequence:
+                            - action: light.turn_on
+                              target:
+                                entity_id: "{{ licht }}"
+                              data:
+                                brightness_pct: "{{ helligkeit }}"
+                        - conditions:
+                            - condition: template
+                              value_template: "{{ licht.startswith('switch.') }}"
+                          sequence:
+                            - action: switch.turn_on
+                              target:
+                                entity_id: "{{ licht }}"
+                    - delay:
+                        minutes: "{{ dauer }}"
+                    - action: homeassistant.turn_off
+                      target:
+                        entity_id: "{{ licht }}"
+                    - action: input_text.set_value
+                      target:
+                        entity_id: input_text.sicherheitsmodus_aktives_licht
+                      data:
+                        value: ""
+            - delay:
+                minutes: "{{ pause }}"
+
+  sicherheitsmodus_stop:
+    alias: Sicherheitsmodus beenden
+    icon: mdi:shield-off
+    mode: single
+    sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.sicherheitsmodus_aktiv
+      - action: script.turn_off
+        target:
+          entity_id: script.sicherheitsmodus_zyklus
+      - variables:
+          aktiv: "{{ states('input_text.sicherheitsmodus_aktives_licht') | trim }}"
+          liste: "{{ state_attr('sensor.sicherheitsmodus_lichter', 'entity_ids') or [] }}"
+          aus: "{{ ([aktiv] if aktiv not in ['', 'unknown', 'unavailable'] else []) + liste | unique | list }}"
+      - action: homeassistant.turn_off
+        target:
+          entity_id: "{{ aus }}"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.sicherheitsmodus_aktives_licht
+        data:
+          value: ""
+
+  sicherheitsmodus_start:
+    alias: Sicherheitsmodus starten
+    icon: mdi:shield-home
+    mode: single
+    sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.sicherheitsmodus_aktiv
+      - action: script.turn_on
+        target:
+          entity_id: script.sicherheitsmodus_zyklus
+
+automation:
+  - id: sicherheitsmodus_sonnenuntergang
+    alias: Sicherheitsmodus — Sonnenuntergang
+    description: Startet Simulation ab Sonnenuntergang, wenn niemand zu Hause ist.
+    mode: single
+    triggers:
+      - trigger: sun
+        event: sunset
+    conditions:
+      - condition: state
+        entity_id: input_boolean.sicherheitsmodus_aktiv
+        state: "off"
+      - condition: template
+        value_template: >
+          {{ is_state('person.thorge', 'not_home') and is_state('person.laura', 'not_home') }}
+      - condition: template
+        value_template: >
+          {{ (state_attr('sensor.sicherheitsmodus_lichter', 'entity_ids') or []) | length > 0 }}
+    actions:
+      - action: script.sicherheitsmodus_start
+
+  - id: sicherheitsmodus_haus_verlassen
+    alias: Sicherheitsmodus — Haus verlassen (nachts)
+    description: Startet Simulation, wenn nach Sonnenuntergang alle weggehen.
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id:
+          - person.thorge
+          - person.laura
+    conditions:
+      - condition: state
+        entity_id: input_boolean.sicherheitsmodus_aktiv
+        state: "off"
+      - condition: sun
+        after: sunset
+        before: sunrise
+      - condition: template
+        value_template: >
+          {{ is_state('person.thorge', 'not_home') and is_state('person.laura', 'not_home') }}
+      - condition: template
+        value_template: >
+          {{ (state_attr('sensor.sicherheitsmodus_lichter', 'entity_ids') or []) | length > 0 }}
+    actions:
+      - action: script.sicherheitsmodus_start
+
+  - id: sicherheitsmodus_heimkehr
+    alias: Sicherheitsmodus — Home-Zone
+    description: Beendet Simulation und schaltet alle Simulations-Lichter aus.
+    mode: restart
+    triggers:
+      - trigger: zone
+        entity_id: person.thorge
+        zone: zone.home
+        event: enter
+      - trigger: zone
+        entity_id: person.laura
+        zone: zone.home
+        event: enter
+    conditions:
+      - condition: state
+        entity_id: input_boolean.sicherheitsmodus_aktiv
+        state: "on"
+    actions:
+      - action: script.sicherheitsmodus_stop

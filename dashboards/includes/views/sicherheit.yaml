@@ -17,8 +17,45 @@
     - type: custom:button-card
       template: card_title
       name: Sicherheit
-      label: Sensoren & Kontakte
+      label: Sensoren & Anwesenheitssimulation
 
+    - type: custom:mod-card
+      card_mod:
+        style: |
+          ha-card {
+            border-radius: 20px;
+            overflow: hidden;
+          }
+      card:
+        type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: input_boolean.sicherheitsmodus_aktiv
+            name: Anwesenheitssimulation
+            icon: mdi:shield-home
+            fill_container: true
+          - type: custom:mushroom-entity-card
+            entity: sensor.sicherheitsmodus_lichter
+            name: Sichtbare Lampen
+            icon: mdi:lightbulb-group
+            fill_container: true
+          - type: custom:mushroom-template-card
+            primary: Status
+            secondary: >-
+              {% if is_state('input_boolean.sicherheitsmodus_aktiv', 'on') %}
+              Aktiv — zufällige Lampen bis Home-Zone
+              {% else %}
+              Inaktiv — startet ab Sonnenuntergang wenn niemand da
+              {% endif %}
+            icon: mdi:information-outline
+            fill_container: true
+            tap_action:
+              action: more-info
+              entity: input_boolean.sicherheitsmodus_aktiv
+
+    - type: custom:button-card
+      template: card_title
+      name: Kontakte & Sensoren
     - type: custom:auto-entities
       show_empty: false
       card:
