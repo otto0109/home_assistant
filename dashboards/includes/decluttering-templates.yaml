@@ -89,7 +89,7 @@ room_auto_content:
           square: false
         card_param: cards
         filter:
-          template: !include scene-tiles-named-filter.jinja
+          template: !include scene-tiles-named-filter.yaml
 
       - type: custom:button-card
         template: card_title

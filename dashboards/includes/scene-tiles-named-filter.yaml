@@ -1,0 +1,61 @@
+|
+  {% set area_label = '[[area]]' %}
+  {% set target = namespace(id='') %}
+  {% for aid in areas() %}
+    {% if area_name(aid) == area_label %}
+      {% set target.id = aid %}
+    {% endif %}
+  {% endfor %}
+  {% if target.id == '' %}
+    []
+  {% else %}
+    {% set target = target.id %}
+    {% set ns = namespace(cards=[]) %}
+    {% set hues = [
+      'blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey',
+      'orange', 'teal', 'cyan', 'indigo', 'lime', 'brown',
+      'deep_orange', 'amber', 'light_blue', 'deep_purple'
+    ] %}
+    {% set prefixes = [target] %}
+    {% if target == 'kueche' %}
+      {% set prefixes = prefixes + ['raum_neben_der_kuche'] %}
+    {% elif target == 'raum_neben_der_kuche' %}
+      {% set prefixes = prefixes + ['kueche'] %}
+    {% endif %}
+    {% for e in states.scene | sort(attribute='friendly_name') %}
+      {% set eid = e.entity_id %}
+      {% if states(eid) != 'unavailable' and not is_hidden_entity(eid) %}
+        {% set matched = namespace(v=false) %}
+        {% if area_id(eid) == target %}
+          {% set matched.v = true %}
+        {% else %}
+          {% for p in prefixes %}
+            {% if eid.startswith('scene.' + p + '_') %}
+              {% set matched.v = true %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if matched.v %}
+          {% set slug = eid.split('.')[1] | default('') %}
+          {% set hash = namespace(v=0) %}
+          {% for ch in slug %}
+            {% set hash.v = (hash.v * 31 + loop.index0) %}
+          {% endfor %}
+          {% set hash.v = hash.v + (slug | length) * 17 %}
+          {% set hue = hues[hash.v % (hues | length)] %}
+          {% set ns.cards = ns.cards + [{
+            'type': 'custom:button-card',
+            'template': 'scene_tile_' ~ hue,
+            'entity': eid,
+            'name': state_attr(eid, 'friendly_name') or eid,
+            'tap_action': {
+              'action': 'perform-action',
+              'perform_action': 'scene.turn_on',
+              'target': {'entity_id': eid}
+            }
+          }] %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {{ ns.cards }}
+  {% endif %}

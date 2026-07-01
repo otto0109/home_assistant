@@ -15,7 +15,7 @@ cards:
       square: false
     card_param: cards
     filter:
-      template: !include scene-tiles-active-filter.jinja
+      template: !include scene-tiles-active-filter.yaml
 
   - type: custom:button-card
     template: card_title
