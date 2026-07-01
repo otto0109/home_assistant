@@ -48,16 +48,12 @@ input_text:
 
 template:
   - trigger:
-      - platform: homeassistant
+      - trigger: homeassistant
         event: start
-      - platform: event
+      - trigger: event
         event_type: entity_registry_updated
-      - platform: time_pattern
-        minutes: "/10"
-      - platform: state
-        entity_id:
-          - light
-          - switch
+      - trigger: time_pattern
+        minutes: "/5"
     sensor:
       - name: Sicherheitsmodus Lichter
         unique_id: sicherheitsmodus_lichter
