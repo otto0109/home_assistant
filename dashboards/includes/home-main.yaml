@@ -58,7 +58,19 @@
         tap_action:
           action: navigate
           navigation_path: dreame
+        double_tap_action:
+          action: none
+        hold_action:
+          action: none
         variables:
           ulm_card_vacuum_name: Dreame
           ulm_card_vacuum_camera: camera.dreame_bot_d9_max_map
           ulm_card_vacuum_camera_toggle: true
+          ulm_card_tap_action: navigate
+          ulm_card_tap_navigate_path: dreame
+          ulm_icon_tap_action: more-info
+          ulm_name_tap_action: navigate
+          ulm_name_tap_navigate_path: dreame
+          ulm_icon_double_tap_action: none
+          ulm_name_double_tap_action: none
+          ulm_card_double_tap_action: none

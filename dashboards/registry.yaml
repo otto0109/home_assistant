@@ -20,9 +20,9 @@
 #    Einstellungen → Dashboards → „Home“ → Als Standard festlegen
 #    (oder default_path in custom-sidebar-config.yaml)
 #
-test-dashboard:
+home-dashboard:
   mode: yaml
   title: Home
   icon: mdi:home
-  filename: dashboards/test.yaml
+  filename: dashboards/home.yaml
   show_in_sidebar: true

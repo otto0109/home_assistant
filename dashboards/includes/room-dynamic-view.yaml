@@ -1,8 +1,8 @@
-- title: Raum
-  path: raum
-  subview: true
-  type: panel
-  icon: mdi:door-open
-  theme: minimalist-desktop
-  background: var(--background-image)
-  cards: !include room-detail-page.yaml
+title: Raum
+path: raum
+subview: true
+type: panel
+icon: mdi:door-open
+theme: minimalist-desktop
+background: var(--background-image)
+cards: !include room-detail-page.yaml

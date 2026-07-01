@@ -113,7 +113,7 @@ filter:
             {% set room_color.t = 'green_no_state' %}
           {% endif %}
           {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
-          {% set nav = "[[[ return hass.callService('input_text', 'set_value', { entity_id: 'input_text.dashboard_active_area', value: " ~ (aid | tojson) ~ " }).then(() => ({ action: 'navigate', navigation_path: 'raum' })); ]]]" %}
+          {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set ns.cards = ns.cards + [{
             'type': 'custom:button-card',
             'template': ['card_room', room_color.t],
@@ -121,7 +121,12 @@ filter:
             'name': aname,
             'icon': icon,
             'double_tap_action': {'action': 'none'},
-            'tap_action': nav,
+            'tap_action': {
+              'action': 'call-service',
+              'service': 'script.turn_on',
+              'target': {'entity_id': 'script.dashboard_raum_oeffnen'},
+              'data': {'area': aid}
+            },
             'variables': {
               'ulm_room_area_id': aid,
               'label_use_temperature': dom == 'climate',

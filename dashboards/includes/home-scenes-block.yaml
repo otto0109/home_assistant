@@ -44,6 +44,8 @@
           tap_action:
             action: perform-action
             perform_action: scene.turn_on
+            target:
+              entity_id: this.entity_id
 
 - type: custom:button-card
   name: Alle aus

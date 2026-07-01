@@ -2,7 +2,7 @@
 # Datei muss in config/www/ liegen (nicht im Config-Root).
 # Nach Änderung: HA neu starten, Browser-Cache leeren.
 
-default_path: /test-dashboard/home
+default_path: /home-dashboard/home
 
 order:
   # Eingebaut: Übersicht
@@ -15,7 +15,7 @@ order:
     exact: true
     hide: true
 
-  # Eingebautes „Home“ (nicht unser Dashboard unter /test-dashboard)
+  # Eingebautes „Home“ (nicht unser Dashboard unter /home-dashboard)
   - match: href
     href: /lovelace/home
     hide: true
@@ -53,5 +53,5 @@ order:
 
   # Unser Dashboard oben
   - match: href
-    href: /test-dashboard/home
+    href: /home-dashboard/home
     order: 1

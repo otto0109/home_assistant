@@ -27,8 +27,17 @@
     - type: custom:button-card
       template: card_vacuum
       entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max
+      double_tap_action:
+        action: none
+      hold_action:
+        action: none
       variables:
         ulm_card_vacuum_name: Dreame
+        ulm_icon_tap_action: more-info
+        ulm_name_tap_action: more-info
+        ulm_icon_double_tap_action: none
+        ulm_name_double_tap_action: none
+        ulm_card_double_tap_action: none
 
     - type: custom:button-card
       template: card_title

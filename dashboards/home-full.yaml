@@ -256,7 +256,7 @@ views:
                           - width: 20px
                       tap_action:
                         action: navigate
-                        navigation_path: /test-dashboard/energie
+                        navigation_path: /home-dashboard/energie
                     - type: custom:button-card
                       name: Speicher
                       icon: mdi:battery-high
@@ -290,7 +290,7 @@ views:
                           - width: 20px
                       tap_action:
                         action: navigate
-                        navigation_path: /test-dashboard/energie
+                        navigation_path: /home-dashboard/energie
                     - type: custom:button-card
                       name: Router
                       icon: mdi:router-wireless
@@ -324,7 +324,7 @@ views:
                           - width: 20px
                       tap_action:
                         action: navigate
-                        navigation_path: /test-dashboard/netzwerk
+                        navigation_path: /home-dashboard/netzwerk
 
             - type: custom:mod-card
               view_layout:
@@ -560,7 +560,7 @@ views:
                         icon: mdi:solar-power-variant
                         tap_action:
                           action: navigate
-                          navigation_path: /test-dashboard/energie
+                          navigation_path: /home-dashboard/energie
                         variables:
                           label_use_temperature: false
                           label_use_brightness: false

@@ -1,5 +1,6 @@
 type: custom:button-card
 template: card_vertical_button
+entity: this.entity_id
 show_name: true
 show_state: false
 show_label: false
@@ -12,3 +13,5 @@ card_mod:
 tap_action:
   action: perform-action
   perform_action: scene.turn_on
+  target:
+    entity_id: this.entity_id

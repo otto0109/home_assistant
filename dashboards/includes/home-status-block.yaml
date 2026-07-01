@@ -39,7 +39,7 @@
           - width: 24px
       tap_action:
         action: navigate
-        navigation_path: /test-dashboard/energie
+        navigation_path: /home-dashboard/energie
     - type: custom:button-card
       name: Speicher
       icon: mdi:battery-high
@@ -73,7 +73,7 @@
           - width: 24px
       tap_action:
         action: navigate
-        navigation_path: /test-dashboard/energie
+        navigation_path: /home-dashboard/energie
     - type: custom:button-card
       name: Router
       icon: mdi:router-wireless
@@ -107,4 +107,4 @@
           - width: 24px
       tap_action:
         action: navigate
-        navigation_path: /test-dashboard/netzwerk
+        navigation_path: /home-dashboard/netzwerk
