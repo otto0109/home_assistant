@@ -25,6 +25,8 @@ lovelace:
       type: module
     - url: /hacsfiles/atomic-calendar-revive/atomic-calendar-revive.js
       type: module
+    - url: /hacsfiles/expander-card/lovelace-expander-card.js
+      type: module
 
 homeassistant:
   packages: !include_dir_named packages

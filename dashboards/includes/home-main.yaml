@@ -47,11 +47,7 @@
       - type: vertical-stack
         cards: !include home-welcome-stack.yaml
 
-      - type: custom:button-card
-        template: card_title
-        name: Räume
-
-      - !include home-rooms.yaml
+      - !include home-rooms-sections.yaml
       - type: custom:button-card
         template: card_vacuum
         entity: vacuum.dreame_bot_d9_max_dreame_bot_d9_max

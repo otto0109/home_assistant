@@ -1,3 +1,25 @@
+# Gemeinsame Expander-Optik: kein Extra-Hintergrund, Karten unverändert, Chevron rechts.
+x-home-expander: &home_expander
+  expanded: true
+  clear: true
+  clear-children: false
+  gap: 14px
+  padding: 0
+  child-padding: 0
+  title-card-padding: 0
+  title-card-button-overlay: true
+  overlay-margin: 4px
+  button-background: transparent
+  card_mod:
+    style: |
+      ha-card {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
 - type: markdown
   content: |
     {% set hour = now().hour %}
@@ -42,12 +64,28 @@
         grid-template-areas: '"scenes status"'
         grid-gap: 28px
   cards:
-    - type: vertical-stack
+    - type: custom:expander-card
+      <<: *home_expander
+      expand-id: home-section-szenen
       view_layout:
         grid-area: scenes
-      cards: !include home-scenes-block.yaml
+      title-card:
+        type: custom:button-card
+        template: card_title
+        name: Szenen
+      cards:
+        - type: vertical-stack
+          cards: !include home-scenes-block.yaml
 
-    - type: vertical-stack
+    - type: custom:expander-card
+      <<: *home_expander
+      expand-id: home-section-status
       view_layout:
         grid-area: status
-      cards: !include home-status-block.yaml
+      title-card:
+        type: custom:button-card
+        template: card_title
+        name: Status
+      cards:
+        - type: vertical-stack
+          cards: !include home-status-block.yaml

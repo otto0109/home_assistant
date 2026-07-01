@@ -1,7 +1,3 @@
-- type: custom:button-card
-  template: card_title
-  name: Status
-
 - type: grid
   columns: 3
   square: false
@@ -118,6 +114,18 @@
   card_param: cards
   filter:
     template: |
+      {% macro days_until(sensor_id) %}
+        {% set state = states(sensor_id) %}
+        {% if state not in ['unknown', 'unavailable', 'Nicht verfügbar'] and state is string and '.' in state %}
+          {% set date_str = state.split(' ') | last %}
+          {% set target_date = strptime(date_str, '%d.%m.%Y', none) %}
+          {% if target_date is not none %}
+            {% set target_str = target_date.strftime('%Y-%m-%d') %}
+            {% set today = now().strftime('%Y-%m-%d') %}
+            {{ ((as_timestamp(target_str) - as_timestamp(today)) / 86400) | int }}
+          {% else %}99{% endif %}
+        {% else %}99{% endif %}
+      {% endmacro %}
       {% set ns = namespace(cards=[]) %}
       {% set hues = [
         'blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey',
@@ -146,23 +154,56 @@
           }] %}
         {% endif %}
       {% endfor %}
-      {% set mull = 'sensor.dashboard_mull_status' %}
-      {% if mull in states %}
-        {% set slug = mull.split('.')[1] | default('') %}
-        {% set hash = namespace(v=0) %}
-        {% for ch in slug %}
-          {% set hash.v = (hash.v * 31 + loop.index0) %}
-        {% endfor %}
-        {% set hash.v = hash.v + (slug | length) * 17 %}
-        {% set mull_hue = hues[hash.v % (hues | length)] %}
-        {% set ns.cards = ns.cards + [{
-          'type': 'custom:button-card',
-          'template': ['status_tile_' ~ mull_hue, 'status_tile_mull_label'],
-          'entity': mull,
-          'name': 'Müll',
-          'icon': 'mdi:trash-can-outline'
-        }] %}
+      {% set bins = [
+        {'id': 'sensor.waste_collection_schedule_restabfall_14_taglich', 'name': 'Restmüll'},
+        {'id': 'sensor.waste_collection_schedule_bioabfall_14_taglich', 'name': 'Bio'},
+        {'id': 'sensor.waste_collection_schedule_papiertonne_monatlich', 'name': 'Papier'},
+        {'id': 'sensor.waste_collection_schedule_gelber_sack_14_taglich', 'name': 'Gelber Sack'}
+      ] %}
+      {% set heute = namespace(list=[]) %}
+      {% set naechste = namespace(name='', days=99) %}
+      {% set any_available = namespace(v=false) %}
+      {% for b in bins %}
+        {% if states(b.id) not in ['unknown', 'unavailable'] %}
+          {% set any_available.v = true %}
+          {% set d = days_until(b.id) | int %}
+          {% if d == 0 %}
+            {% set heute.list = heute.list + [b.name] %}
+          {% endif %}
+          {% if d >= 0 and d < naechste.days %}
+            {% set naechste.days = d %}
+            {% set naechste.name = b.name %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% if not any_available.v %}
+        {% set mull_label = 'Keine Termine' %}
+      {% elif heute.list | length > 0 %}
+        {% set mull_label = 'Heute: ' ~ (heute.list | join(', ')) %}
+      {% elif naechste.days == 1 %}
+        {% set mull_label = 'Morgen: ' ~ naechste.name %}
+      {% elif naechste.days < 99 %}
+        {% set mull_label = naechste.name ~ ' in ' ~ naechste.days ~ ' Tagen' %}
+      {% else %}
+        {% set mull_label = 'Keine Termine' %}
       {% endif %}
+      {% set mull_entity = bins[0].id %}
+      {% set slug = mull_entity.split('.')[1] | default('') %}
+      {% set hash = namespace(v=0) %}
+      {% for ch in slug %}
+        {% set hash.v = (hash.v * 31 + loop.index0) %}
+      {% endfor %}
+      {% set hash.v = hash.v + (slug | length) * 17 %}
+      {% set mull_hue = hues[hash.v % (hues | length)] %}
+      {% set ns.cards = ns.cards + [{
+        'type': 'custom:button-card',
+        'template': ['status_tile_' ~ mull_hue, 'status_tile_mull_label'],
+        'entity': mull_entity,
+        'name': 'Müll',
+        'icon': 'mdi:trash-can-outline',
+        'label': mull_label,
+        'show_label': true
+      }] %}
       {% set cal = 'calendar.thorge_3_laura' %}
       {% set slug = cal.split('.')[1] | default('') %}
       {% set hash = namespace(v=0) %}

@@ -1,7 +1,3 @@
-- type: custom:button-card
-  template: card_title
-  name: Szenen
-
 - type: custom:auto-entities
   show_empty: false
   card:

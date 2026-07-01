@@ -104,4 +104,5 @@ status_tile_calendar_label:
 
 status_tile_mull_label:
   show_label: true
-  label: '[[[ var s=states["sensor.dashboard_mull_status"]; return (s&&s.state!=="unavailable"&&s.state!=="unknown")?s.state:"—"; ]]]'
+  show_state: false
+  label: '[[[ return this.config.label || "—"; ]]]'
