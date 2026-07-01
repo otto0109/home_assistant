@@ -16,8 +16,6 @@ filter:
   template: |
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
     {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
-    {% set cfg_id = ['_netzwerk', '_network', '_turbo', '_relais', '_relay', '_detach', '_inching', '_child_lock', '_rssi', '_ssid', '_startup'] %}
-    {% set cfg_fn = ['netzwerk', 'network', 'turbo', 'relais', 'relay', 'detach', 'abtrennen', 'inching', 'child lock', 'rssi', 'ssid', 'startup'] %}
     {% set palette = ['yellow_no_state', 'pink_no_state', 'red_no_state', 'purple_no_state', 'grey_no_state', 'blue_no_state', 'green_no_state'] %}
     {% set ns = namespace(cards=[], sorted=[]) %}
     {% for aid in areas() %}
@@ -31,25 +29,8 @@ filter:
         {% for domain in domains %}
           {% if picked.e is none %}
             {% for e in states[domain] | sort(attribute='entity_id') %}
-              {% set eid = e.entity_id %}
-              {% set el = eid | lower %}
-              {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
-              {% set ok = namespace(v=true) %}
-              {% if is_hidden_entity(eid) %}
-                {% set ok.v = false %}
-              {% endif %}
-              {% for t in cfg_id %}
-                {% if t in el %}
-                  {% set ok.v = false %}
-                {% endif %}
-              {% endfor %}
-              {% for t in cfg_fn %}
-                {% if t in fn %}
-                  {% set ok.v = false %}
-                {% endif %}
-              {% endfor %}
-              {% if ok.v and area_id(eid) == aid %}
-                {% set picked.e = eid %}
+              {% if area_id(e.entity_id) == aid and not is_hidden_entity(e.entity_id) %}
+                {% set picked.e = e.entity_id %}
               {% endif %}
             {% endfor %}
           {% endif %}
@@ -59,24 +40,8 @@ filter:
           {% set chips = namespace(list=[]) %}
           {% for cd in chip_domains %}
             {% for e in states[cd] | sort(attribute='entity_id') %}
-              {% set eid = e.entity_id %}
-              {% set el = eid | lower %}
-              {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
-              {% set ok = namespace(v=true) %}
-              {% if is_hidden_entity(eid) %}
-                {% set ok.v = false %}
-              {% endif %}
-              {% for t in cfg_id %}
-                {% if t in el %}
-                  {% set ok.v = false %}
-                {% endif %}
-              {% endfor %}
-              {% for t in cfg_fn %}
-                {% if t in fn %}
-                  {% set ok.v = false %}
-                {% endif %}
-              {% endfor %}
-              {% if ok.v and area_id(eid) == aid and chips.list | length < 2 %}
+              {% if area_id(e.entity_id) == aid and not is_hidden_entity(e.entity_id) and chips.list | length < 2 %}
+                {% set eid = e.entity_id %}
                 {% if cd == 'light' %}
                   {% set chips.list = chips.list + [{
                     'entity_id': eid,
@@ -119,7 +84,7 @@ filter:
           {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
             {% set dreame.eid = 'script.dreame_reinigen_flur_eg' %}
           {% endif %}
-          {% if dreame.eid %}
+          {% if dreame.eid and not is_hidden_entity(dreame.eid) %}
             {% set chips.list = chips.list + [{
               'entity_id': dreame.eid,
               'icon': state_attr(dreame.eid, 'icon') or 'mdi:broom',
@@ -147,7 +112,6 @@ filter:
           {% elif aname == 'Garten' or aid == 'garten' %}
             {% set room_color.t = 'green_no_state' %}
           {% endif %}
-          {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set ns.cards = ns.cards + [{
             'type': 'custom:button-card',
