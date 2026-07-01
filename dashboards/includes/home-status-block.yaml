@@ -109,33 +109,4 @@
         action: navigate
         navigation_path: /home-dashboard/netzwerk
 
-- type: custom:auto-entities
-  show_empty: false
-  card:
-    type: vertical-stack
-  card_param: cards
-  filter:
-    template: |
-      {% set ns = namespace(cards=[]) %}
-      {% for e in states.todo | sort(attribute='name') %}
-        {% set eid = e.entity_id %}
-        {% if states(eid) not in ['unavailable', 'unknown'] and not is_hidden_entity(eid) %}
-          {% set ns.cards = ns.cards + [{
-            'type': 'custom:mod-card',
-            'card_mod': {
-              'style': 'ha-card { border-radius: var(--border-radius); box-shadow: var(--box-shadow); overflow: hidden; }'
-            },
-            'card': {
-              'type': 'todo-list',
-              'entity': eid,
-              'title': state_attr(eid, 'friendly_name') or eid,
-              'hide_completed': true
-            }
-          }] %}
-        {% endif %}
-      {% endfor %}
-      {% if ns.cards | length > 0 %}
-        {{ [{'type': 'custom:button-card', 'template': 'card_title', 'name': 'To-do-Listen'}] + ns.cards }}
-      {% else %}
-        []
-      {% endif %}
+- !include home-todo-summary.yaml
