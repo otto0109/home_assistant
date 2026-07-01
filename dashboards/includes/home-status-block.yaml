@@ -109,5 +109,4 @@
         action: navigate
         navigation_path: /home-dashboard/netzwerk
 
-- !include home-calendar-summary.yaml
-- !include home-todo-summary.yaml
+- !include home-status-extras.yaml
