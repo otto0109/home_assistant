@@ -1,5 +1,6 @@
 # Status-Kacheln (Solar-Stil): To-dos + Kalender
-status_tile:
+# Farb-Varianten mit statischen ULM-Farben (wie card_room_yellow_no_state).
+status_tile_layout:
   show_name: true
   show_icon: true
   show_state: false
@@ -25,19 +26,65 @@ status_tile:
       - width: 50px
       - height: 50px
       - border-radius: 50%
-      - |
-        [[[
-          const c = variables.ulm_status_color || 'blue';
-          return `background-color: rgba(var(--color-${c}), 0.2)`;
-        ]]]
     icon:
       - width: 24px
       - height: 24px
-      - |
-        [[[
-          const c = variables.ulm_status_color || 'blue';
-          return `color: rgba(var(--color-${c}), 1)`;
-        ]]]
+
+status_tile_blue:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-blue), 0.2)
+    icon:
+      - color: rgba(var(--color-blue), 1)
+
+status_tile_pink:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-pink), 0.2)
+    icon:
+      - color: rgba(var(--color-pink), 1)
+
+status_tile_yellow:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-yellow), 0.2)
+    icon:
+      - color: rgba(var(--color-yellow), 1)
+
+status_tile_green:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-green), 0.2)
+    icon:
+      - color: rgba(var(--color-green), 1)
+
+status_tile_red:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-red), 0.2)
+    icon:
+      - color: rgba(var(--color-red), 1)
+
+status_tile_purple:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-purple), 0.2)
+    icon:
+      - color: rgba(var(--color-purple), 1)
+
+status_tile_grey:
+  template: status_tile_layout
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-grey), 0.2)
+    icon:
+      - color: rgba(var(--color-grey), 1)
 
 status_tile_calendar:
   show_name: true
