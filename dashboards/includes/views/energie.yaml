@@ -58,7 +58,7 @@
               color_icon: true
               display_zero: true
             grid:
-              entity: sensor.pv_netzleistung
+              entity: sensor.pv_activepower_pcc_total
               name: Netz
               icon: mdi:transmission-tower
               display_state: one_way
@@ -70,6 +70,7 @@
               display_state: one_way
               color_circle: color_dynamically
               state_of_charge_decimals: 0
+              invert_state: true
             home:
               entity: sensor.pv_activepower_load_sys
               name: Haus

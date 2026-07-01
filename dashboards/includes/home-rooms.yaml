@@ -16,7 +16,8 @@ filter:
   template: |
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
     {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
-    {% set palette = ['yellow_no_state', 'pink_no_state', 'red_no_state', 'purple_no_state', 'grey_no_state', 'blue_no_state', 'green_no_state'] %}
+    {% set palette_idle = ['yellow_no_state', 'pink_no_state', 'red_no_state', 'purple_no_state', 'grey_no_state', 'blue_no_state', 'green_no_state'] %}
+    {% set palette_active = ['yellow_on', 'pink_on', 'red_on', 'purple_on', 'grey_on', 'blue_on', 'green_on'] %}
     {% set ns = namespace(cards=[], sorted=[]) %}
     {% for aid in areas() %}
       {% set ns.sorted = ns.sorted + [{'aid': aid, 'name': area_name(aid)}] %}
@@ -46,28 +47,28 @@ filter:
                   {% set chips.list = chips.list + [{
                     'entity_id': eid,
                     'icon': state_attr(eid, 'icon') or 'mdi:lightbulb',
-                    'templates': ['yellow_on'],
+                    'templates': ['yellow_on'] if states(eid) == 'on' else ['yellow_no_state'],
                     'tap_action': {'action': 'toggle'}
                   }] %}
                 {% elif cd == 'climate' %}
                   {% set chips.list = chips.list + [{
                     'entity_id': eid,
                     'icon': state_attr(eid, 'icon') or 'mdi:snowflake',
-                    'templates': ['blue_on'],
+                    'templates': ['blue_on'] if states(eid) not in ['off', 'unavailable', 'unknown'] else ['blue_no_state'],
                     'tap_action': {'action': 'more-info'}
                   }] %}
                 {% elif cd == 'switch' %}
                   {% set chips.list = chips.list + [{
                     'entity_id': eid,
                     'icon': state_attr(eid, 'icon') or 'mdi:light-switch',
-                    'templates': ['grey_on'],
+                    'templates': ['grey_on'] if states(eid) == 'on' else ['grey_no_state'],
                     'tap_action': {'action': 'toggle'}
                   }] %}
                 {% elif cd == 'fan' %}
                   {% set chips.list = chips.list + [{
                     'entity_id': eid,
                     'icon': state_attr(eid, 'icon') or 'mdi:fan',
-                    'templates': ['green_on'],
+                    'templates': ['green_on'] if states(eid) == 'on' else ['green_no_state'],
                     'tap_action': {'action': 'toggle'}
                   }] %}
                 {% endif %}
@@ -96,26 +97,50 @@ filter:
               }
             }] %}
           {% endif %}
-          {% set room_color = namespace(t=palette[loop.index0 % 7]) %}
+          {% set area_active = namespace(v=false) %}
+          {% for eid in area_entities(aid) %}
+            {% if not is_hidden_entity(eid) %}
+              {% set st = states(eid) %}
+              {% if eid.startswith('light.') and st == 'on' %}
+                {% set area_active.v = true %}
+              {% elif eid.startswith('switch.') and st == 'on' %}
+                {% set area_active.v = true %}
+              {% elif eid.startswith('fan.') and st == 'on' %}
+                {% set area_active.v = true %}
+              {% elif eid.startswith('climate.') and st not in ['off', 'unavailable', 'unknown'] %}
+                {% set area_active.v = true %}
+              {% elif eid.startswith('cover.') and st not in ['closed', 'unavailable', 'unknown'] %}
+                {% set area_active.v = true %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% set room_color = namespace(idle=palette_idle[loop.index0 % 7], active=palette_active[loop.index0 % 7]) %}
           {% if aname == 'Wohnzimmer' or aid == 'wohnzimmer' %}
-            {% set room_color.t = 'yellow_no_state' %}
+            {% set room_color.idle = 'yellow_no_state' %}
+            {% set room_color.active = 'yellow_on' %}
           {% elif aname == 'Esszimmer' or aid == 'esszimmer' %}
-            {% set room_color.t = 'pink_no_state' %}
+            {% set room_color.idle = 'pink_no_state' %}
+            {% set room_color.active = 'pink_on' %}
           {% elif aname == 'Raum neben der Küche' or aname == 'Küche' or aid == 'raum_neben_der_kuche' or aid == 'kueche' %}
-            {% set room_color.t = 'red_no_state' %}
+            {% set room_color.idle = 'red_no_state' %}
+            {% set room_color.active = 'red_on' %}
           {% elif aname == 'Schlafzimmer' or aid == 'schlafzimmer' %}
-            {% set room_color.t = 'purple_no_state' %}
+            {% set room_color.idle = 'purple_no_state' %}
+            {% set room_color.active = 'purple_on' %}
           {% elif aname == 'Flur' or aname == 'Flur OG' or aid == 'flur' or aid == 'flur_og' %}
-            {% set room_color.t = 'grey_no_state' %}
+            {% set room_color.idle = 'grey_no_state' %}
+            {% set room_color.active = 'grey_on' %}
           {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
-            {% set room_color.t = 'blue_no_state' %}
+            {% set room_color.idle = 'blue_no_state' %}
+            {% set room_color.active = 'blue_on' %}
           {% elif aname == 'Garten' or aid == 'garten' %}
-            {% set room_color.t = 'green_no_state' %}
+            {% set room_color.idle = 'green_no_state' %}
+            {% set room_color.active = 'green_on' %}
           {% endif %}
           {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set ns.cards = ns.cards + [{
             'type': 'custom:button-card',
-            'template': ['card_room', room_color.t],
+            'template': ['card_room', room_color.active if area_active.v else room_color.idle],
             'entity': picked.e,
             'name': aname,
             'icon': icon,
@@ -138,35 +163,4 @@ filter:
         {% endif %}
       {% endif %}
     {% endfor %}
-    {% set energie = {
-      'type': 'custom:button-card',
-      'template': ['card_room', 'purple_no_state'],
-      'name': 'Energie',
-      'entity': 'sensor.pv_pv_power',
-      'icon': 'mdi:solar-power-variant',
-      'double_tap_action': {'action': 'none'},
-      'tap_action': {'action': 'navigate', 'navigation_path': 'energie'},
-      'variables': {
-        'label_use_temperature': false,
-        'label_use_brightness': false,
-        'entity_1': {
-          'entity_id': 'sensor.pv_battery',
-          'icon': 'mdi:battery-high',
-          'templates': ['green_on'],
-          'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
-        },
-        'entity_2': {
-          'entity_id': 'sensor.pv_netzleistung',
-          'icon': 'mdi:transmission-tower',
-          'templates': ['blue_on'],
-          'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
-        },
-        'entity_3': {
-          'entity_id': 'sensor.pv_activepower_load_sys',
-          'icon': 'mdi:home-lightning-bolt',
-          'templates': ['yellow_on'],
-          'tap_action': {'action': 'navigate', 'navigation_path': 'energie'}
-        }
-      }
-    } %}
-    {{ ns.cards + [energie] }}
+    {{ ns.cards }}

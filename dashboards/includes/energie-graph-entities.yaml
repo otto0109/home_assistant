@@ -4,15 +4,12 @@
 - entity: sensor.pv_activepower_load_sys
   name: Verbrauch
   color: "#4285f4"
-- entity: sensor.pv_batterie_ladung
-  name: Batterie Ladung
+- entity: sensor.pv_battery_power
+  name: Batterie
   color: "#34a853"
-- entity: sensor.pv_netzbezug
-  name: Netzbezug
+- entity: sensor.pv_activepower_pcc_total
+  name: Netz
   color: "#e53935"
-- entity: sensor.pv_netzverkauf
-  name: Netzverkauf
-  color: "#00acc1"
 - entity: sensor.pv_battery
   name: Ladestand
   color: "#8e24aa"

@@ -21,7 +21,7 @@ variables:
       action: navigate
       navigation_path: energie
   entity_2:
-    entity_id: sensor.pv_netzleistung
+    entity_id: sensor.pv_activepower_pcc_total
     icon: mdi:transmission-tower
     templates:
       - blue_on

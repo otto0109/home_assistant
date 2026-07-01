@@ -1,5 +1,4 @@
-# =============================================================================
-# NAVIQ — Helfer & Energie-Sensoren (eine Datei)
+# NAVIQ — Helfer (eine Datei)
 #
 # Einbindung (empfohlen, eine Zeile in configuration.yaml):
 #
@@ -70,61 +69,7 @@ input_select:
     initial: Täglich
 
 template:
-  - trigger:
-      - platform: homeassistant
-        event: start
-      - platform: state
-        entity_id:
-          - sensor.pv_activepower_load_sys
-          - sensor.pv_pv_power
-          - sensor.pv_battery_power
-          - sensor.pv_netzleistung
-      - platform: time_pattern
-        minutes: "/1"
-    sensor:
-      - name: PV Netzleistung
-        unique_id: pv_netzleistung
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        icon: mdi:transmission-tower
-        state: >
-          {% set load = states('sensor.pv_activepower_load_sys') | float(0) %}
-          {% set solar = states('sensor.pv_pv_power') | float(0) %}
-          {% set battery = states('sensor.pv_battery_power') | float(0) %}
-          {{ (load + battery - solar) | round(0) }}
-
-      - name: PV Netzbezug
-        unique_id: pv_netzbezug
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        icon: mdi:transmission-tower-import
-        state: >
-          {% set netz = states('sensor.pv_netzleistung') | float(0) %}
-          {{ [netz, 0] | max | round(0) }}
-
-      - name: PV Netzverkauf
-        unique_id: pv_netzverkauf
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        icon: mdi:transmission-tower-export
-        state: >
-          {% set netz = states('sensor.pv_netzleistung') | float(0) %}
-          {{ [(-netz), 0] | max | round(0) }}
-
-      - name: PV Batterie Ladung
-        unique_id: pv_batterie_ladung
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        icon: mdi:battery-charging
-        state: >
-          {% set battery = states('sensor.pv_battery_power') | float(0) %}
-          {# Negativ = Laden (typisch Huawei/Solar); bei invertiertem Vorzeichen Vorzeichen tauschen #}
-          {{ [(-battery), 0] | max | round(0) }}
-
+  - sensor:
       - name: PV Anlagenleistung
         unique_id: pv_kwpeak
         unit_of_measurement: kWp
