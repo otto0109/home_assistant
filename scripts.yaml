@@ -24,6 +24,3 @@ dashboard_raum_oeffnen:
         entity_id: input_text.dashboard_active_area
       data:
         value: "{{ area }}"
-    - action: browser_mod.navigate
-      data:
-        path: /test-dashboard/raum

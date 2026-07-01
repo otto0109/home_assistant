@@ -14,6 +14,14 @@
   card:
     type: vertical-stack
     cards:
+      - type: custom:button-card
+        template: card_title
+        name: Zurück
+        icon: mdi:arrow-left
+        tap_action:
+          action: navigate
+          navigation_path: home
+
       - type: markdown
         content: |
           {% set aid = states('input_text.dashboard_active_area') %}
