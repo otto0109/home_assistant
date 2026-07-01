@@ -1,0 +1,94 @@
+# Szenen-Kacheln (gleicher Icon-Stil, ohne Unterzeile)
+scene_tile_layout:
+  show_name: true
+  show_icon: true
+  show_state: false
+  show_label: false
+  styles:
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 14px 0 10px
+    grid:
+      - grid-template-areas: "'i' 'n'"
+    name:
+      - justify-self: center
+      - font-weight: bold
+      - font-size: 15px
+      - margin-top: 12px
+    img_cell:
+      - width: 50px
+      - height: 50px
+      - border-radius: 50%
+    icon:
+      - width: 24px
+      - height: 24px
+
+scene_tile_blue:
+  template:
+    - scene_tile_layout
+    - tile_color_blue
+scene_tile_pink:
+  template:
+    - scene_tile_layout
+    - tile_color_pink
+scene_tile_yellow:
+  template:
+    - scene_tile_layout
+    - tile_color_yellow
+scene_tile_green:
+  template:
+    - scene_tile_layout
+    - tile_color_green
+scene_tile_red:
+  template:
+    - scene_tile_layout
+    - tile_color_red
+scene_tile_purple:
+  template:
+    - scene_tile_layout
+    - tile_color_purple
+scene_tile_grey:
+  template:
+    - scene_tile_layout
+    - tile_color_grey
+scene_tile_orange:
+  template:
+    - scene_tile_layout
+    - tile_color_orange
+scene_tile_teal:
+  template:
+    - scene_tile_layout
+    - tile_color_teal
+scene_tile_cyan:
+  template:
+    - scene_tile_layout
+    - tile_color_cyan
+scene_tile_indigo:
+  template:
+    - scene_tile_layout
+    - tile_color_indigo
+scene_tile_lime:
+  template:
+    - scene_tile_layout
+    - tile_color_lime
+scene_tile_brown:
+  template:
+    - scene_tile_layout
+    - tile_color_brown
+scene_tile_deep_orange:
+  template:
+    - scene_tile_layout
+    - tile_color_deep_orange
+scene_tile_amber:
+  template:
+    - scene_tile_layout
+    - tile_color_amber
+scene_tile_light_blue:
+  template:
+    - scene_tile_layout
+    - tile_color_light_blue
+scene_tile_deep_purple:
+  template:
+    - scene_tile_layout
+    - tile_color_deep_purple

@@ -1,0 +1,119 @@
+# Farb-Bausteine für Status- und Szenen-Kacheln (ULM + Zusatzfarben).
+tile_color_blue:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-blue), 0.2)
+    icon:
+      - color: rgba(var(--color-blue), 1)
+
+tile_color_pink:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-pink), 0.2)
+    icon:
+      - color: rgba(var(--color-pink), 1)
+
+tile_color_yellow:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-yellow), 0.2)
+    icon:
+      - color: rgba(var(--color-yellow), 1)
+
+tile_color_green:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-green), 0.2)
+    icon:
+      - color: rgba(var(--color-green), 1)
+
+tile_color_red:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-red), 0.2)
+    icon:
+      - color: rgba(var(--color-red), 1)
+
+tile_color_purple:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-purple), 0.2)
+    icon:
+      - color: rgba(var(--color-purple), 1)
+
+tile_color_grey:
+  styles:
+    img_cell:
+      - background-color: rgba(var(--color-grey), 0.2)
+    icon:
+      - color: rgba(var(--color-grey), 1)
+
+tile_color_orange:
+  styles:
+    img_cell:
+      - background-color: rgba(255, 152, 0, 0.2)
+    icon:
+      - color: rgb(255, 152, 0)
+
+tile_color_teal:
+  styles:
+    img_cell:
+      - background-color: rgba(0, 150, 136, 0.2)
+    icon:
+      - color: rgb(0, 150, 136)
+
+tile_color_cyan:
+  styles:
+    img_cell:
+      - background-color: rgba(0, 188, 212, 0.2)
+    icon:
+      - color: rgb(0, 188, 212)
+
+tile_color_indigo:
+  styles:
+    img_cell:
+      - background-color: rgba(63, 81, 181, 0.2)
+    icon:
+      - color: rgb(63, 81, 181)
+
+tile_color_lime:
+  styles:
+    img_cell:
+      - background-color: rgba(139, 195, 74, 0.2)
+    icon:
+      - color: rgb(139, 195, 74)
+
+tile_color_brown:
+  styles:
+    img_cell:
+      - background-color: rgba(121, 85, 72, 0.2)
+    icon:
+      - color: rgb(121, 85, 72)
+
+tile_color_deep_orange:
+  styles:
+    img_cell:
+      - background-color: rgba(255, 87, 34, 0.2)
+    icon:
+      - color: rgb(255, 87, 34)
+
+tile_color_amber:
+  styles:
+    img_cell:
+      - background-color: rgba(255, 193, 7, 0.25)
+    icon:
+      - color: rgb(255, 179, 0)
+
+tile_color_light_blue:
+  styles:
+    img_cell:
+      - background-color: rgba(3, 169, 244, 0.2)
+    icon:
+      - color: rgb(3, 169, 244)
+
+tile_color_deep_purple:
+  styles:
+    img_cell:
+      - background-color: rgba(103, 58, 183, 0.2)
+    icon:
+      - color: rgb(103, 58, 183)
