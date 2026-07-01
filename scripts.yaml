@@ -10,11 +10,11 @@ alle_lichter_aus:
 dashboard_raum_oeffnen:
   alias: Dashboard Raum öffnen
   icon: mdi:door-open
-  mode: parallel
+  mode: single
   fields:
     area:
-      name: Bereich
-      description: Anzeigename des HA-Bereichs für die Raum-Detailseite
+      name: Bereichs-ID
+      description: ID des HA-Bereichs für die Raum-Detailseite (z. B. wohnzimmer)
       required: true
       selector:
         text:
@@ -24,3 +24,6 @@ dashboard_raum_oeffnen:
         entity_id: input_text.dashboard_active_area
       data:
         value: "{{ area }}"
+    - action: browser_mod.navigate
+      data:
+        path: /test-dashboard/raum

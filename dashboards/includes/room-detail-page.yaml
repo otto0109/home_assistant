@@ -17,7 +17,12 @@
       - type: markdown
         content: |
           {% set aid = states('input_text.dashboard_active_area') %}
-          ## {{ area_name(aid) if aid not in ['unknown', 'unavailable', ''] else 'Raum' }}
+          {% if aid in ['unknown', 'unavailable', ''] %}
+          ## Raum
+          > Bitte von der Übersicht eine Raumkachel antippen.
+          {% else %}
+          ## {{ area_name(aid) }}
+          {% endif %}
         card_mod:
           style: |
             ha-card {
@@ -31,4 +36,200 @@
               font-size: 1.35rem;
               font-weight: 600;
             }
-      - !include room-auto-content-active.yaml
+
+      - type: custom:button-card
+        template: card_title
+        name: Szenen
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          template: |
+            {% set target = states('input_text.dashboard_active_area') %}
+            {% if target in ['unknown', 'unavailable', ''] %}
+              []
+            {% else %}
+              {% set ns = namespace(ids=[]) %}
+              {% for e in states.scene %}
+                {% if area_id(e.entity_id) == target %}
+                  {% set ns.ids = ns.ids + [e.entity_id] %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.ids }}
+            {% endif %}
+        options: !include scene-button-room.yaml
+
+      - type: custom:button-card
+        template: card_title
+        name: Beleuchtung
+
+      - type: custom:auto-entities
+        show_empty: false
+        unique: true
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          template: |
+            {% set target = states('input_text.dashboard_active_area') %}
+            {% if target in ['unknown', 'unavailable', ''] %}
+              []
+            {% else %}
+              {% set ns = namespace(ids=[]) %}
+              {% for e in states.light %}
+                {% if area_id(e.entity_id) == target %}
+                  {% set ns.ids = ns.ids + [e.entity_id] %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.ids }}
+            {% endif %}
+        options:
+          type: custom:mushroom-light-card
+          fill_container: true
+          show_brightness_control: true
+          use_light_color: true
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+
+      - type: custom:button-card
+        template: card_title
+        name: Schalter
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          template: |
+            {% set target = states('input_text.dashboard_active_area') %}
+            {% if target in ['unknown', 'unavailable', ''] %}
+              []
+            {% else %}
+              {% set ns = namespace(ids=[]) %}
+              {% set light_icons = [
+                'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
+                'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
+                'mdi:led-strip', 'mdi:lamps'
+              ] %}
+              {% for e in states.switch %}
+                {% if area_id(e.entity_id) == target %}
+                  {% set eid = e.entity_id | lower %}
+                  {% set icon = e.attributes.icon | default('') %}
+                  {% if not ('licht' in eid or 'light' in eid or icon in light_icons) %}
+                    {% set ns.ids = ns.ids + [e.entity_id] %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.ids }}
+            {% endif %}
+        options:
+          type: custom:button-card
+          template: card_power_outlet
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+
+      - type: custom:button-card
+        template: card_title
+        name: Klima
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          template: |
+            {% set target = states('input_text.dashboard_active_area') %}
+            {% if target in ['unknown', 'unavailable', ''] %}
+              []
+            {% else %}
+              {% set ns = namespace(ids=[]) %}
+              {% for e in states.climate %}
+                {% if area_id(e.entity_id) == target %}
+                  {% set ns.ids = ns.ids + [e.entity_id] %}
+                {% endif %}
+              {% endfor %}
+              {{ ns.ids }}
+            {% endif %}
+        options:
+          type: tile
+          features:
+            - type: climate-hvac-modes
+            - type: climate-temperature
+
+      - type: custom:button-card
+        template: card_title
+        name: Aktionen
+
+      - type: custom:auto-entities
+        show_empty: false
+        sort:
+          method: friendly_name
+        card:
+          type: grid
+          columns: 1
+          square: false
+        card_param: cards
+        filter:
+          template: |
+            {% set target = states('input_text.dashboard_active_area') %}
+            {% if target in ['unknown', 'unavailable', ''] %}
+              []
+            {% else %}
+              {% set ns = namespace(ids=[]) %}
+              {% for e in states.script %}
+                {% if area_id(e.entity_id) == target %}
+                  {% set ns.ids = ns.ids + [e.entity_id] %}
+                {% endif %}
+              {% endfor %}
+              {% if target == 'wohnzimmer' %}
+                {% set ns.ids = ns.ids + ['script.dreame_reinigen_wohnzimmer'] %}
+              {% elif target == 'esszimmer' %}
+                {% set ns.ids = ns.ids + ['script.dreame_reinigen_esszimmer'] %}
+              {% elif target in ['raum_neben_der_kuche', 'kueche'] %}
+                {% set ns.ids = ns.ids + ['script.dreame_reinigen_kueche'] %}
+              {% elif target == 'flur_eg' %}
+                {% set ns.ids = ns.ids + ['script.dreame_reinigen_flur_eg'] %}
+              {% endif %}
+              {{ ns.ids | unique | list }}
+            {% endif %}
+        options:
+          type: custom:button-card
+          template: card_vertical_button
+          card_mod:
+            style: |
+              ha-card {
+                border-radius: 20px;
+                overflow: hidden;
+              }
+          tap_action:
+            action: perform-action
+            perform_action: script.turn_on
