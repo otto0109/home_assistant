@@ -125,7 +125,7 @@ template:
             {% for event in today_events[:5] %}
               {% set start = as_datetime(event.start, default=none) %}
               {% set time = start.strftime('%H:%M') if start else '' %}
-              {% set ns.lines = ns.lines + ['• ' ~ (event.summary | default('Termin')) ~ (' · ' ~ time if time else '')] %}
+              {% set ns.lines = ns.lines + ['• ' ~ (event['summary'] | default('Termin')) ~ (' · ' ~ time if time else '')] %}
             {% endfor %}
             {{ ns.lines | join('\n') }}
             {% endif %}
