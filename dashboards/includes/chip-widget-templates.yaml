@@ -1,0 +1,66 @@
+chip_widget_active:
+  template: widget_icon_room
+  state:
+    - operator: template
+      value: |
+        [[[
+          if (!entity?.entity_id) return false;
+          if (entity.entity_id.startsWith('climate.')) {
+            const hvac = entity.attributes?.hvac_action;
+            if (hvac && !['idle', 'off'].includes(hvac)) return true;
+            return entity.state && !['off', 'unavailable', 'unknown'].includes(entity.state);
+          }
+          return entity.state === 'on';
+        ]]]
+      styles:
+        icon:
+          - color: |
+              [[[
+                const c = variables.chip_color || 'yellow';
+                return `rgba(var(--color-${c}), 1)`;
+              ]]]
+        img_cell:
+          - background-color: |
+              [[[
+                const c = variables.chip_color || 'yellow';
+                return `rgba(var(--color-${c}), 0.45)`;
+              ]]]
+
+chip_widget_blue:
+  template: widget_icon_room
+  state:
+    - operator: template
+      value: |
+        [[[
+          if (!entity?.entity_id?.startsWith('climate.')) return false;
+          const hvac = entity.attributes?.hvac_action;
+          if (hvac && !['idle', 'off'].includes(hvac)) return true;
+          return entity.state && !['off', 'unavailable', 'unknown'].includes(entity.state);
+        ]]]
+      styles:
+        icon:
+          - color: rgba(var(--color-blue), 1)
+        img_cell:
+          - background-color: rgba(var(--color-blue), 0.45)
+
+chip_widget_grey:
+  template: widget_icon_room
+  state:
+    - operator: template
+      value: "[[[ return entity?.state === 'on'; ]]]"
+      styles:
+        icon:
+          - color: rgba(var(--color-grey), 1)
+        img_cell:
+          - background-color: rgba(var(--color-grey), 0.45)
+
+chip_widget_green:
+  template: widget_icon_room
+  state:
+    - operator: template
+      value: "[[[ return entity?.state === 'on'; ]]]"
+      styles:
+        icon:
+          - color: rgba(var(--color-green), 1)
+        img_cell:
+          - background-color: rgba(var(--color-green), 0.45)
