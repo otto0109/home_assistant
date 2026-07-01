@@ -89,10 +89,7 @@ room_auto_content:
           square: false
         card_param: cards
         filter:
-          include:
-            - domain: scene
-              area: "[[area]]"
-              options: !include scene-button-room.yaml
+          template: !include scene-tiles-named-filter.jinja
 
       - type: custom:button-card
         template: card_title

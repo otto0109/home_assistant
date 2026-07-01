@@ -37,17 +37,21 @@
               {% set card_round = 'ha-card { border-radius: 20px; overflow: hidden; }' %}
               {% set out = namespace(cards=[]) %}
 
-              {% set scene_items = namespace(list=[]) %}
+              {% set scene_cards = namespace(list=[]) %}
+              {% set hues = [
+                'blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey',
+                'orange', 'teal', 'cyan', 'indigo', 'lime', 'brown',
+                'deep_orange', 'amber', 'light_blue', 'deep_purple'
+              ] %}
               {% set prefixes = [target] %}
               {% if target == 'kueche' %}
                 {% set prefixes = prefixes + ['raum_neben_der_kuche'] %}
               {% elif target == 'raum_neben_der_kuche' %}
                 {% set prefixes = prefixes + ['kueche'] %}
               {% endif %}
-              {% for e in states.scene %}
+              {% for e in states.scene | sort(attribute='friendly_name') %}
                 {% set eid = e.entity_id %}
-                {% set st = states(eid) %}
-                {% if st not in ['unavailable', 'unknown'] and not is_hidden_entity(eid) %}
+                {% if states(eid) != 'unavailable' and not is_hidden_entity(eid) %}
                   {% set matched = namespace(v=false) %}
                   {% if area_id(eid) == target %}
                     {% set matched.v = true %}
@@ -59,57 +63,26 @@
                     {% endfor %}
                   {% endif %}
                   {% if matched.v %}
-                    {% set scene_items.list = scene_items.list + [{
-                      'eid': eid,
+                    {% set slug = eid.split('.')[1] | default('') %}
+                    {% set hash = namespace(v=0) %}
+                    {% for ch in slug %}
+                      {% set hash.v = (hash.v * 31 + loop.index0) %}
+                    {% endfor %}
+                    {% set hash.v = hash.v + (slug | length) * 17 %}
+                    {% set hue = hues[hash.v % (hues | length)] %}
+                    {% set scene_cards.list = scene_cards.list + [{
+                      'type': 'custom:button-card',
+                      'template': 'scene_tile_' ~ hue,
+                      'entity': eid,
                       'name': state_attr(eid, 'friendly_name') or eid,
-                      'icon': state_attr(eid, 'icon') or 'mdi:image-filter-frames'
+                      'tap_action': {
+                        'action': 'perform-action',
+                        'perform_action': 'scene.turn_on',
+                        'target': {'entity_id': eid}
+                      }
                     }] %}
                   {% endif %}
                 {% endif %}
-              {% endfor %}
-              {% set scene_cards = namespace(list=[]) %}
-              {% for item in scene_items.list | sort(attribute='name') %}
-                {% set scene_cards.list = scene_cards.list + [{
-                  'type': 'custom:button-card',
-                  'entity': item.eid,
-                  'name': item.name,
-                  'icon': item.icon,
-                  'show_name': true,
-                  'show_icon': true,
-                  'show_state': false,
-                  'show_label': false,
-                  'styles': {
-                    'card': [
-                      {'border-radius': 'var(--border-radius)'},
-                      {'box-shadow': 'var(--box-shadow)'},
-                      {'padding': '14px 0 10px'}
-                    ],
-                    'grid': [
-                      {'grid-template-areas': "'i' 'n'"}
-                    ],
-                    'name': [
-                      {'justify-self': 'center'},
-                      {'font-weight': 'bold'},
-                      {'font-size': '15px'},
-                      {'margin-top': '12px'}
-                    ],
-                    'img_cell': [
-                      {'width': '50px'},
-                      {'height': '50px'},
-                      {'border-radius': '50%'},
-                      {'background-color': 'rgba(var(--color-yellow), 0.2)'}
-                    ],
-                    'icon': [
-                      {'color': 'rgba(var(--color-yellow), 1)'},
-                      {'width': '24px'}
-                    ]
-                  },
-                  'tap_action': {
-                    'action': 'call-service',
-                    'service': 'scene.turn_on',
-                    'target': {'entity_id': item.eid}
-                  }
-                }] %}
               {% endfor %}
               {% if scene_cards.list | length > 0 %}
                 {% set out.cards = out.cards + [

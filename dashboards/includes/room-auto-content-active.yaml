@@ -15,21 +15,7 @@ cards:
       square: false
     card_param: cards
     filter:
-      include:
-        - domain: scene
-          template: |
-            {% set target = states('input_text.dashboard_active_area') %}
-            {% if target in ['unknown', 'unavailable', ''] %}
-            {% else %}
-              {% set ns = namespace(ids=[]) %}
-              {% for e in states.scene %}
-                {% if area_id(e.entity_id) == target %}
-                  {% set ns.ids = ns.ids + [e.entity_id] %}
-                {% endif %}
-              {% endfor %}
-              {{ ns.ids | join(',') }}
-            {% endif %}
-          options: !include scene-button-room.yaml
+      template: !include scene-tiles-active-filter.jinja
 
   - type: custom:button-card
     template: card_title
