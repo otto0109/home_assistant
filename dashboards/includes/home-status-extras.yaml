@@ -1,84 +1,107 @@
 # Kompakte Status-Kacheln: To-do-Listen + Kalender (gleicher Stil wie Solar/Speicher/Router).
 - type: custom:auto-entities
   show_empty: false
-  sort:
-    method: friendly_name
   card:
     type: grid
     columns: 3
     square: false
   card_param: cards
   filter:
-    include:
-      - domain: todo
-        options:
-          type: custom:button-card
-          show_name: true
-          show_icon: true
-          show_state: false
-          show_label: true
-          label: '[[[ return states[entity.entity_id].state + " offen" ]]]'
-          styles:
-            card:
-              - border-radius: var(--border-radius)
-              - box-shadow: var(--box-shadow)
-              - padding: 10px 0 8px
-            grid:
-              - grid-template-areas: "'i' 'n' 'l'"
-            name:
-              - justify-self: center
-              - font-weight: bold
-              - font-size: 14px
-              - margin-top: 8px
-            label:
-              - justify-self: center
-              - font-size: 12px
-              - opacity: 0.7
-            img_cell:
-              - width: 28px
-              - height: 28px
-              - margin: 0 auto
-              - background: none
-            icon:
-              - width: 22px
-              - height: 22px
-          tap_action:
-            action: navigate
-            navigation_path: '[[[ return "/todo?entity_id=" + entity.entity_id ]]]'
     template: |
-      - type: custom:button-card
-        name: Kalender
-        entity: sensor.dashboard_kalender_heute
-        show_name: true
-        show_icon: true
-        show_state: false
-        show_label: true
-        label: '[[[ const s = states["sensor.dashboard_kalender_heute"]; const n = parseInt(s ? s.state : "0", 10) || 0; return n + (n === 1 ? " Termin heute" : " Termine heute"); ]]]'
-        styles:
-          card:
-            - border-radius: var(--border-radius)
-            - box-shadow: var(--box-shadow)
-            - padding: 10px 0 8px
-          grid:
-            - grid-template-areas: "'i' 'n' 'l'"
-          name:
-            - justify-self: center
-            - font-weight: bold
-            - font-size: 14px
-            - margin-top: 8px
-          label:
-            - justify-self: center
-            - font-size: 12px
-            - opacity: 0.7
-          img_cell:
-            - width: 28px
-            - height: 28px
-            - margin: 0 auto
-            - background: none
-          icon:
-            - width: 22px
-            - height: 22px
-            - color: rgba(var(--color-purple), 1)
-        tap_action:
-          action: navigate
-          navigation_path: /home-dashboard/kalender
+      {% set ns = namespace(cards=[]) %}
+      {% set hues = ['blue', 'pink', 'yellow', 'green'] %}
+      {% for e in states.todo | sort(attribute='name') %}
+        {% set eid = e.entity_id %}
+        {% if states(eid) not in ['unavailable', 'unknown'] %}
+          {% set hue = hues[loop.index0 % 4] %}
+          {% set ns.cards = ns.cards + [{
+            'type': 'custom:button-card',
+            'entity': eid,
+            'name': state_attr(eid, 'friendly_name') or eid,
+            'show_name': true,
+            'show_icon': true,
+            'show_state': false,
+            'show_label': true,
+            'label': '[[[ return states[entity.entity_id].state + " offen" ]]]',
+            'styles': {
+              'card': [
+                'border-radius: var(--border-radius)',
+                'box-shadow: var(--box-shadow)',
+                'padding: 14px 0 10px'
+              ],
+              'grid': ["grid-template-areas: \"'i' 'n' 'l'\""],
+              'name': [
+                'justify-self: center',
+                'font-weight: bold',
+                'font-size: 15px',
+                'margin-top: 12px'
+              ],
+              'label': [
+                'justify-self: center',
+                'font-size: 13px',
+                'opacity: 0.7'
+              ],
+              'img_cell': [
+                'width: 50px',
+                'height: 50px',
+                'border-radius: 50%',
+                'background-color: rgba(var(--color-' ~ hue ~ '), 0.2)'
+              ],
+              'icon': [
+                'color: rgba(var(--color-' ~ hue ~ '), 1)',
+                'width: 24px'
+              ]
+            },
+            'tap_action': {
+              'action': 'navigate',
+              'navigation_path': '/todo?entity_id=' ~ eid
+            }
+          }] %}
+        {% endif %}
+      {% endfor %}
+      {% set ns.cards = ns.cards + [{
+        'type': 'custom:button-card',
+        'name': 'Kalender',
+        'icon': 'mdi:calendar',
+        'entity': 'calendar.thorge_3_laura',
+        'show_name': true,
+        'show_icon': true,
+        'show_state': false,
+        'show_label': true,
+        'label': '[[[ const s = states["sensor.dashboard_kalender_heute"]; const n = s && s.state !== "unavailable" && s.state !== "unknown" ? parseInt(s.state, 10) || 0 : 0; return n + (n === 1 ? " Termin heute" : " Termine heute"); ]]]',
+        'triggers_update': ['sensor.dashboard_kalender_heute', 'calendar.thorge_3_laura'],
+        'styles': {
+          'card': [
+            'border-radius: var(--border-radius)',
+            'box-shadow: var(--box-shadow)',
+            'padding: 14px 0 10px'
+          ],
+          'grid': ["grid-template-areas: \"'i' 'n' 'l'\""],
+          'name': [
+            'justify-self: center',
+            'font-weight: bold',
+            'font-size: 15px',
+            'margin-top: 12px'
+          ],
+          'label': [
+            'justify-self: center',
+            'font-size: 13px',
+            'opacity: 0.7'
+          ],
+          'img_cell': [
+            'width: 50px',
+            'height: 50px',
+            'border-radius: 50%',
+            'background-color: rgba(var(--color-purple), 0.2)'
+          ],
+          'icon': [
+            'color: rgba(var(--color-purple), 1)',
+            'width: 24px'
+          ]
+        },
+        'tap_action': {
+          'action': 'navigate',
+          'navigation_path': '/home-dashboard/kalender'
+        }
+      }] %}
+      {{ ns.cards }}

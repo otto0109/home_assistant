@@ -8,12 +8,9 @@ template:
       - platform: state
         entity_id: calendar.thorge_3_laura
     action:
-      - action: calendar.get_events
+      - service: calendar.get_events
         target:
-          entity_id: >
-            {{ states.calendar
-               | rejectattr('state', 'in', ['unavailable', 'unknown'])
-               | map(attribute='entity_id') | list }}
+          entity_id: calendar.thorge_3_laura
         data:
           start_date_time: "{{ today_at('00:00:00') }}"
           end_date_time: "{{ today_at('23:59:59') }}"
@@ -23,8 +20,8 @@ template:
         unique_id: dashboard_kalender_heute
         icon: mdi:calendar
         state: >
-          {% set ns = namespace(count=0) %}
-          {% for cal in agenda | default({}, true) %}
-            {% set ns.count = ns.count + (agenda[cal].events | default([]) | count) %}
-          {% endfor %}
-          {{ ns.count }}
+          {% if agenda is defined and 'calendar.thorge_3_laura' in agenda %}
+            {{ agenda['calendar.thorge_3_laura'].events | default([]) | count }}
+          {% else %}
+            0
+          {% endif %}
