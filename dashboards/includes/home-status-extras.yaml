@@ -2,7 +2,7 @@
 - type: custom:auto-entities
   show_empty: false
   sort:
-    method: entity_id
+    method: friendly_name
   card:
     type: grid
     columns: 3
@@ -10,7 +10,7 @@
   card_param: cards
   filter:
     include:
-      - entity_id: todo.einkaufsliste
+      - domain: todo
         options:
           type: custom:button-card
           show_name: true
@@ -38,48 +38,31 @@
               - width: 50px
               - height: 50px
               - border-radius: 50%
-              - background-color: rgba(var(--color-blue), 0.2)
+              - |
+                [[[
+                  const hues = ['blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey'];
+                  let h = 0;
+                  for (let i = 0; i < entity.entity_id.length; i++) {
+                    h = (h * 31 + entity.entity_id.charCodeAt(i)) >>> 0;
+                  }
+                  const hue = hues[h % hues.length];
+                  return `background-color: rgba(var(--color-${hue}), 0.2)`;
+                ]]]
             icon:
-              - color: rgba(var(--color-blue), 1)
               - width: 24px
+              - |
+                [[[
+                  const hues = ['blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey'];
+                  let h = 0;
+                  for (let i = 0; i < entity.entity_id.length; i++) {
+                    h = (h * 31 + entity.entity_id.charCodeAt(i)) >>> 0;
+                  }
+                  const hue = hues[h % hues.length];
+                  return `color: rgba(var(--color-${hue}), 1)`;
+                ]]]
           tap_action:
             action: navigate
-            navigation_path: /todo?entity_id=todo.einkaufsliste
-      - entity_id: todo.haus
-        options:
-          type: custom:button-card
-          show_name: true
-          show_icon: true
-          show_state: false
-          show_label: true
-          label: '[[[ return states[entity.entity_id].state + " offen" ]]]'
-          styles:
-            card:
-              - border-radius: var(--border-radius)
-              - box-shadow: var(--box-shadow)
-              - padding: 14px 0 10px
-            grid:
-              - grid-template-areas: "'i' 'n' 'l'"
-            name:
-              - justify-self: center
-              - font-weight: bold
-              - font-size: 15px
-              - margin-top: 12px
-            label:
-              - justify-self: center
-              - font-size: 13px
-              - opacity: 0.7
-            img_cell:
-              - width: 50px
-              - height: 50px
-              - border-radius: 50%
-              - background-color: rgba(var(--color-pink), 0.2)
-            icon:
-              - color: rgba(var(--color-pink), 1)
-              - width: 24px
-          tap_action:
-            action: navigate
-            navigation_path: /todo?entity_id=todo.haus
+            navigation_path: '[[[ return "/todo?entity_id=" + entity.entity_id ]]]'
       - entity_id: calendar.thorge_3_laura
         options:
           type: custom:button-card
