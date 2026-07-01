@@ -23,7 +23,9 @@ dashboard_raum_oeffnen:
       target:
         entity_id: input_text.dashboard_active_area
       data:
-        value: "{{ area }}"
+        value: "{{ area | trim }}"
+    - delay:
+        milliseconds: 300
     - action: browser_mod.navigate
       data:
         path: /home-dashboard/raum

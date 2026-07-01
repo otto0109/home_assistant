@@ -24,7 +24,7 @@
 
       - type: markdown
         content: |
-          {% set aid = states('input_text.dashboard_active_area') %}
+          {% set aid = states('input_text.dashboard_active_area') | trim %}
           {% if aid in ['unknown', 'unavailable', ''] %}
           ## Raum
           > Bitte von der Übersicht eine Raumkachel antippen.
@@ -59,21 +59,20 @@
           square: false
         card_param: cards
         filter:
-          include:
-            - domain: scene
-              template: |
-                {% set target = states('input_text.dashboard_active_area') %}
-                {% if target in ['unknown', 'unavailable', ''] %}
-                {% else %}
-                  {% set ns = namespace(ids=[]) %}
-                  {% for e in states.scene %}
-                    {% if area_id(e.entity_id) == target %}
-                      {% set ns.ids = ns.ids + [e.entity_id] %}
-                    {% endif %}
-                  {% endfor %}
-                  {{ ns.ids | join(',') }}
+          template: |
+            {% set target = states('input_text.dashboard_active_area') | trim %}
+            {% if target in ['unknown', 'unavailable', ''] %}
+              []
+            {% else %}
+              {% set ns = namespace(ids=[]) %}
+              {% for eid in area_entities(target) %}
+                {% if eid.startswith('scene.') %}
+                  {% set ns.ids = ns.ids + [eid] %}
                 {% endif %}
-              options: !include scene-button-room.yaml
+              {% endfor %}
+              {{ ns.ids }}
+            {% endif %}
+        options: !include scene-button-room.yaml
 
       - type: custom:button-card
         template: card_title
@@ -91,20 +90,21 @@
         card_param: cards
         filter:
           template: |
-            {% set target = states('input_text.dashboard_active_area') %}
+            {% set target = states('input_text.dashboard_active_area') | trim %}
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
               {% set ns = namespace(ids=[]) %}
-              {% for e in states.light %}
-                {% if area_id(e.entity_id) == target %}
-                  {% set ns.ids = ns.ids + [e.entity_id] %}
+              {% for eid in area_entities(target) %}
+                {% if eid.startswith('light.') %}
+                  {% set ns.ids = ns.ids + [eid] %}
                 {% endif %}
               {% endfor %}
               {{ ns.ids }}
             {% endif %}
         options:
           type: custom:mushroom-light-card
+          entity: this.entity_id
           fill_container: true
           show_brightness_control: true
           use_light_color: true
@@ -130,7 +130,7 @@
         card_param: cards
         filter:
           template: |
-            {% set target = states('input_text.dashboard_active_area') %}
+            {% set target = states('input_text.dashboard_active_area') | trim %}
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
@@ -140,12 +140,13 @@
                 'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
                 'mdi:led-strip', 'mdi:lamps'
               ] %}
-              {% for e in states.switch %}
-                {% if area_id(e.entity_id) == target %}
-                  {% set eid = e.entity_id | lower %}
+              {% for eid in area_entities(target) %}
+                {% if eid.startswith('switch.') %}
+                  {% set e = states[eid] %}
+                  {% set eid_lower = eid | lower %}
                   {% set icon = e.attributes.icon | default('') %}
-                  {% if not ('licht' in eid or 'light' in eid or icon in light_icons) %}
-                    {% set ns.ids = ns.ids + [e.entity_id] %}
+                  {% if not ('licht' in eid_lower or 'light' in eid_lower or icon in light_icons) %}
+                    {% set ns.ids = ns.ids + [eid] %}
                   {% endif %}
                 {% endif %}
               {% endfor %}
@@ -176,14 +177,14 @@
         card_param: cards
         filter:
           template: |
-            {% set target = states('input_text.dashboard_active_area') %}
+            {% set target = states('input_text.dashboard_active_area') | trim %}
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
               {% set ns = namespace(ids=[]) %}
-              {% for e in states.climate %}
-                {% if area_id(e.entity_id) == target %}
-                  {% set ns.ids = ns.ids + [e.entity_id] %}
+              {% for eid in area_entities(target) %}
+                {% if eid.startswith('climate.') %}
+                  {% set ns.ids = ns.ids + [eid] %}
                 {% endif %}
               {% endfor %}
               {{ ns.ids }}
@@ -209,14 +210,14 @@
         card_param: cards
         filter:
           template: |
-            {% set target = states('input_text.dashboard_active_area') %}
+            {% set target = states('input_text.dashboard_active_area') | trim %}
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
               {% set ns = namespace(ids=[]) %}
-              {% for e in states.script %}
-                {% if area_id(e.entity_id) == target %}
-                  {% set ns.ids = ns.ids + [e.entity_id] %}
+              {% for eid in area_entities(target) %}
+                {% if eid.startswith('script.') %}
+                  {% set ns.ids = ns.ids + [eid] %}
                 {% endif %}
               {% endfor %}
               {% if target == 'wohnzimmer' %}
@@ -233,6 +234,7 @@
         options:
           type: custom:button-card
           template: card_vertical_button
+          entity: this.entity_id
           card_mod:
             style: |
               ha-card {
@@ -240,7 +242,7 @@
                 overflow: hidden;
               }
           tap_action:
-            action: perform-action
-            perform_action: script.turn_on
+            action: call-service
+            service: script.turn_on
             target:
               entity_id: this.entity_id

@@ -125,7 +125,7 @@ filter:
               'action': 'call-service',
               'service': 'script.turn_on',
               'target': {'entity_id': 'script.dashboard_raum_oeffnen'},
-              'data': {'area': aid}
+              'data': {'variables': {'area': aid}}
             },
             'variables': {
               'ulm_room_area_id': aid,
