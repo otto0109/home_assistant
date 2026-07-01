@@ -5,34 +5,57 @@
     action: navigate
     navigation_path: /todo
 
-- type: custom:button-card
-  show_icon: false
-  show_name: false
-  show_label: true
-  label: |
-    [[[
-      const s = hass.states['sensor.dashboard_todo_zusammenfassung'];
-      if (!s || s.state === 'unavailable' || s.state === 'unknown') {
-        return 'To-do-Zusammenfassung wird geladen…';
-      }
-      return s.attributes?.text || 'Keine offenen Aufgaben';
-    ]]]
-  styles:
-    card:
-      - border-radius: var(--border-radius)
-      - box-shadow: var(--box-shadow)
-      - padding: 12px 16px
-      - white-space: pre-wrap
-      - text-align: left
-      - font-size: 14px
-      - line-height: 1.45
-    label:
-      - justify-self: start
-      - text-align: left
-      - white-space: pre-wrap
-      - font-size: 14px
-      - font-weight: 400
-      - opacity: 0.9
-  tap_action:
-    action: navigate
-    navigation_path: /todo
+- type: custom:auto-entities
+  show_empty: false
+  card:
+    type: vertical-stack
+  card_param: cards
+  filter:
+    template: |
+      {% set ns = namespace(cards=[]) %}
+      {% for e in states.todo | sort(attribute='name') %}
+        {% set eid = e.entity_id %}
+        {% if states(eid) not in ['unavailable', 'unknown'] %}
+          {% set title = state_attr(eid, 'friendly_name') or eid %}
+          {% set count = states(eid) | int(0) %}
+          {% set ns.cards = ns.cards + [{
+            'type': 'custom:button-card',
+            'entity': eid,
+            'name': title,
+            'label': '1 offen' if count == 1 else (count ~ ' offen'),
+            'icon': state_attr(eid, 'icon') or 'mdi:format-list-checks',
+            'show_name': true,
+            'show_icon': true,
+            'show_label': true,
+            'styles': {
+              'card': [
+                'border-radius: var(--border-radius)',
+                'box-shadow: var(--box-shadow)',
+                'padding: 10px 14px',
+                'margin-bottom: 6px'
+              ],
+              'grid': [
+                "grid-template-areas: \"'i n l'\"",
+                'grid-template-columns: min-content 1fr auto'
+              ],
+              'icon': ['width: 22px'],
+              'name': [
+                'justify-self: start',
+                'text-align: left',
+                'font-size: 14px',
+                'font-weight: 600'
+              ],
+              'label': [
+                'justify-self: end',
+                'font-size: 12px',
+                'opacity: 0.6'
+              ]
+            },
+            'tap_action': {
+              'action': 'navigate',
+              'navigation_path': '/todo?entity_id=' ~ eid
+            }
+          }] %}
+        {% endif %}
+      {% endfor %}
+      {{ ns.cards }}
