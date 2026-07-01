@@ -98,6 +98,19 @@ status_tile_deep_purple:
     - status_tile_layout
     - tile_color_deep_purple
 
+status_tile_sensor:
+  template:
+    - status_tile_layout
+  show_state: true
+  show_label: false
+  styles:
+    grid:
+      - grid-template-areas: "'i' 'n' 's'"
+    state:
+      - justify-self: center
+      - font-size: 13px
+      - opacity: 0.7
+
 status_tile_calendar_label:
   show_label: true
   label: '[[[ var s=states["sensor.dashboard_kalender_heute"]; var n=(s&&s.state!=="unavailable"&&s.state!=="unknown")?(parseInt(s.state,10)||0):0; return n+(n===1?" Termin heute":" Termine heute"); ]]]'

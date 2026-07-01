@@ -3,10 +3,10 @@
     'expanded': true,
     'clear': true,
     'clear-children': false,
-    'gap': '14px',
+    'gap': '20px',
     'padding': '0',
     'child-padding': '0',
-    'title-card-padding': '0',
+    'title-card-padding': '0 0 4px 0',
     'title-card-button-overlay': true,
     'overlay-margin': '4px',
     'button-background': 'transparent',
@@ -14,11 +14,15 @@
       'style': 'ha-card { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }'
     }
   } %}
+  {% set title_card_mod = {
+    'card_mod': {
+      'style': 'ha-card { margin-bottom: 6px !important; }'
+    }
+  } %}
   {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
   {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
   {% set palette_hues = ['yellow', 'pink', 'red', 'purple', 'grey', 'blue', 'green'] %}
   {% set default_priority = 9999 %}
-  {% set sonstige_key = '_sonstige' %}
   {% set sorted_areas = namespace(list=[], seen=[]) %}
   {% set priority_labels = namespace(list=[]) %}
   {% for lid in labels() %}
@@ -51,9 +55,10 @@
       }] %}
     {% endif %}
   {% endfor %}
-  {% set floor_groups = namespace(map={}) %}
+  {% set area_order = sorted_areas.list | sort(attribute='name') | sort(attribute='priority') %}
+  {% set room_cards_by_aid = namespace(map={}) %}
   {% set ns = namespace(cards=[]) %}
-  {% for item in sorted_areas.list | sort(attribute='name') | sort(attribute='priority') %}
+  {% for item in area_order %}
     {% set aid = item.aid %}
     {% set aname = item.name %}
     {% if aname %}
@@ -83,11 +88,11 @@
           {% set room_hue.c = 'red' %}
         {% elif aname == 'Schlafzimmer' or aid == 'schlafzimmer' %}
           {% set room_hue.c = 'purple' %}
-        {% elif aname == 'Flur' or aname == 'Flur OG' or aid == 'flur' or aid == 'flur_og' %}
+        {% elif aname == 'Flur' or aname == 'Flur OG' or aid in ['flur', 'flur_og'] %}
           {% set room_hue.c = 'grey' %}
-        {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
+        {% elif aname == 'Flur EG' or aname == 'Flur Unten' or aid in ['flur_eg', 'flur_unten'] %}
           {% set room_hue.c = 'blue' %}
-        {% elif aname == 'Garten' or aid == 'garten' %}
+        {% elif aname == 'Garten' or aname == 'Draußen' or aid in ['garten', 'draussen'] %}
           {% set room_hue.c = 'green' %}
         {% endif %}
         {% set chips = namespace(list=[]) %}
@@ -135,7 +140,7 @@
           {% set dreame.eid = 'script.dreame_reinigen_esszimmer' %}
         {% elif aname == 'Raum neben der Küche' or aname == 'Küche' or aid == 'raum_neben_der_kuche' or aid == 'kueche' %}
           {% set dreame.eid = 'script.dreame_reinigen_kueche' %}
-        {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
+        {% elif aname == 'Flur EG' or aname == 'Flur Unten' or aid in ['flur_eg', 'flur_unten'] %}
           {% set dreame.eid = 'script.dreame_reinigen_flur_eg' %}
         {% endif %}
         {% if dreame.eid and not is_hidden_entity(dreame.eid) and chips.list | length < 3 %}
@@ -151,7 +156,7 @@
           }] %}
         {% endif %}
         {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
-        {% set room_card = {
+        {% set room_cards_by_aid.map = room_cards_by_aid.map | combine({aid: {
           'type': 'custom:button-card',
           'template': ['card_room', room_hue.c ~ '_no_state'],
           'entity': picked.e,
@@ -171,32 +176,45 @@
             'entity_2': chips.list[1] if chips.list | length > 1 else false,
             'entity_3': chips.list[2] if chips.list | length > 2 else false
           }
-        } %}
-        {% set floor_key = floor_id(aid) %}
-        {% if floor_key is none or floor_key in ['unknown', 'unavailable', ''] %}
-          {% set floor_key = sonstige_key %}
-        {% endif %}
-        {% set _prev = floor_groups.map[floor_key] if floor_key in floor_groups.map else [] %}
-        {% set floor_groups.map = floor_groups.map | combine({floor_key: _prev + [room_card]}) %}
+        }}) %}
       {% endif %}
     {% endif %}
+  {% endfor %}
+  {% set floor_aids = namespace(map={}) %}
+  {% for fid in floors() %}
+    {% set floor_aids.map = floor_aids.map | combine({fid: floor_areas(fid)}) %}
+  {% endfor %}
+  {% set assigned_aids = namespace(list=[]) %}
+  {% for fid in floors() %}
+    {% for aid in floor_areas(fid) %}
+      {% if aid not in assigned_aids.list %}
+        {% set assigned_aids.list = assigned_aids.list + [aid] %}
+      {% endif %}
+    {% endfor %}
   {% endfor %}
   {% set floor_order = namespace(list=[]) %}
   {% for fid in floors() %}
     {% set floor_order.list = floor_order.list + [{'id': fid, 'name': floor_name(fid)}] %}
   {% endfor %}
-  {% for floor_item in floor_order.list | sort(attribute='name') %}
+  {% for floor_item in floor_order.list | sort(attribute='name', reverse=true) %}
     {% set fid = floor_item.id %}
-    {% set room_cards = floor_groups.map[fid] if fid in floor_groups.map else [] %}
-    {% if room_cards | length > 0 %}
+    {% set floor_area_ids = floor_aids.map[fid] if fid in floor_aids.map else [] %}
+    {% set room_cards = namespace(list=[]) %}
+    {% for item in area_order %}
+      {% set aid = item.aid %}
+      {% if aid in floor_area_ids and aid in room_cards_by_aid.map %}
+        {% set room_cards.list = room_cards.list + [room_cards_by_aid.map[aid]] %}
+      {% endif %}
+    {% endfor %}
+    {% if room_cards.list | length > 0 %}
       {% set ns.cards = ns.cards + [expander_defaults | combine({
         'type': 'custom:expander-card',
         'expand-id': 'home-floor-' ~ fid,
-        'title-card': {
+        'title-card': title_card_mod | combine({
           'type': 'custom:button-card',
           'template': 'card_title',
           'name': floor_item.name
-        },
+        }),
         'cards': [{
           'type': 'custom:layout-card',
           'layout_type': 'custom:grid-layout',
@@ -210,21 +228,27 @@
               }
             }
           },
-          'cards': room_cards
+          'cards': room_cards.list
         }]
       })] %}
     {% endif %}
   {% endfor %}
-  {% set sonstige_cards = floor_groups.map[sonstige_key] if sonstige_key in floor_groups.map else [] %}
-  {% if sonstige_cards | length > 0 %}
+  {% set other_cards = namespace(list=[]) %}
+  {% for item in area_order %}
+    {% set aid = item.aid %}
+    {% if aid not in assigned_aids.list and aid in room_cards_by_aid.map %}
+      {% set other_cards.list = other_cards.list + [room_cards_by_aid.map[aid]] %}
+    {% endif %}
+  {% endfor %}
+  {% if other_cards.list | length > 0 %}
     {% set ns.cards = ns.cards + [expander_defaults | combine({
       'type': 'custom:expander-card',
-      'expand-id': 'home-floor-sonstige',
-      'title-card': {
+      'expand-id': 'home-floor-andere',
+      'title-card': title_card_mod | combine({
         'type': 'custom:button-card',
         'template': 'card_title',
-        'name': 'Sonstige'
-      },
+        'name': 'Andere Bereiche'
+      }),
       'cards': [{
         'type': 'custom:layout-card',
         'layout_type': 'custom:grid-layout',
@@ -238,7 +262,7 @@
             }
           }
         },
-        'cards': sonstige_cards
+        'cards': other_cards.list
       }]
     })] %}
   {% endif %}

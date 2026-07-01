@@ -1,0 +1,161 @@
+|
+  {# Zusätzliche Status-Sensoren per Label steuern (Einstellungen → Labels):
+     Label „Dashboard Status“         → Entity erscheint als Status-Kachel
+     Label „Dashboard Status · energie“ → + Tippen öffnet /home-dashboard/energie
+     Pfade: energie, netzwerk, kalender, dreame, sicherheit, einstellungen
+     Ohne Label: Solar, Speicher, Router (Standard).
+     To-dos, Müll und Kalender werden immer angezeigt. #}
+  {% macro entity_hue(eid, hues) -%}
+    {%- set slug = eid.split('.')[1] | default('') -%}
+    {%- set hash = namespace(v=0) -%}
+    {%- for ch in slug -%}
+      {%- set hash.v = (hash.v * 31 + loop.index0) -%}
+    {%- endfor -%}
+    {%- set hash.v = hash.v + (slug | length) * 17 -%}
+    {{- hues[hash.v % (hues | length)] -}}
+  {%- endmacro %}
+  {% macro days_until(sensor_id) %}
+    {% set state = states(sensor_id) %}
+    {% if state not in ['unknown', 'unavailable', 'Nicht verfügbar'] and state is string and '.' in state %}
+      {% set date_str = state.split(' ') | last %}
+      {% set target_date = strptime(date_str, '%d.%m.%Y', none) %}
+      {% if target_date is not none %}
+        {% set target_str = target_date.strftime('%Y-%m-%d') %}
+        {% set today = now().strftime('%Y-%m-%d') %}
+        {{ ((as_timestamp(target_str) - as_timestamp(today)) / 86400) | int }}
+      {% else %}99{% endif %}
+    {% else %}99{% endif %}
+  {% endmacro %}
+  {% set hues = [
+    'blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey',
+    'orange', 'teal', 'cyan', 'indigo', 'lime', 'brown',
+    'deep_orange', 'amber', 'light_blue', 'deep_purple'
+  ] %}
+  {% set sensors = namespace(list=[], seen=[], has_labels=false) %}
+  {% for lid in labels() %}
+    {% set lname = label_name(lid) %}
+    {% if lname | regex_findall('(?i)^dashboard\\s+status') | length > 0 %}
+      {% set sensors.has_labels = true %}
+      {% set nav = namespace(v='') %}
+      {% set sfx = lname | regex_findall('(?i)^dashboard\\s+status\\s*[·•|]\\s*(.+)\\s*$') %}
+      {% if sfx | length > 0 %}
+        {% set nav.v = sfx[0] | trim %}
+      {% endif %}
+      {% for eid in label_entities(lid) | sort %}
+        {% if eid not in sensors.seen and not is_hidden_entity(eid) and not eid.startswith('todo.') and not eid.startswith('calendar.') %}
+          {% if states(eid) not in ['unavailable', 'unknown'] %}
+            {% set sensors.seen = sensors.seen + [eid] %}
+            {% set sensors.list = sensors.list + [{'eid': eid, 'nav': nav.v}] %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {% if not sensors.has_labels %}
+    {% set sensors.list = [
+      {'eid': 'sensor.pv_pv_power', 'nav': 'energie', 'name': 'Solar', 'icon': 'mdi:weather-sunny'},
+      {'eid': 'sensor.pv_battery', 'nav': 'energie', 'name': 'Speicher', 'icon': 'mdi:battery-high'},
+      {'eid': 'sensor.speedtest_download', 'nav': 'netzwerk', 'name': 'Router', 'icon': 'mdi:router-wireless'}
+    ] %}
+  {% endif %}
+  {% set ns = namespace(cards=[]) %}
+  {% for item in sensors.list | sort(attribute='eid') %}
+    {% set eid = item.eid %}
+    {% set hue = entity_hue(eid, hues) %}
+    {% set nav_raw = item.nav | default('') | trim | lower %}
+    {% set tap_action = {'action': 'more-info'} %}
+    {% if nav_raw and nav_raw not in ['none', 'more-info', 'more_info'] %}
+      {% if nav_raw.startswith('/home-dashboard/') or nav_raw.startswith('/') %}
+        {% set tap_action = {'action': 'navigate', 'navigation_path': nav_raw} %}
+      {% else %}
+        {% set tap_action = {'action': 'navigate', 'navigation_path': '/home-dashboard/' ~ nav_raw} %}
+      {% endif %}
+    {% endif %}
+    {% set card = {
+      'type': 'custom:button-card',
+      'template': ['status_tile_' ~ hue, 'status_tile_sensor'],
+      'entity': eid,
+      'tap_action': tap_action
+    } %}
+    {% if item.name is defined %}
+      {% set card = card | combine({'name': item.name}) %}
+    {% endif %}
+    {% if item.icon is defined %}
+      {% set card = card | combine({'icon': item.icon}) %}
+    {% endif %}
+    {% set ns.cards = ns.cards + [card] %}
+  {% endfor %}
+  {% for e in states.todo | sort(attribute='entity_id') %}
+    {% set eid = e.entity_id %}
+    {% if states(eid) not in ['unavailable', 'unknown'] and not is_hidden_entity(eid) %}
+      {% set hue = entity_hue(eid, hues) %}
+      {% set ns.cards = ns.cards + [{
+        'type': 'custom:button-card',
+        'template': 'status_tile_' ~ hue,
+        'entity': eid,
+        'name': state_attr(eid, 'friendly_name') or eid,
+        'tap_action': {
+          'action': 'navigate',
+          'navigation_path': '/todo?entity_id=' ~ eid
+        }
+      }] %}
+    {% endif %}
+  {% endfor %}
+  {% set bins = [
+    {'id': 'sensor.waste_collection_schedule_restabfall_14_taglich', 'name': 'Restmüll'},
+    {'id': 'sensor.waste_collection_schedule_bioabfall_14_taglich', 'name': 'Bio'},
+    {'id': 'sensor.waste_collection_schedule_papiertonne_monatlich', 'name': 'Papier'},
+    {'id': 'sensor.waste_collection_schedule_gelber_sack_14_taglich', 'name': 'Gelber Sack'}
+  ] %}
+  {% set heute = namespace(list=[]) %}
+  {% set naechste = namespace(name='', days=99) %}
+  {% set any_available = namespace(v=false) %}
+  {% for b in bins %}
+    {% if states(b.id) not in ['unknown', 'unavailable'] %}
+      {% set any_available.v = true %}
+      {% set d = days_until(b.id) | int %}
+      {% if d == 0 %}
+        {% set heute.list = heute.list + [b.name] %}
+      {% endif %}
+      {% if d >= 0 and d < naechste.days %}
+        {% set naechste.days = d %}
+        {% set naechste.name = b.name %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if not any_available.v %}
+    {% set mull_label = 'Keine Termine' %}
+  {% elif heute.list | length > 0 %}
+    {% set mull_label = 'Heute: ' ~ (heute.list | join(', ')) %}
+  {% elif naechste.days == 1 %}
+    {% set mull_label = 'Morgen: ' ~ naechste.name %}
+  {% elif naechste.days < 99 %}
+    {% set mull_label = naechste.name ~ ' in ' ~ naechste.days ~ ' Tagen' %}
+  {% else %}
+    {% set mull_label = 'Keine Termine' %}
+  {% endif %}
+  {% set mull_entity = bins[0].id %}
+  {% set mull_hue = entity_hue(mull_entity, hues) %}
+  {% set ns.cards = ns.cards + [{
+    'type': 'custom:button-card',
+    'template': ['status_tile_' ~ mull_hue, 'status_tile_mull_label'],
+    'entity': mull_entity,
+    'name': 'Müll',
+    'icon': 'mdi:trash-can-outline',
+    'label': mull_label,
+    'show_label': true
+  }] %}
+  {% set cal = 'calendar.thorge_3_laura' %}
+  {% set cal_hue = entity_hue(cal, hues) %}
+  {% set ns.cards = ns.cards + [{
+    'type': 'custom:button-card',
+    'template': ['status_tile_' ~ cal_hue, 'status_tile_calendar_label'],
+    'entity': cal,
+    'name': 'Kalender',
+    'icon': 'mdi:calendar',
+    'tap_action': {
+      'action': 'navigate',
+      'navigation_path': '/home-dashboard/kalender'
+    }
+  }] %}
+  {{ ns.cards }}

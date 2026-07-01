@@ -47,10 +47,10 @@
       expanded: true
       clear: true
       clear-children: false
-      gap: 14px
+      gap: 20px
       padding: 0
       child-padding: 0
-      title-card-padding: 0
+      title-card-padding: 0 0 4px 0
       title-card-button-overlay: true
       overlay-margin: 4px
       button-background: transparent
@@ -69,6 +69,11 @@
         type: custom:button-card
         template: card_title
         name: Szenen
+        card_mod:
+          style: |
+            ha-card {
+              margin-bottom: 6px !important;
+            }
       cards:
         - type: vertical-stack
           cards: !include home-scenes-block.yaml
@@ -78,10 +83,10 @@
       expanded: true
       clear: true
       clear-children: false
-      gap: 14px
+      gap: 20px
       padding: 0
       child-padding: 0
-      title-card-padding: 0
+      title-card-padding: 0 0 4px 0
       title-card-button-overlay: true
       overlay-margin: 4px
       button-background: transparent
@@ -100,6 +105,11 @@
         type: custom:button-card
         template: card_title
         name: Status
+        card_mod:
+          style: |
+            ha-card {
+              margin-bottom: 6px !important;
+            }
       cards:
         - type: vertical-stack
           cards: !include home-status-block.yaml
