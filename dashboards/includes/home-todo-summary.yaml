@@ -5,34 +5,34 @@
     action: navigate
     navigation_path: /todo
 
-- type: markdown
-  content: |
-    {% set sensor_id = 'sensor.dashboard_todo_zusammenfassung' %}
-    {% if states(sensor_id) in ['unavailable', 'unknown'] %}
-    *To-do-Zusammenfassung wird geladen…*
-    {% else %}
-    {% set items = state_attr(sensor_id, 'items') or [] %}
-    {% if items | length == 0 %}
-    *Keine offenen Aufgaben*
-    {% else %}
-    {% for item in items[:10] %}
-    - [{{ item.summary }}]({{ '/todo?entity_id=' ~ item.entity_id }}) · {{ item.list_name }}
-    {% endfor %}
-    {% endif %}
-    {% endif %}
-  card_mod:
-    style: |
-      ha-card {
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        padding: 12px 16px;
-        font-size: 14px;
-        line-height: 1.45;
+- type: custom:button-card
+  show_icon: false
+  show_name: false
+  show_label: true
+  label: |
+    [[[
+      const s = hass.states['sensor.dashboard_todo_zusammenfassung'];
+      if (!s || s.state === 'unavailable' || s.state === 'unknown') {
+        return 'To-do-Zusammenfassung wird geladen…';
       }
-      ha-card a {
-        color: var(--primary-color);
-        text-decoration: none;
-      }
-      ha-card a:hover {
-        text-decoration: underline;
-      }
+      return s.attributes?.text || 'Keine offenen Aufgaben';
+    ]]]
+  styles:
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 12px 16px
+      - white-space: pre-wrap
+      - text-align: left
+      - font-size: 14px
+      - line-height: 1.45
+    label:
+      - justify-self: start
+      - text-align: left
+      - white-space: pre-wrap
+      - font-size: 14px
+      - font-weight: 400
+      - opacity: 0.9
+  tap_action:
+    action: navigate
+    navigation_path: /todo

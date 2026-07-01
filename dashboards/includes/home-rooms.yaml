@@ -17,7 +17,9 @@ filter:
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
     {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
     {% set palette_hues = ['yellow', 'pink', 'red', 'purple', 'grey', 'blue', 'green'] %}
-    {% set room_active_styles = "[[[ const aid = variables.ulm_room_area_id; const c = variables.ulm_room_color; if (!aid || !c) return ''; const isActive = (id) => { const e = hass.entities[id]; if (!e || e.hidden || e.area_id !== aid) return false; const st = hass.states[id]; if (!st) return false; const s = st.state; if (s === 'unavailable' || s === 'unknown') return false; if (id.startsWith('light.') || id.startsWith('switch.') || id.startsWith('fan.')) return s === 'on'; if (id.startsWith('climate.')) { const h = st.attributes?.hvac_action; if (h && !['idle', 'off'].includes(h)) return true; return s && s !== 'off'; } if (id.startsWith('cover.')) return s !== 'closed'; return false; }; const on = Object.keys(hass.states).some(isActive); if (on) { return `#card { background-color: rgba(var(--color-background-${c}), var(--opacity-bg)); }`; } return `#card { opacity: 0.68; } #name, #label { opacity: 0.55; } #img-cell { opacity: 0.42; }`; ]]]" %}
+    {% set glow_card = "[[[ const aid = variables.ulm_room_area_id; const c = variables.ulm_room_color; if (!aid || !c) return null; const glow = Object.keys(hass.states).some((id) => { const e = hass.entities[id]; return id.startsWith('light.') && e && e.area_id === aid && !e.hidden && hass.states[id]?.state === 'on'; }); if (!glow) return null; return `background-color: rgba(var(--color-background-${c}), var(--opacity-bg)); box-shadow: 0 0 24px rgba(var(--color-${c}), 0.5);`; ]]]" %}
+    {% set glow_icon = "[[[ const aid = variables.ulm_room_area_id; const c = variables.ulm_room_color; if (!aid || !c) return `color: rgba(var(--color-theme), 0.35);`; const glow = Object.keys(hass.states).some((id) => { const e = hass.entities[id]; return id.startsWith('light.') && e && e.area_id === aid && !e.hidden && hass.states[id]?.state === 'on'; }); return glow ? `color: rgba(var(--color-${c}), 1);` : `color: rgba(var(--color-${c}), 0.4);`; ]]]" %}
+    {% set glow_img = "[[[ const aid = variables.ulm_room_area_id; const c = variables.ulm_room_color; if (!aid || !c) return `background-color: rgba(var(--color-theme), 0.06);`; const glow = Object.keys(hass.states).some((id) => { const e = hass.entities[id]; return id.startsWith('light.') && e && e.area_id === aid && !e.hidden && hass.states[id]?.state === 'on'; }); return glow ? `background-color: rgba(var(--color-${c}), 0.42);` : `background-color: rgba(var(--color-${c}), 0.14);`; ]]]" %}
     {% set ns = namespace(cards=[], sorted=[]) %}
     {% for aid in areas() %}
       {% set ns.sorted = ns.sorted + [{'aid': aid, 'name': area_name(aid)}] %}
@@ -27,8 +29,13 @@ filter:
       {% set aname = item.name %}
       {% if aname %}
         {% set picked = namespace(e=none) %}
+        {% for e in states.light | sort(attribute='entity_id') %}
+          {% if picked.e is none and area_id(e.entity_id) == aid and not is_hidden_entity(e.entity_id) %}
+            {% set picked.e = e.entity_id %}
+          {% endif %}
+        {% endfor %}
         {% for domain in domains %}
-          {% if picked.e is none %}
+          {% if picked.e is none and domain != 'light' %}
             {% for e in states[domain] | sort(attribute='entity_id') %}
               {% if area_id(e.entity_id) == aid and not is_hidden_entity(e.entity_id) %}
                 {% set picked.e = e.entity_id %}
@@ -121,7 +128,11 @@ filter:
             'name': aname,
             'icon': icon,
             'double_tap_action': {'action': 'none'},
-            'extra_styles': room_active_styles,
+            'styles': {
+              'card': [glow_card],
+              'icon': [glow_icon],
+              'img_cell': [glow_img]
+            },
             'tap_action': {
               'action': 'call-service',
               'service': 'script.turn_on',

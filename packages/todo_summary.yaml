@@ -64,3 +64,25 @@ template:
               {% endif %}
             {% endfor %}
             {{ ns.items }}
+          text: >
+            {% set ns = namespace(items=[]) %}
+            {% for eid in todo_entities %}
+              {% if eid in todo_items and ns.items | length < 10 %}
+                {% for item in todo_items[eid]['items'] %}
+                  {% if ns.items | length < 10 %}
+                    {% set ns.items = ns.items + [{
+                      'summary': item.summary | default(''),
+                      'entity_id': eid,
+                      'list_name': state_attr(eid, 'friendly_name') | default(eid)
+                    }] %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            {% if ns.items | length == 0 %}
+            *Keine offenen Aufgaben*
+            {% else %}
+            {% for item in ns.items %}
+            - {{ item.summary }} · _{{ item.list_name }}_
+            {% endfor %}
+            {% endif %}
