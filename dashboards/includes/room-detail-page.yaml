@@ -64,15 +64,25 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(ids=[]) %}
+              {% set ns = namespace(cards=[]) %}
               {% for eid in area_entities(target) %}
                 {% if eid.startswith('scene.') %}
-                  {% set ns.ids = ns.ids + [eid] %}
+                  {% set ns.cards = ns.cards + [{
+                    'type': 'custom:button-card',
+                    'template': 'card_vertical_button',
+                    'entity': eid,
+                    'show_name': true,
+                    'show_state': false,
+                    'tap_action': {
+                      'action': 'call-service',
+                      'service': 'scene.turn_on',
+                      'target': {'entity_id': eid}
+                    }
+                  }] %}
                 {% endif %}
               {% endfor %}
-              {{ ns.ids }}
+              {{ ns.cards }}
             {% endif %}
-        options: !include scene-button-room.yaml
 
       - type: custom:button-card
         template: card_title
@@ -94,26 +104,38 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(ids=[]) %}
+              {% set ns = namespace(cards=[]) %}
+              {% set light_icons = [
+                'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
+                'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
+                'mdi:led-strip', 'mdi:lamps'
+              ] %}
               {% for eid in area_entities(target) %}
                 {% if eid.startswith('light.') %}
-                  {% set ns.ids = ns.ids + [eid] %}
+                  {% set ns.cards = ns.cards + [{
+                    'type': 'custom:mushroom-light-card',
+                    'entity': eid,
+                    'fill_container': true,
+                    'show_brightness_control': true,
+                    'use_light_color': true
+                  }] %}
+                {% elif eid.startswith('switch.') %}
+                  {% set e = states[eid] %}
+                  {% set eid_lower = eid | lower %}
+                  {% set icon = e.attributes.icon | default('') %}
+                  {% if 'licht' in eid_lower or 'light' in eid_lower or icon in light_icons %}
+                    {% set ns.cards = ns.cards + [{
+                      'type': 'custom:mushroom-light-card',
+                      'entity': eid,
+                      'fill_container': true,
+                      'show_brightness_control': true,
+                      'use_light_color': true
+                    }] %}
+                  {% endif %}
                 {% endif %}
               {% endfor %}
-              {{ ns.ids }}
+              {{ ns.cards }}
             {% endif %}
-        options:
-          type: custom:mushroom-light-card
-          entity: this.entity_id
-          fill_container: true
-          show_brightness_control: true
-          use_light_color: true
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
 
       - type: custom:button-card
         template: card_title
@@ -134,7 +156,7 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(ids=[]) %}
+              {% set ns = namespace(cards=[]) %}
               {% set light_icons = [
                 'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
                 'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
@@ -146,21 +168,16 @@
                   {% set eid_lower = eid | lower %}
                   {% set icon = e.attributes.icon | default('') %}
                   {% if not ('licht' in eid_lower or 'light' in eid_lower or icon in light_icons) %}
-                    {% set ns.ids = ns.ids + [eid] %}
+                    {% set ns.cards = ns.cards + [{
+                      'type': 'custom:button-card',
+                      'template': 'card_power_outlet',
+                      'entity': eid
+                    }] %}
                   {% endif %}
                 {% endif %}
               {% endfor %}
-              {{ ns.ids }}
+              {{ ns.cards }}
             {% endif %}
-        options:
-          type: custom:button-card
-          template: card_power_outlet
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
 
       - type: custom:button-card
         template: card_title
@@ -181,19 +198,25 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(ids=[]) %}
+              {% set ns = namespace(cards=[]) %}
               {% for eid in area_entities(target) %}
                 {% if eid.startswith('climate.') %}
-                  {% set ns.ids = ns.ids + [eid] %}
+                  {% set ns.cards = ns.cards + [{
+                    'type': 'custom:button-card',
+                    'template': 'card_thermostat',
+                    'entity': eid,
+                    'variables': {
+                      'ulm_card_thermostat_enable_collapse': false,
+                      'ulm_card_thermostat_enable_controls': true,
+                      'ulm_card_thermostat_enable_hvac_modes': true,
+                      'ulm_card_thermostat_enable_popup': true,
+                      'ulm_card_thermostat_enable_background_color': false
+                    }
+                  }] %}
                 {% endif %}
               {% endfor %}
-              {{ ns.ids }}
+              {{ ns.cards }}
             {% endif %}
-        options:
-          type: tile
-          features:
-            - type: climate-hvac-modes
-            - type: climate-temperature
 
       - type: custom:button-card
         template: card_title
@@ -214,7 +237,7 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(ids=[]) %}
+              {% set ns = namespace(cards=[], ids=[]) %}
               {% for eid in area_entities(target) %}
                 {% if eid.startswith('script.') %}
                   {% set ns.ids = ns.ids + [eid] %}
@@ -229,20 +252,17 @@
               {% elif target == 'flur_eg' %}
                 {% set ns.ids = ns.ids + ['script.dreame_reinigen_flur_eg'] %}
               {% endif %}
-              {{ ns.ids | unique | list }}
+              {% for eid in ns.ids | unique %}
+                {% set ns.cards = ns.cards + [{
+                  'type': 'custom:button-card',
+                  'template': 'card_vertical_button',
+                  'entity': eid,
+                  'tap_action': {
+                    'action': 'call-service',
+                    'service': 'script.turn_on',
+                    'target': {'entity_id': eid}
+                  }
+                }] %}
+              {% endfor %}
+              {{ ns.cards }}
             {% endif %}
-        options:
-          type: custom:button-card
-          template: card_vertical_button
-          entity: this.entity_id
-          card_mod:
-            style: |
-              ha-card {
-                border-radius: 20px;
-                overflow: hidden;
-              }
-          tap_action:
-            action: call-service
-            service: script.turn_on
-            target:
-              entity_id: this.entity_id
