@@ -25,3 +25,65 @@ template:
           {% else %}
             0
           {% endif %}
+
+  - trigger:
+      - platform: state
+        entity_id:
+          - sensor.waste_collection_schedule_restabfall_14_taglich
+          - sensor.waste_collection_schedule_bioabfall_14_taglich
+          - sensor.waste_collection_schedule_papiertonne_monatlich
+          - sensor.waste_collection_schedule_gelber_sack_14_taglich
+      - platform: time
+        at: "00:05:00"
+      - platform: homeassistant
+        event: start
+    sensor:
+      - name: Dashboard Müll Status
+        unique_id: dashboard_mull_status
+        icon: mdi:trash-can-outline
+        state: >
+          {% macro days_until(sensor_id) %}
+            {% set state = states(sensor_id) %}
+            {% if state not in ['unknown', 'unavailable', 'Nicht verfügbar'] and state is string and '.' in state %}
+              {% set date_str = state.split(' ') | last %}
+              {% set target_date = strptime(date_str, '%d.%m.%Y', none) %}
+              {% if target_date is not none %}
+                {% set target_str = target_date.strftime('%Y-%m-%d') %}
+                {% set today = now().strftime('%Y-%m-%d') %}
+                {{ ((as_timestamp(target_str) - as_timestamp(today)) / 86400) | int }}
+              {% else %}99{% endif %}
+            {% else %}99{% endif %}
+          {% endmacro %}
+          {% set bins = [
+            {'id': 'sensor.waste_collection_schedule_restabfall_14_taglich', 'name': 'Restmüll'},
+            {'id': 'sensor.waste_collection_schedule_bioabfall_14_taglich', 'name': 'Bio'},
+            {'id': 'sensor.waste_collection_schedule_papiertonne_monatlich', 'name': 'Papier'},
+            {'id': 'sensor.waste_collection_schedule_gelber_sack_14_taglich', 'name': 'Gelber Sack'}
+          ] %}
+          {% set heute = namespace(list=[]) %}
+          {% set naechste = namespace(name='', days=99) %}
+          {% set any_available = namespace(v=false) %}
+          {% for b in bins %}
+            {% if states(b.id) not in ['unknown', 'unavailable'] %}
+              {% set any_available.v = true %}
+              {% set d = days_until(b.id) | int %}
+              {% if d == 0 %}
+                {% set heute.list = heute.list + [b.name] %}
+              {% endif %}
+              {% if d >= 0 and d < naechste.days %}
+                {% set naechste.days = d %}
+                {% set naechste.name = b.name %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% if not any_available.v %}
+            Keine Termine
+          {% elif heute.list | length > 0 %}
+            Heute: {{ heute.list | join(', ') }}
+          {% elif naechste.days == 1 %}
+            Morgen: {{ naechste.name }}
+          {% elif naechste.days < 99 %}
+            {{ naechste.name }} in {{ naechste.days }} Tagen
+          {% else %}
+            Keine Termine
+          {% endif %}

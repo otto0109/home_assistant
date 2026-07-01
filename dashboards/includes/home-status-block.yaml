@@ -146,6 +146,23 @@
           }] %}
         {% endif %}
       {% endfor %}
+      {% set mull = 'sensor.dashboard_mull_status' %}
+      {% if mull in states %}
+        {% set slug = mull.split('.')[1] | default('') %}
+        {% set hash = namespace(v=0) %}
+        {% for ch in slug %}
+          {% set hash.v = (hash.v * 31 + loop.index0) %}
+        {% endfor %}
+        {% set hash.v = hash.v + (slug | length) * 17 %}
+        {% set mull_hue = hues[hash.v % (hues | length)] %}
+        {% set ns.cards = ns.cards + [{
+          'type': 'custom:button-card',
+          'template': ['status_tile_' ~ mull_hue, 'status_tile_mull_label'],
+          'entity': mull,
+          'name': 'Müll',
+          'icon': 'mdi:trash-can-outline'
+        }] %}
+      {% endif %}
       {% set cal = 'calendar.thorge_3_laura' %}
       {% set slug = cal.split('.')[1] | default('') %}
       {% set hash = namespace(v=0) %}

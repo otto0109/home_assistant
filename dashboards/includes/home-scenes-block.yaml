@@ -19,7 +19,7 @@
       ] %}
       {% for e in states.scene | sort(attribute='friendly_name') %}
         {% set eid = e.entity_id %}
-        {% if states(eid) != 'unavailable' %}
+        {% if states(eid) != 'unavailable' and not is_hidden_entity(eid) %}
           {% set slug = eid.split('.')[1] | default('') %}
           {% set hash = namespace(v=0) %}
           {% for ch in slug %}
