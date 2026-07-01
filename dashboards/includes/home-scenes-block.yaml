@@ -2,7 +2,6 @@
   template: card_title
   name: Szenen
 
-# Nur explizit gelistete Szenen (scenes.yaml). Weitere Karten unten manuell ergänzen.
 - type: custom:auto-entities
   show_empty: false
   card:
@@ -13,17 +12,14 @@
   filter:
     template: |
       {% set ns = namespace(cards=[]) %}
-      {% set scene_ids = [
-        'scene.wohnzimmer_volle_beluechtung',
-        'scene.wohnzimmer_fehrnsehen'
-      ] %}
       {% set hues = [
         'blue', 'pink', 'yellow', 'green', 'red', 'purple', 'grey',
         'orange', 'teal', 'cyan', 'indigo', 'lime', 'brown',
         'deep_orange', 'amber', 'light_blue', 'deep_purple'
       ] %}
-      {% for eid in scene_ids %}
-        {% if eid in states and states(eid) != 'unavailable' %}
+      {% for e in states.scene | sort(attribute='friendly_name') %}
+        {% set eid = e.entity_id %}
+        {% if states(eid) != 'unavailable' %}
           {% set slug = eid.split('.')[1] | default('') %}
           {% set hash = namespace(v=0) %}
           {% for ch in slug %}
@@ -45,17 +41,6 @@
         {% endif %}
       {% endfor %}
       {{ ns.cards }}
-
-# Beispiel Esszimmer (Entity-ID anpassen, Template-Farbe frei wählen):
-# - type: custom:button-card
-#   template: scene_tile_pink
-#   entity: scene.deine_esszimmer_szene
-#   name: Esszimmer
-#   tap_action:
-#     action: perform-action
-#     perform_action: scene.turn_on
-#     target:
-#       entity_id: scene.deine_esszimmer_szene
 
 - type: custom:button-card
   name: Alle aus
