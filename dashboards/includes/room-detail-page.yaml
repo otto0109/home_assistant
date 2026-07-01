@@ -2,61 +2,33 @@
   card_mod:
     style: |
       ha-card {
-        margin: 16px auto 24px auto;
+        margin: 16px auto 32px auto;
         max-width: 720px;
         background: transparent !important;
         box-shadow: none !important;
         border: none !important;
       }
       #root {
-        gap: 14px;
+        gap: 18px;
       }
   card:
     type: vertical-stack
     cards:
       - type: custom:button-card
         template: card_title
-        name: Zurück
-        icon: mdi:arrow-left
+        name: "[[[ const a = states['input_text.dashboard_active_area']?.state?.trim(); if (!a || a === 'unknown' || a === 'unavailable') return 'Raum'; return hass.areas[a]?.name || 'Raum'; ]]]"
+        label: Zurück zur Übersicht
+        icon: "[[[ const a = states['input_text.dashboard_active_area']?.state?.trim(); return (a && hass.areas[a]?.icon) || 'mdi:door-open'; ]]]"
         tap_action:
           action: navigate
           navigation_path: home
-
-      - type: markdown
-        content: |
-          {% set aid = states('input_text.dashboard_active_area') | trim %}
-          {% if aid in ['unknown', 'unavailable', ''] %}
-          ## Raum
-          > Bitte von der Übersicht eine Raumkachel antippen.
-          {% else %}
-          ## {{ area_name(aid) }}
-          {% endif %}
-        card_mod:
-          style: |
-            ha-card {
-              background: transparent !important;
-              box-shadow: none !important;
-              border: none !important;
-              padding: 0 0 4px 0;
-            }
-            h2 {
-              margin: 0;
-              font-size: 1.35rem;
-              font-weight: 600;
-            }
-
-      - type: custom:button-card
-        template: card_title
-        name: Szenen
 
       - type: custom:auto-entities
         show_empty: false
         sort:
           method: friendly_name
         card:
-          type: grid
-          columns: 2
-          square: false
+          type: vertical-stack
         card_param: cards
         filter:
           template: |
@@ -64,15 +36,59 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(cards=[]) %}
-              {% for eid in area_entities(target) %}
-                {% if eid.startswith('scene.') %}
-                  {% set ns.cards = ns.cards + [{
+              {% set prefixes = [target] %}
+              {% if target == 'kueche' %}
+                {% set prefixes = prefixes + ['raum_neben_der_kuche'] %}
+              {% elif target == 'raum_neben_der_kuche' %}
+                {% set prefixes = prefixes + ['kueche'] %}
+              {% endif %}
+              {% set scene_cards = namespace(list=[]) %}
+              {% for e in states.scene %}
+                {% set eid = e.entity_id %}
+                {% set match = namespace(v=false) %}
+                {% if area_id(eid) == target %}
+                  {% set match.v = true %}
+                {% else %}
+                  {% for p in prefixes %}
+                    {% if eid.startswith('scene.' + p + '_') or eid == 'scene.' + p %}
+                      {% set match.v = true %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+                {% if match.v and not is_hidden_entity(eid) %}
+                  {% set scene_cards.list = scene_cards.list + [{
                     'type': 'custom:button-card',
-                    'template': 'card_vertical_button',
                     'entity': eid,
                     'show_name': true,
+                    'show_icon': true,
                     'show_state': false,
+                    'show_label': false,
+                    'styles': {
+                      'card': [
+                        {'border-radius': 'var(--border-radius)'},
+                        {'box-shadow': 'var(--box-shadow)'},
+                        {'padding': '14px 0 10px'}
+                      ],
+                      'grid': [
+                        {'grid-template-areas': "'i' 'n'"}
+                      ],
+                      'name': [
+                        {'justify-self': 'center'},
+                        {'font-weight': 'bold'},
+                        {'font-size': '15px'},
+                        {'margin-top': '12px'}
+                      ],
+                      'img_cell': [
+                        {'width': '50px'},
+                        {'height': '50px'},
+                        {'border-radius': '50%'},
+                        {'background-color': 'rgba(var(--color-yellow), 0.2)'}
+                      ],
+                      'icon': [
+                        {'color': 'rgba(var(--color-yellow), 1)'},
+                        {'width': '24px'}
+                      ]
+                    },
                     'tap_action': {
                       'action': 'call-service',
                       'service': 'scene.turn_on',
@@ -81,22 +97,28 @@
                   }] %}
                 {% endif %}
               {% endfor %}
-              {{ ns.cards }}
+              {% if scene_cards.list | length > 0 %}
+                {{ [
+                  {'type': 'custom:button-card', 'template': 'card_title', 'name': 'Szenen'},
+                  {
+                    'type': 'custom:layout-card',
+                    'layout_type': 'custom:grid-layout',
+                    'layout': {
+                      'grid-template-columns': 'repeat(2, 1fr)',
+                      'grid-gap': '12px'
+                    },
+                    'cards': scene_cards.list
+                  }
+                ] }}
+              {% else %}
+                []
+              {% endif %}
             {% endif %}
-
-      - type: custom:button-card
-        template: card_title
-        name: Beleuchtung
 
       - type: custom:auto-entities
         show_empty: false
-        unique: true
-        sort:
-          method: friendly_name
         card:
-          type: grid
-          columns: 1
-          square: false
+          type: vertical-stack
         card_param: cards
         filter:
           template: |
@@ -104,165 +126,176 @@
             {% if target in ['unknown', 'unavailable', ''] %}
               []
             {% else %}
-              {% set ns = namespace(cards=[]) %}
+              {% set cfg_id = [
+                '_netzwerk', '_network', '_turbo', '_relais', '_relay', '_detach',
+                '_inching', '_child_lock', '_rssi', '_ssid', '_startup', '_sensitivity'
+              ] %}
+              {% set cfg_fn = [
+                'netzwerk', 'network', 'turbo', 'relais', 'relay', 'detach', 'abtrennen',
+                'inching', 'child lock', 'rssi', 'ssid', 'startup', 'sensitivity'
+              ] %}
               {% set light_icons = [
                 'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
                 'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
                 'mdi:led-strip', 'mdi:lamps'
               ] %}
+              {% set card_round = 'ha-card { border-radius: 20px; overflow: hidden; }' %}
+              {% set out = namespace(cards=[]) %}
+
+              {% set vis = namespace(ids=[]) %}
               {% for eid in area_entities(target) %}
+                {% set el = eid | lower %}
+                {% set fn = state_attr(eid, 'friendly_name') | default('') | lower %}
+                {% set ok = namespace(v=true) %}
+                {% if is_hidden_entity(eid) %}
+                  {% set ok.v = false %}
+                {% endif %}
+                {% for t in cfg_id %}
+                  {% if t in el %}
+                    {% set ok.v = false %}
+                  {% endif %}
+                {% endfor %}
+                {% for t in cfg_fn %}
+                  {% if t in fn %}
+                    {% set ok.v = false %}
+                  {% endif %}
+                {% endfor %}
+                {% if ok.v %}
+                  {% set vis.ids = vis.ids + [eid] %}
+                {% endif %}
+              {% endfor %}
+
+              {% set light_cards = namespace(list=[]) %}
+              {% set has_light_domain = namespace(v=false) %}
+              {% for eid in vis.ids %}
                 {% if eid.startswith('light.') %}
-                  {% set ns.cards = ns.cards + [{
-                    'type': 'custom:mushroom-light-card',
-                    'entity': eid,
-                    'fill_container': true,
-                    'show_brightness_control': true,
-                    'use_light_color': true
-                  }] %}
-                {% elif eid.startswith('switch.') %}
-                  {% set e = states[eid] %}
-                  {% set eid_lower = eid | lower %}
-                  {% set icon = e.attributes.icon | default('') %}
-                  {% if 'licht' in eid_lower or 'light' in eid_lower or icon in light_icons %}
-                    {% set ns.cards = ns.cards + [{
+                  {% set has_light_domain.v = true %}
+                  {% set light_cards.list = light_cards.list + [{
+                    'type': 'custom:mod-card',
+                    'card_mod': {'style': card_round},
+                    'card': {
                       'type': 'custom:mushroom-light-card',
                       'entity': eid,
                       'fill_container': true,
                       'show_brightness_control': true,
                       'use_light_color': true
-                    }] %}
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-              {{ ns.cards }}
-            {% endif %}
-
-      - type: custom:button-card
-        template: card_title
-        name: Schalter
-
-      - type: custom:auto-entities
-        show_empty: false
-        sort:
-          method: friendly_name
-        card:
-          type: grid
-          columns: 1
-          square: false
-        card_param: cards
-        filter:
-          template: |
-            {% set target = states('input_text.dashboard_active_area') | trim %}
-            {% if target in ['unknown', 'unavailable', ''] %}
-              []
-            {% else %}
-              {% set ns = namespace(cards=[]) %}
-              {% set light_icons = [
-                'mdi:ceiling-light', 'mdi:lightbulb', 'mdi:lightbulb-on', 'mdi:lightbulb-outline',
-                'mdi:floor-lamp', 'mdi:wall-sconce', 'mdi:chandelier', 'mdi:track-light',
-                'mdi:led-strip', 'mdi:lamps'
-              ] %}
-              {% for eid in area_entities(target) %}
-                {% if eid.startswith('switch.') %}
-                  {% set e = states[eid] %}
-                  {% set eid_lower = eid | lower %}
-                  {% set icon = e.attributes.icon | default('') %}
-                  {% if not ('licht' in eid_lower or 'light' in eid_lower or icon in light_icons) %}
-                    {% set ns.cards = ns.cards + [{
-                      'type': 'custom:button-card',
-                      'template': 'card_power_outlet',
-                      'entity': eid
-                    }] %}
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-              {{ ns.cards }}
-            {% endif %}
-
-      - type: custom:button-card
-        template: card_title
-        name: Klima
-
-      - type: custom:auto-entities
-        show_empty: false
-        sort:
-          method: friendly_name
-        card:
-          type: grid
-          columns: 1
-          square: false
-        card_param: cards
-        filter:
-          template: |
-            {% set target = states('input_text.dashboard_active_area') | trim %}
-            {% if target in ['unknown', 'unavailable', ''] %}
-              []
-            {% else %}
-              {% set ns = namespace(cards=[]) %}
-              {% for eid in area_entities(target) %}
-                {% if eid.startswith('climate.') %}
-                  {% set ns.cards = ns.cards + [{
-                    'type': 'custom:button-card',
-                    'template': 'card_thermostat',
-                    'entity': eid,
-                    'variables': {
-                      'ulm_card_thermostat_enable_collapse': false,
-                      'ulm_card_thermostat_enable_controls': true,
-                      'ulm_card_thermostat_enable_hvac_modes': true,
-                      'ulm_card_thermostat_enable_popup': true,
-                      'ulm_card_thermostat_enable_background_color': false
                     }
                   }] %}
                 {% endif %}
               {% endfor %}
-              {{ ns.cards }}
-            {% endif %}
+              {% for eid in vis.ids %}
+                {% if eid.startswith('switch.') and not has_light_domain.v %}
+                  {% set el = eid | lower %}
+                  {% set icon = state_attr(eid, 'icon') | default('') %}
+                  {% if 'licht' in el or 'light' in el or icon in light_icons %}
+                    {% set light_cards.list = light_cards.list + [{
+                      'type': 'custom:mod-card',
+                      'card_mod': {'style': card_round},
+                      'card': {
+                        'type': 'custom:mushroom-light-card',
+                        'entity': eid,
+                        'fill_container': true,
+                        'show_brightness_control': true,
+                        'use_light_color': true
+                      }
+                    }] %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {% if light_cards.list | length > 0 %}
+                {% set out.cards = out.cards + [
+                  {'type': 'custom:button-card', 'template': 'card_title', 'name': 'Beleuchtung'}
+                ] + light_cards.list %}
+              {% endif %}
 
-      - type: custom:button-card
-        template: card_title
-        name: Aktionen
+              {% set switch_cards = namespace(list=[]) %}
+              {% for eid in vis.ids %}
+                {% if eid.startswith('switch.') %}
+                  {% set el = eid | lower %}
+                  {% set icon = state_attr(eid, 'icon') | default('') %}
+                  {% if not ('licht' in el or 'light' in el or icon in light_icons) %}
+                    {% set switch_cards.list = switch_cards.list + [{
+                      'type': 'custom:mod-card',
+                      'card_mod': {'style': card_round},
+                      'card': {
+                        'type': 'custom:button-card',
+                        'template': 'card_power_outlet',
+                        'entity': eid
+                      }
+                    }] %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {% if switch_cards.list | length > 0 %}
+                {% set out.cards = out.cards + [
+                  {'type': 'custom:button-card', 'template': 'card_title', 'name': 'Schalter'}
+                ] + switch_cards.list %}
+              {% endif %}
 
-      - type: custom:auto-entities
-        show_empty: false
-        sort:
-          method: friendly_name
-        card:
-          type: grid
-          columns: 1
-          square: false
-        card_param: cards
-        filter:
-          template: |
-            {% set target = states('input_text.dashboard_active_area') | trim %}
-            {% if target in ['unknown', 'unavailable', ''] %}
-              []
-            {% else %}
-              {% set ns = namespace(cards=[], ids=[]) %}
-              {% for eid in area_entities(target) %}
+              {% set climate_cards = namespace(list=[]) %}
+              {% for eid in vis.ids %}
+                {% if eid.startswith('climate.') %}
+                  {% set climate_cards.list = climate_cards.list + [{
+                    'type': 'custom:mod-card',
+                    'card_mod': {'style': card_round ~ ' ha-card { background: var(--ha-card-background) !important; }'},
+                    'card': {
+                      'type': 'custom:button-card',
+                      'template': 'card_thermostat',
+                      'entity': eid,
+                      'variables': {
+                        'ulm_card_thermostat_enable_collapse': false,
+                        'ulm_card_thermostat_enable_controls': true,
+                        'ulm_card_thermostat_enable_hvac_modes': true,
+                        'ulm_card_thermostat_enable_popup': true,
+                        'ulm_card_thermostat_enable_background_color': false
+                      }
+                    }
+                  }] %}
+                {% endif %}
+              {% endfor %}
+              {% if climate_cards.list | length > 0 %}
+                {% set out.cards = out.cards + [
+                  {'type': 'custom:button-card', 'template': 'card_title', 'name': 'Klima'}
+                ] + climate_cards.list %}
+              {% endif %}
+
+              {% set action_ids = namespace(list=[]) %}
+              {% for eid in vis.ids %}
                 {% if eid.startswith('script.') %}
-                  {% set ns.ids = ns.ids + [eid] %}
+                  {% set action_ids.list = action_ids.list + [eid] %}
                 {% endif %}
               {% endfor %}
               {% if target == 'wohnzimmer' %}
-                {% set ns.ids = ns.ids + ['script.dreame_reinigen_wohnzimmer'] %}
+                {% set action_ids.list = action_ids.list + ['script.dreame_reinigen_wohnzimmer'] %}
               {% elif target == 'esszimmer' %}
-                {% set ns.ids = ns.ids + ['script.dreame_reinigen_esszimmer'] %}
+                {% set action_ids.list = action_ids.list + ['script.dreame_reinigen_esszimmer'] %}
               {% elif target in ['raum_neben_der_kuche', 'kueche'] %}
-                {% set ns.ids = ns.ids + ['script.dreame_reinigen_kueche'] %}
+                {% set action_ids.list = action_ids.list + ['script.dreame_reinigen_kueche'] %}
               {% elif target == 'flur_eg' %}
-                {% set ns.ids = ns.ids + ['script.dreame_reinigen_flur_eg'] %}
+                {% set action_ids.list = action_ids.list + ['script.dreame_reinigen_flur_eg'] %}
               {% endif %}
-              {% for eid in ns.ids | unique %}
-                {% set ns.cards = ns.cards + [{
-                  'type': 'custom:button-card',
-                  'template': 'card_vertical_button',
-                  'entity': eid,
-                  'tap_action': {
-                    'action': 'call-service',
-                    'service': 'script.turn_on',
-                    'target': {'entity_id': eid}
+              {% set action_cards = namespace(list=[]) %}
+              {% for eid in action_ids.list | unique %}
+                {% set action_cards.list = action_cards.list + [{
+                  'type': 'custom:mod-card',
+                  'card_mod': {'style': card_round},
+                  'card': {
+                    'type': 'custom:button-card',
+                    'template': 'card_vertical_button',
+                    'entity': eid,
+                    'tap_action': {
+                      'action': 'call-service',
+                      'service': 'script.turn_on',
+                      'target': {'entity_id': eid}
+                    }
                   }
                 }] %}
               {% endfor %}
-              {{ ns.cards }}
+              {% if action_cards.list | length > 0 %}
+                {% set out.cards = out.cards + [
+                  {'type': 'custom:button-card', 'template': 'card_title', 'name': 'Aktionen'}
+                ] + action_cards.list %}
+              {% endif %}
+
+              {{ out.cards }}
             {% endif %}

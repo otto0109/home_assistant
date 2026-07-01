@@ -231,28 +231,18 @@
             name: Live
             hours_to_show: 1
             points_per_hour: 12
-            height: 280
+            height: 320
             line_width: 3
             animate: true
             lower_bound: 0
+            lower_bound_secondary: 0
+            upper_bound_secondary: 100
             show:
               labels: false
               extrema: false
               legend: true
               icon: false
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-                color: "#f4b400"
-                show_fill: true
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-                color: "#4285f4"
-                show_fill: true
-              - entity: sensor.pv_battery_power
-                name: Batterie
-                color: "#34a853"
-                y_axis: secondary
+            entities: !include ../energie-graph-entities-live.yaml
 
       - type: conditional
         conditions:
@@ -273,27 +263,17 @@
             name: 24 Stunden
             hours_to_show: 24
             points_per_hour: 4
-            height: 280
+            height: 320
             line_width: 2
             lower_bound: 0
+            lower_bound_secondary: 0
+            upper_bound_secondary: 100
             show:
               labels: false
               extrema: false
               legend: true
               icon: false
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-                color: "#f4b400"
-                show_fill: true
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-                color: "#4285f4"
-                show_fill: true
-              - entity: sensor.pv_battery_power
-                name: Batterie
-                color: "#34a853"
-                y_axis: secondary
+            entities: !include ../energie-graph-entities.yaml
 
       - type: conditional
         conditions:
@@ -313,28 +293,20 @@
             type: custom:mini-graph-card
             name: Woche
             hours_to_show: 168
-            height: 280
+            height: 320
             group_by:
               duration: 1h
               func: avg
             line_width: 2
             lower_bound: 0
+            lower_bound_secondary: 0
+            upper_bound_secondary: 100
             show:
               labels: false
               extrema: false
               legend: true
               icon: false
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-                color: "#f4b400"
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-                color: "#4285f4"
-              - entity: sensor.pv_battery_power
-                name: Batterie
-                color: "#34a853"
-                y_axis: secondary
+            entities: !include ../energie-graph-entities.yaml
 
       - type: conditional
         conditions:
@@ -354,28 +326,20 @@
             type: custom:mini-graph-card
             name: Monat
             hours_to_show: 720
-            height: 280
+            height: 320
             group_by:
               duration: 6h
               func: avg
             line_width: 2
             lower_bound: 0
+            lower_bound_secondary: 0
+            upper_bound_secondary: 100
             show:
               labels: false
               extrema: false
               legend: true
               icon: false
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-                color: "#f4b400"
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-                color: "#4285f4"
-              - entity: sensor.pv_battery_power
-                name: Batterie
-                color: "#34a853"
-                y_axis: secondary
+            entities: !include ../energie-graph-entities.yaml
 
       - type: conditional
         conditions:
@@ -395,28 +359,20 @@
             type: custom:mini-graph-card
             name: Jahr
             hours_to_show: 8760
-            height: 280
+            height: 320
             group_by:
               duration: 1d
               func: avg
             line_width: 2
             lower_bound: 0
+            lower_bound_secondary: 0
+            upper_bound_secondary: 100
             show:
               labels: false
               extrema: false
               legend: true
               icon: false
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-                color: "#f4b400"
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-                color: "#4285f4"
-              - entity: sensor.pv_battery_power
-                name: Batterie
-                color: "#34a853"
-                y_axis: secondary
+            entities: !include ../energie-graph-entities.yaml
 
       - type: conditional
         conditions:
@@ -436,25 +392,17 @@
             type: custom:mini-graph-card
             name: Gesamt
             hours_to_show: 8760
-            height: 280
+            height: 320
             group_by:
               duration: 1d
               func: avg
             line_width: 2
             lower_bound: 0
+            lower_bound_secondary: 0
+            upper_bound_secondary: 100
             show:
               labels: false
               extrema: false
               legend: true
               icon: false
-            entities:
-              - entity: sensor.pv_pv_power
-                name: Solar
-                color: "#f4b400"
-              - entity: sensor.pv_activepower_load_sys
-                name: Verbrauch
-                color: "#4285f4"
-              - entity: sensor.pv_battery_power
-                name: Batterie
-                color: "#34a853"
-                y_axis: secondary
+            entities: !include ../energie-graph-entities.yaml
