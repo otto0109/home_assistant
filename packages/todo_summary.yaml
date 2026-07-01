@@ -3,6 +3,8 @@ template:
   - trigger:
       - trigger: homeassistant
         event: start
+      - trigger: event
+        event_type: event_template_reloaded
       - trigger: time_pattern
         minutes: "/2"
       - trigger: template
@@ -53,9 +55,9 @@ template:
                 {% for item in todo_items[eid]['items'] %}
                   {% if ns.items | length < 10 %}
                     {% set ns.items = ns.items + [{
-                      'summary': item.summary,
+                      'summary': item.summary | default(''),
                       'entity_id': eid,
-                      'list_name': state_attr(eid, 'friendly_name') or eid
+                      'list_name': state_attr(eid, 'friendly_name') | default(eid)
                     }] %}
                   {% endif %}
                 {% endfor %}

@@ -16,9 +16,10 @@
 #    Einstellungen → Dashboards → Übersicht & Landkarte
 #    → „Zur Seitenleiste hinzufügen“ AUS
 #
-# 4) Standard-Dashboard:
-#    Einstellungen → Dashboards → „Home“ → Als Standard festlegen
-#    (oder default_path in custom-sidebar-config.yaml)
+# 4) Standard-Dashboard (systemweit, per Code):
+#    .storage/frontend.system_data → "default_panel": "home-dashboard"
+#    Nach Deploy: HA neu starten (oder Datei einmalig kopieren, falls .storage schon existiert).
+#    UI-Alternative: Einstellungen → Dashboards → „Home“ → Als Standard festlegen
 #
 home-dashboard:
   mode: yaml

@@ -17,7 +17,7 @@ filter:
     {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
     {% set chip_domains = ['light', 'climate', 'switch', 'fan'] %}
     {% set palette_hues = ['yellow', 'pink', 'red', 'purple', 'grey', 'blue', 'green'] %}
-    {% set area_active_js = "[[[ const aid = variables.ulm_room_area_id; const active = (id) => { const e = hass.entities[id]; if (!e || e.hidden || e.area_id !== aid) return false; const s = hass.states[id]?.state; if (id.startsWith('light.') || id.startsWith('switch.') || id.startsWith('fan.')) return s === 'on'; if (id.startsWith('climate.')) return s && !['off','unavailable','unknown'].includes(s); if (id.startsWith('cover.')) return s && !['closed','unavailable','unknown'].includes(s); return false; }; return Object.keys(hass.states).some(active); ]]]" %}
+    {% set room_active_styles = "[[[ const aid = variables.ulm_room_area_id; const c = variables.ulm_room_color; if (!aid || !c) return ''; const isActive = (id) => { const e = hass.entities[id]; if (!e || e.hidden || e.area_id !== aid) return false; const st = hass.states[id]; if (!st) return false; const s = st.state; if (s === 'unavailable' || s === 'unknown') return false; if (id.startsWith('light.') || id.startsWith('switch.') || id.startsWith('fan.')) return s === 'on'; if (id.startsWith('climate.')) { const h = st.attributes?.hvac_action; if (h && !['idle', 'off'].includes(h)) return true; return s && s !== 'off'; } if (id.startsWith('cover.')) return s !== 'closed'; return false; }; const on = Object.keys(hass.states).some(isActive); if (on) { return `#card { background-color: rgba(var(--color-background-${c}), var(--opacity-bg)); }`; } return `#card { opacity: 0.68; } #name, #label { opacity: 0.55; } #img-cell { opacity: 0.42; }`; ]]]" %}
     {% set ns = namespace(cards=[], sorted=[]) %}
     {% for aid in areas() %}
       {% set ns.sorted = ns.sorted + [{'aid': aid, 'name': area_name(aid)}] %}
@@ -38,6 +38,22 @@ filter:
         {% endfor %}
         {% if picked.e is not none %}
           {% set dom = picked.e.split('.')[0] %}
+          {% set room_hue = namespace(c=palette_hues[loop.index0 % 7]) %}
+          {% if aname == 'Wohnzimmer' or aid == 'wohnzimmer' %}
+            {% set room_hue.c = 'yellow' %}
+          {% elif aname == 'Esszimmer' or aid == 'esszimmer' %}
+            {% set room_hue.c = 'pink' %}
+          {% elif aname == 'Raum neben der Küche' or aname == 'Küche' or aid == 'raum_neben_der_kuche' or aid == 'kueche' %}
+            {% set room_hue.c = 'red' %}
+          {% elif aname == 'Schlafzimmer' or aid == 'schlafzimmer' %}
+            {% set room_hue.c = 'purple' %}
+          {% elif aname == 'Flur' or aname == 'Flur OG' or aid == 'flur' or aid == 'flur_og' %}
+            {% set room_hue.c = 'grey' %}
+          {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
+            {% set room_hue.c = 'blue' %}
+          {% elif aname == 'Garten' or aid == 'garten' %}
+            {% set room_hue.c = 'green' %}
+          {% endif %}
           {% set chips = namespace(list=[]) %}
           {% for cd in chip_domains %}
             {% for e in states[cd] | sort(attribute='entity_id') %}
@@ -47,7 +63,7 @@ filter:
                   {% set chips.list = chips.list + [{
                     'entity_id': eid,
                     'icon': state_attr(eid, 'icon') or 'mdi:lightbulb',
-                    'templates': ['yellow_on', 'yellow_no_state'],
+                    'templates': [room_hue.c ~ '_on', room_hue.c ~ '_no_state'],
                     'tap_action': {'action': 'toggle'}
                   }] %}
                 {% elif cd == 'climate' %}
@@ -97,49 +113,15 @@ filter:
               }
             }] %}
           {% endif %}
-          {% set room_hue = namespace(c=palette_hues[loop.index0 % 7]) %}
-          {% if aname == 'Wohnzimmer' or aid == 'wohnzimmer' %}
-            {% set room_hue.c = 'yellow' %}
-          {% elif aname == 'Esszimmer' or aid == 'esszimmer' %}
-            {% set room_hue.c = 'pink' %}
-          {% elif aname == 'Raum neben der Küche' or aname == 'Küche' or aid == 'raum_neben_der_kuche' or aid == 'kueche' %}
-            {% set room_hue.c = 'red' %}
-          {% elif aname == 'Schlafzimmer' or aid == 'schlafzimmer' %}
-            {% set room_hue.c = 'purple' %}
-          {% elif aname == 'Flur' or aname == 'Flur OG' or aid == 'flur' or aid == 'flur_og' %}
-            {% set room_hue.c = 'grey' %}
-          {% elif aname == 'Flur EG' or aid == 'flur_eg' %}
-            {% set room_hue.c = 'blue' %}
-          {% elif aname == 'Garten' or aid == 'garten' %}
-            {% set room_hue.c = 'green' %}
-          {% endif %}
           {% set icon = "[[[ return hass.areas[" ~ (aid | tojson) ~ "]?.icon || entity.attributes.icon || 'mdi:home-floor-1'; ]]]" %}
           {% set ns.cards = ns.cards + [{
             'type': 'custom:button-card',
-            'template': ['card_room', room_hue.c ~ '_no_state'],
+            'template': ['card_room', room_hue.c ~ '_no_state', room_hue.c ~ '_on'],
             'entity': picked.e,
             'name': aname,
             'icon': icon,
             'double_tap_action': {'action': 'none'},
-            'state': [{
-              'operator': 'template',
-              'value': area_active_js,
-              'styles': {
-                'card': [
-                  {'box-shadow': '0 0 0 2px rgba(var(--color-' ~ room_hue.c ~ '), 0.55)'},
-                  {'border': '1px solid rgba(var(--color-' ~ room_hue.c ~ '), 0.4)'}
-                ],
-                'icon': [
-                  {'color': 'rgba(var(--color-' ~ room_hue.c ~ '), 1)'}
-                ],
-                'img_cell': [
-                  {'background-color': 'rgba(var(--color-' ~ room_hue.c ~ '), 0.38)'}
-                ],
-                'name': [
-                  {'font-weight': '700'}
-                ]
-              }
-            }],
+            'extra_styles': room_active_styles,
             'tap_action': {
               'action': 'call-service',
               'service': 'script.turn_on',

@@ -1,8 +1,9 @@
 # Custom Sidebar — nur YAML-Dashboard „Home“ in der Leiste
 # Datei muss in config/www/ liegen (nicht im Config-Root).
 # Nach Änderung: HA neu starten, Browser-Cache leeren.
-
-default_path: /home-dashboard/home
+#
+# Standard-Dashboard: .storage/frontend.system_data (default_panel: home-dashboard)
+# Nicht default_path hier — das würde bei jedem Reload umleiten (auch z. B. von /todo).
 
 order:
   # Eingebaut: Übersicht
