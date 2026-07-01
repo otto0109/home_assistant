@@ -60,3 +60,12 @@ views:
     theme: minimalist-desktop
     background: var(--background-image)
     cards: !include includes/views/einstellungen.yaml
+
+  - title: Kalender
+    path: kalender
+    subview: true
+    type: panel
+    icon: mdi:calendar
+    theme: minimalist-desktop
+    background: var(--background-image)
+    cards: !include includes/views/kalender.yaml

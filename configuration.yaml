@@ -23,6 +23,8 @@ lovelace:
       type: module
     - url: /hacsfiles/my-cards/my-cards.js
       type: module
+    - url: /hacsfiles/atomic-calendar-revive/atomic-calendar-revive.js
+      type: module
 
 homeassistant:
   packages: !include_dir_named packages

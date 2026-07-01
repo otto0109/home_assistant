@@ -1,31 +1,28 @@
 - type: custom:button-card
   template: card_title
-  name: To-do-Listen
-  tap_action:
-    action: navigate
-    navigation_path: /todo
+  name: Termine
 
 - type: custom:button-card
-  entity: sensor.dashboard_todo_zusammenfassung
+  entity: sensor.dashboard_kalender_heute
   show_icon: true
   show_name: true
   show_label: true
   show_state: false
-  icon: mdi:format-list-checks
+  icon: mdi:calendar
   name: |
     [[[
-      const s = hass.states['sensor.dashboard_todo_zusammenfassung'];
+      const s = hass.states['sensor.dashboard_kalender_heute'];
       if (!s || s.state === 'unavailable' || s.state === 'unknown') return 'Wird geladen…';
       const n = parseInt(s.state, 10) || 0;
-      if (n === 0) return 'Keine offenen Aufgaben';
-      if (n === 1) return '1 offene Aufgabe';
-      return `${n} offene Aufgaben`;
+      if (n === 0) return 'Keine Termine heute';
+      if (n === 1) return '1 Termin heute';
+      return `${n} Termine heute`;
     ]]]
   label: |
     [[[
-      const s = hass.states['sensor.dashboard_todo_zusammenfassung'];
+      const s = hass.states['sensor.dashboard_kalender_heute'];
       if (!s || s.state === 'unavailable' || s.state === 'unknown') return '';
-      return s.attributes?.text || '';
+      return s.attributes?.preview || '';
     ]]]
   styles:
     card:
@@ -54,4 +51,4 @@
       - margin-top: 6px
   tap_action:
     action: navigate
-    navigation_path: /todo
+    navigation_path: /home-dashboard/kalender

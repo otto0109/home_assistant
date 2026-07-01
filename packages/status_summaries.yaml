@@ -1,0 +1,131 @@
+# Zusammenfassungen für Dashboard-Status (To-dos + Kalender heute).
+template:
+  - trigger:
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+      - trigger: time_pattern
+        minutes: "/2"
+      - trigger: template
+        value_template: >
+          {{ states.todo | map(attribute='last_updated') | join(',') }}
+    action:
+      - variables:
+          todo_entities: >
+            {% set ns = namespace(ids=[]) %}
+            {% for e in states.todo | sort(attribute='name') %}
+              {% if e.state not in ['unavailable', 'unknown'] %}
+                {% set ns.ids = ns.ids + [e.entity_id] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.ids }}
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ todo_entities | length > 0 }}"
+            sequence:
+              - action: todo.get_items
+                target:
+                  entity_id: "{{ todo_entities }}"
+                data:
+                  status:
+                    - needs_action
+                response_variable: todo_items
+          - default:
+              - variables:
+                  todo_items: {}
+    sensor:
+      - name: Dashboard Todo Zusammenfassung
+        unique_id: dashboard_todo_zusammenfassung
+        icon: mdi:format-list-checks
+        state: >
+          {% set ns = namespace(count=0) %}
+          {% for eid in todo_entities %}
+            {% if eid in todo_items %}
+              {% set ns.count = ns.count + (todo_items[eid]['items'] | length) %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.count }}
+        attributes:
+          text: >
+            {% set ns = namespace(lines=[]) %}
+            {% for eid in todo_entities %}
+              {% if eid in todo_items and ns.lines | length < 10 %}
+                {% for item in todo_items[eid]['items'] %}
+                  {% if ns.lines | length < 10 %}
+                    {% set list_name = state_attr(eid, 'friendly_name') | default(eid) %}
+                    {% set ns.lines = ns.lines + ['• ' ~ item['summary'] ~ ' · ' ~ list_name] %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            {% if ns.lines | length == 0 %}
+            Keine offenen Aufgaben
+            {% else %}
+            {{ ns.lines | join('\n') }}
+            {% endif %}
+
+  - trigger:
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+      - trigger: time_pattern
+        minutes: "/5"
+      - trigger: template
+        value_template: >
+          {{ states.calendar | map(attribute='last_updated') | join(',') }}
+    action:
+      - variables:
+          calendar_entities: >
+            {% set ns = namespace(ids=[]) %}
+            {% for e in states.calendar | sort(attribute='name') %}
+              {% if e.state not in ['unavailable', 'unknown'] %}
+                {% set ns.ids = ns.ids + [e.entity_id] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.ids }}
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ calendar_entities | length > 0 }}"
+            sequence:
+              - action: calendar.get_events
+                target:
+                  entity_id: "{{ calendar_entities }}"
+                data:
+                  start_date_time: "{{ today_at().isoformat() }}"
+                  duration:
+                    hours: 24
+                response_variable: calendar_events
+          - default:
+              - variables:
+                  calendar_events: {}
+      - variables:
+          today_events: >
+            {% set merged = namespace(events=[]) %}
+            {% for eid in calendar_entities %}
+              {% if eid in calendar_events %}
+                {% set merged.events = merged.events + calendar_events[eid]['events'] %}
+              {% endif %}
+            {% endfor %}
+            {{ merged.events | sort(attribute='start') }}
+    sensor:
+      - name: Dashboard Kalender Heute
+        unique_id: dashboard_kalender_heute
+        icon: mdi:calendar
+        state: "{{ today_events | length }}"
+        attributes:
+          preview: >
+            {% if today_events | length == 0 %}
+            Keine Termine heute
+            {% else %}
+            {% set ns = namespace(lines=[]) %}
+            {% for event in today_events[:5] %}
+              {% set start = as_datetime(event.start, default=none) %}
+              {% set time = start.strftime('%H:%M') if start else '' %}
+              {% set ns.lines = ns.lines + ['• ' ~ (event.summary | default('Termin')) ~ (' · ' ~ time if time else '')] %}
+            {% endfor %}
+            {{ ns.lines | join('\n') }}
+            {% endif %}

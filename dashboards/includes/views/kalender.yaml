@@ -1,0 +1,41 @@
+- type: custom:mod-card
+  card_mod:
+    style: |
+      ha-card {
+        margin: 16px auto 24px auto;
+        max-width: 900px;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #root {
+        gap: 14px;
+      }
+  card:
+    type: vertical-stack
+    cards:
+      - type: custom:button-card
+        template: card_title
+        name: Kalender
+        tap_action:
+          action: navigate
+          navigation_path: home
+
+      - type: custom:mod-card
+        card_mod:
+          style: |
+            ha-card {
+              border-radius: var(--border-radius);
+              box-shadow: var(--box-shadow);
+              overflow: hidden;
+            }
+        card:
+          type: custom:atomic-calendar-revive
+          name: Termine
+          enableModeChange: true
+          firstDayOfWeek: 1
+          maxDaysToShow: 7
+          defaultMode: Event
+          showProgressBar: true
+          showMultiDay: true
+          entities: !include ../kalender-entities.yaml
