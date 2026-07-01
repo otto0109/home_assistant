@@ -11,12 +11,7 @@
     'overlay-margin': '4px',
     'button-background': 'transparent',
     'card_mod': {
-      'style': 'ha-card { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }'
-    }
-  } %}
-  {% set title_card_mod = {
-    'card_mod': {
-      'style': 'ha-card { margin-bottom: 6px !important; }'
+      'style': 'ha-card { background: transparent !important; box-shadow: none !important; border: none !important; }'
     }
   } %}
   {% set domains = ['light', 'climate', 'switch', 'script', 'fan', 'cover'] %}
@@ -210,11 +205,14 @@
       {% set ns.cards = ns.cards + [expander_defaults | combine({
         'type': 'custom:expander-card',
         'expand-id': 'home-floor-' ~ fid,
-        'title-card': title_card_mod | combine({
+        'title-card': {
           'type': 'custom:button-card',
           'template': 'card_title',
-          'name': floor_item.name
-        }),
+          'name': floor_item.name,
+          'card_mod': {
+            'style': 'ha-card { margin-bottom: 6px !important; }'
+          }
+        },
         'cards': [{
           'type': 'custom:layout-card',
           'layout_type': 'custom:grid-layout',
@@ -244,11 +242,14 @@
     {% set ns.cards = ns.cards + [expander_defaults | combine({
       'type': 'custom:expander-card',
       'expand-id': 'home-floor-andere',
-      'title-card': title_card_mod | combine({
+      'title-card': {
         'type': 'custom:button-card',
         'template': 'card_title',
-        'name': 'Andere Bereiche'
-      }),
+        'name': 'Andere Bereiche',
+        'card_mod': {
+          'style': 'ha-card { margin-bottom: 6px !important; }'
+        }
+      },
       'cards': [{
         'type': 'custom:layout-card',
         'layout_type': 'custom:grid-layout',

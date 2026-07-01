@@ -33,13 +33,9 @@
   layout:
     grid-gap: 20px
     grid-template-columns: 1fr
-    grid-template-areas: |
-      "scenes"
-      "status"
     mediaquery:
       "(min-width: 900px)":
         grid-template-columns: 1fr 1fr
-        grid-template-areas: '"scenes status"'
         grid-gap: 28px
   cards:
     - type: custom:expander-card
@@ -60,11 +56,7 @@
             background: transparent !important;
             box-shadow: none !important;
             border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
           }
-      view_layout:
-        grid-area: scenes
       title-card:
         type: custom:button-card
         template: card_title
@@ -96,11 +88,7 @@
             background: transparent !important;
             box-shadow: none !important;
             border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
           }
-      view_layout:
-        grid-area: status
       title-card:
         type: custom:button-card
         template: card_title
