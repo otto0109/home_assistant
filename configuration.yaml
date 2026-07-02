@@ -41,8 +41,8 @@ frontend:
     # YAML-Config: www/custom-sidebar-config.yaml
     - /hacsfiles/custom-sidebar/custom-sidebar-plugin.js
 
-automation: !include automations.yaml
-script: !include scripts.yaml
+automation: !include_dir_merge_list automations/
+script: !include_dir_merge_named scripts/
 scene: !include scenes.yaml
 
 http:

@@ -1,4 +1,4 @@
-# Außenbeleuchtung — Helfer. Automationen liegen in automations.yaml (UI-editierbar).
+# Außenbeleuchtung — Helfer. Automationen liegen in automations/aussenbeleuchtung.yaml.
 
 timer:
   aussenlicht_heimkehr:

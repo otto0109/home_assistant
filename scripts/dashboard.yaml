@@ -1,15 +1,8 @@
-alle_lichter_aus:
-  alias: Alle Lichter aus
-  icon: mdi:lightbulb-off-outline
-  mode: single
-  sequence:
-    - action: light.turn_off
-      target:
-        entity_id: all
-
 dashboard_raum_oeffnen:
   alias: Dashboard Raum öffnen
   icon: mdi:door-open
+  labels:
+    - Dashboard
   mode: single
   fields:
     area:

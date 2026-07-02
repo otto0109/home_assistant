@@ -1,11 +1,47 @@
-# Esszimmer: Sonoff-Matter-Schalter (kein Detach-Relay möglich).
-# Strategie: Der Schalter wird nach jedem physischen "Aus" sofort wieder
-# eingeschaltet (Strom bleibt für die Leuchte), und der Wunschzustand der
-# Leuchte wird per Software umgeschaltet.
-# Automation liegt in automations.yaml (UI-editierbar): esszimmer_schalter_toggle
+# Esszimmer: Sonoff-Matter-Schalter (kein Detach-Relay).
+# Steuernde Automation liegt in automations/esszimmer.yaml: esszimmer_schalter_toggle
+#
+# WICHTIG: Die alten Automationen (esszimmer_lichtschalter_an / _aus_abfangen)
+# waren PACKAGE-Automationen. Sie verschwinden erst nach einem VOLLEN Neustart
+# bzw. "Alle YAML-Konfigurationen neu laden" - nicht durch "Automationen neu laden".
+# Helfer esszimmer_licht_sync_bypass kann in der UI geloescht werden.
 
 input_boolean:
   esszimmer_lampe_gewuenscht:
     name: Esszimmer Lampe gewünscht
     icon: mdi:lightbulb
     initial: true
+
+# Eine Bedienkachel fürs Dashboard: light.esszimmer_licht
+# - an/aus + Dimmen gehen direkt an die echte Leuchte
+# - der Wunsch-Helfer wird synchron gehalten, damit der Sonoff-Schalter
+#   weiterhin korrekt toggelt (kein "toter" Tastendruck).
+template:
+  - light:
+      - name: Esszimmer Licht
+        unique_id: esszimmer_licht
+        state: "{{ is_state('light.esszimmer_lampe_leuchte', 'on') }}"
+        level: "{{ state_attr('light.esszimmer_lampe_leuchte', 'brightness') | int(0) }}"
+        turn_on:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.esszimmer_lampe_gewuenscht
+          - action: light.turn_on
+            target:
+              entity_id: light.esszimmer_lampe_leuchte
+        turn_off:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.esszimmer_lampe_gewuenscht
+          - action: light.turn_off
+            target:
+              entity_id: light.esszimmer_lampe_leuchte
+        set_level:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.esszimmer_lampe_gewuenscht
+          - action: light.turn_on
+            target:
+              entity_id: light.esszimmer_lampe_leuchte
+            data:
+              brightness: "{{ brightness }}"

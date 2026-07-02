@@ -1,0 +1,200 @@
+# Klima: Grundtemperatur + PV-Komfort-Offset
+#
+# Logik:
+# - input_number.klima_grund_* = dein Wunsch (hoch/runter an der Klima = Trend ändern)
+# - input_boolean.klima_pv_* = PV-Komfort: ±2 K um die Grundtemperatur
+# - Script klima_anwenden entscheidet, ob überhaupt geheizt/gekühlt wird (Außen + Innen)
+# - Automationen nur bei relevanten Änderungen, kein 10-Minuten-Zwang
+
+input_number:
+  klima_pv_offset:
+    name: Klima PV-Komfort (Abweichung)
+    min: 0
+    max: 4
+    step: 0.5
+    initial: 2
+    unit_of_measurement: K
+    icon: mdi:solar-power
+
+  klima_grund_esszimmer:
+    name: Klima Grundtemperatur Esszimmer
+    min: 16
+    max: 30
+    step: 0.5
+    initial: 22
+    unit_of_measurement: °C
+    icon: mdi:thermometer
+
+  klima_grund_kueche:
+    name: Klima Grundtemperatur Küche
+    min: 16
+    max: 30
+    step: 0.5
+    initial: 22
+    unit_of_measurement: °C
+    icon: mdi:thermometer
+
+  klima_grund_schlafzimmer:
+    name: Klima Grundtemperatur Schlafzimmer
+    min: 16
+    max: 30
+    step: 0.5
+    initial: 21
+    unit_of_measurement: °C
+    icon: mdi:thermometer
+
+script:
+  klima_anwenden:
+    alias: Klima smart anwenden
+    icon: mdi:air-conditioner
+    labels:
+      - Klima
+    mode: queued
+    max: 5
+    fields:
+      klima:
+        name: Klima-Entity
+        required: true
+        selector:
+          entity:
+            domain: climate
+      grund:
+        name: Grundtemperatur-Helfer
+        required: true
+        selector:
+          entity:
+            domain: input_number
+      freigabe:
+        name: PV-Komfort-Schalter
+        required: true
+        selector:
+          entity:
+            domain: input_boolean
+      aussen_sensor:
+        name: Außentemperatur-Sensor
+        required: true
+        selector:
+          entity:
+            domain: sensor
+    sequence:
+      - variables:
+          grund: "{{ states(grund) | float(22) }}"
+          innen: "{{ state_attr(klima, 'current_temperature') | float(grund) }}"
+          aussen: "{{ states(aussen_sensor) | float(20) }}"
+          pv: "{{ is_state(freigabe, 'on') }}"
+          offset: "{{ states('input_number.klima_pv_offset') | float(2) }}"
+          cool_schwelle: >
+            {% if aussen >= 26 %}
+              {{ grund - 0.5 }}
+            {% elif aussen >= 22 %}
+              {{ grund + 1.0 }}
+            {% elif aussen >= 18 %}
+              {{ grund + 2.0 }}
+            {% else %}
+              {{ grund + 3.5 }}
+            {% endif %}
+          heat_schwelle: >
+            {% if aussen <= 8 %}
+              {{ grund + 0.5 }}
+            {% elif aussen <= 14 %}
+              {{ grund - 1.0 }}
+            {% elif aussen <= 18 %}
+              {{ grund - 2.0 }}
+            {% else %}
+              {{ grund - 3.5 }}
+            {% endif %}
+          need_cool: "{{ innen > (cool_schwelle | float) and aussen > 16 }}"
+          need_heat: "{{ innen < (heat_schwelle | float) and aussen < 22 }}"
+          soll_kuehlen: "{{ (grund - offset) if pv else grund }}"
+          soll_heizen: "{{ (grund + offset) if pv else grund }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ need_cool and not need_heat }}"
+            sequence:
+              - action: climate.set_temperature
+                target:
+                  entity_id: "{{ klima }}"
+                data:
+                  hvac_mode: cool
+                  temperature: "{{ soll_kuehlen }}"
+          - conditions:
+              - condition: template
+                value_template: "{{ need_heat and not need_cool }}"
+            sequence:
+              - action: climate.set_temperature
+                target:
+                  entity_id: "{{ klima }}"
+                data:
+                  hvac_mode: heat
+                  temperature: "{{ soll_heizen }}"
+          - conditions:
+              - condition: template
+                value_template: "{{ need_cool and need_heat }}"
+            sequence:
+              - action: climate.set_temperature
+                target:
+                  entity_id: "{{ klima }}"
+                data:
+                  hvac_mode: "{{ 'cool' if (innen - grund) > (grund - innen) else 'heat' }}"
+                  temperature: "{{ soll_kuehlen if (innen - grund) > (grund - innen) else soll_heizen }}"
+        default:
+          - action: climate.turn_off
+            target:
+              entity_id: "{{ klima }}"
+
+template:
+  - sensor:
+      - name: Klima Bedarf Esszimmer
+        unique_id: klima_bedarf_esszimmer
+        icon: mdi:air-conditioner
+        state: >
+          {% set grund = states('input_number.klima_grund_esszimmer') | float(22) %}
+          {% set innen = state_attr('climate.esszimmer_klimaanlage', 'current_temperature') | float(grund) %}
+          {% set aussen = states('sensor.esszimmer_klimaanlage_aussentemperatur') | float(20) %}
+          {% set cool_s = grund + (0.5 if aussen >= 26 else (1 if aussen >= 22 else (2 if aussen >= 18 else 3.5))) %}
+          {% set heat_s = grund - (0.5 if aussen <= 8 else (1 if aussen <= 14 else (2 if aussen <= 18 else 3.5))) %}
+          {% if innen > cool_s and aussen > 16 %}Kühlen
+          {% elif innen < heat_s and aussen < 22 %}Heizen
+          {% else %}Aus{% endif %}
+        attributes:
+          grundtemperatur: "{{ states('input_number.klima_grund_esszimmer') }}"
+          pv_komfort: "{{ is_state('input_boolean.klima_pv_esszimmer', 'on') }}"
+          aussen: "{{ states('sensor.esszimmer_klimaanlage_aussentemperatur') }}"
+          innen: "{{ state_attr('climate.esszimmer_klimaanlage', 'current_temperature') }}"
+
+      - name: Klima Bedarf Küche
+        unique_id: klima_bedarf_kueche
+        icon: mdi:air-conditioner
+        state: >
+          {% set grund = states('input_number.klima_grund_kueche') | float(22) %}
+          {% set innen = state_attr('climate.raum_neben_der_kuche_klimaanlage', 'current_temperature') | float(grund) %}
+          {% set aussen = states('sensor.esszimmer_klimaanlage_aussentemperatur') | float(20) %}
+          {% set cool_s = grund + (0.5 if aussen >= 26 else (1 if aussen >= 22 else (2 if aussen >= 18 else 3.5))) %}
+          {% set heat_s = grund - (0.5 if aussen <= 8 else (1 if aussen <= 14 else (2 if aussen <= 18 else 3.5))) %}
+          {% if innen > cool_s and aussen > 16 %}Kühlen
+          {% elif innen < heat_s and aussen < 22 %}Heizen
+          {% else %}Aus{% endif %}
+        attributes:
+          grundtemperatur: "{{ states('input_number.klima_grund_kueche') }}"
+          pv_komfort: "{{ is_state('input_boolean.klima_pv_kuche', 'on') }}"
+          aussen: "{{ states('sensor.esszimmer_klimaanlage_aussentemperatur') }}"
+          innen: "{{ state_attr('climate.raum_neben_der_kuche_klimaanlage', 'current_temperature') }}"
+
+      - name: Klima Bedarf Schlafzimmer
+        unique_id: klima_bedarf_schlafzimmer
+        icon: mdi:air-conditioner
+        state: >
+          {% set grund = states('input_number.klima_grund_schlafzimmer') | float(21) %}
+          {% set innen = state_attr('climate.schlafzimmer_klimaanlage', 'current_temperature') | float(grund) %}
+          {% set aussen = states('sensor.esszimmer_klimaanlage_aussentemperatur') | float(20) %}
+          {% set cool_s = grund + (0.5 if aussen >= 26 else (1 if aussen >= 22 else (2 if aussen >= 18 else 3.5))) %}
+          {% set heat_s = grund - (0.5 if aussen <= 8 else (1 if aussen <= 14 else (2 if aussen <= 18 else 3.5))) %}
+          {% if innen > cool_s and aussen > 16 %}Kühlen
+          {% elif innen < heat_s and aussen < 22 %}Heizen
+          {% else %}Aus{% endif %}
+        attributes:
+          grundtemperatur: "{{ states('input_number.klima_grund_schlafzimmer') }}"
+          pv_komfort: "{{ is_state('input_boolean.klima_pv_schlafzimmer', 'on') }}"
+          aussen: "{{ states('sensor.esszimmer_klimaanlage_aussentemperatur') }}"
+          innen: "{{ state_attr('climate.schlafzimmer_klimaanlage', 'current_temperature') }}"

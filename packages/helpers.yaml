@@ -16,18 +16,18 @@
 
 input_boolean:
   klima_pv_esszimmer:
-    name: Klima PV Esszimmer
-    icon: mdi:air-conditioner
+    name: Klima PV-Komfort Esszimmer
+    icon: mdi:solar-power
     initial: false
 
   klima_pv_kuche:
-    name: Klima PV Küche
-    icon: mdi:air-conditioner
+    name: Klima PV-Komfort Küche
+    icon: mdi:solar-power
     initial: false
 
   klima_pv_schlafzimmer:
-    name: Klima PV Schlafzimmer
-    icon: mdi:air-conditioner
+    name: Klima PV-Komfort Schlafzimmer
+    icon: mdi:solar-power
     initial: false
 
 input_text:

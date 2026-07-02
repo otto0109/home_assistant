@@ -154,6 +154,8 @@ script:
   sicherheitsmodus_zyklus:
     alias: Sicherheitsmodus Zyklus
     icon: mdi:shield-sync
+    labels:
+      - Sicherheit
     mode: restart
     sequence:
       - repeat:
@@ -215,6 +217,8 @@ script:
   sicherheitsmodus_stop:
     alias: Sicherheitsmodus beenden
     icon: mdi:shield-off
+    labels:
+      - Sicherheit
     mode: single
     sequence:
       - action: input_boolean.turn_off
@@ -239,6 +243,8 @@ script:
   sicherheitsmodus_start:
     alias: Sicherheitsmodus starten
     icon: mdi:shield-home
+    labels:
+      - Sicherheit
     mode: single
     sequence:
       - action: input_boolean.turn_on
@@ -248,5 +254,5 @@ script:
         target:
           entity_id: script.sicherheitsmodus_zyklus
 
-# Automationen liegen in automations.yaml (UI-editierbar):
+# Automationen liegen in automations/sicherheitsmodus.yaml (UI-editierbar):
 #   sicherheitsmodus_sonnenuntergang, sicherheitsmodus_haus_verlassen, sicherheitsmodus_heimkehr
