@@ -59,6 +59,10 @@ template:
         unique_id: sicherheitsmodus_lichter
         icon: mdi:lightbulb-group
         state: >
+          {% set excluded = [
+            'light.draussen_aussenbeleuchtung_haus',
+            'light.esszimmer_lichtschalter_esszimmer'
+          ] %}
           {% set cfg_id = [
             '_netzwerk', '_network', '_turbo', '_relais', '_relay', '_detach',
             '_inching', '_child_lock', '_rssi', '_ssid', '_startup', '_sensitivity'
@@ -81,7 +85,7 @@ template:
               {% set ok = namespace(v=true) %}
               {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
               {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
-              {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+              {% if ok.v and eid not in excluded %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
             {% endif %}
           {% endfor %}
           {% for e in states.switch %}
@@ -94,13 +98,17 @@ template:
                 {% set ok = namespace(v=true) %}
                 {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
                 {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
-                {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+                {% if ok.v and eid not in excluded %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
               {% endif %}
             {% endif %}
           {% endfor %}
           {{ (ns.ids | unique | list) | length }}
         attributes:
           entity_ids: >
+            {% set excluded = [
+              'light.draussen_aussenbeleuchtung_haus',
+              'light.esszimmer_lichtschalter_esszimmer'
+            ] %}
             {% set cfg_id = [
               '_netzwerk', '_network', '_turbo', '_relais', '_relay', '_detach',
               '_inching', '_child_lock', '_rssi', '_ssid', '_startup', '_sensitivity'
@@ -123,7 +131,7 @@ template:
                 {% set ok = namespace(v=true) %}
                 {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
                 {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
-                {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+                {% if ok.v and eid not in excluded %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
               {% endif %}
             {% endfor %}
             {% for e in states.switch %}
@@ -136,7 +144,7 @@ template:
                   {% set ok = namespace(v=true) %}
                   {% for t in cfg_id %}{% if t in el %}{% set ok.v = false %}{% endif %}{% endfor %}
                   {% for t in cfg_fn %}{% if t in fn %}{% set ok.v = false %}{% endif %}{% endfor %}
-                  {% if ok.v %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
+                  {% if ok.v and eid not in excluded %}{% set ns.ids = ns.ids + [eid] %}{% endif %}
                 {% endif %}
               {% endif %}
             {% endfor %}

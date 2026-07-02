@@ -29,3 +29,9 @@ homeassistant:
       icon: mdi:broom
     script.dreame_reinigen_flur_eg:
       icon: mdi:broom
+    light.draussen_aussenbeleuchtung_haus:
+      icon: mdi:outdoor-lamp
+    light.esszimmer_lichtschalter_esszimmer:
+      icon: mdi:light-switch
+    light.esszimmer_lampe_leuchte:
+      icon: mdi:ceiling-light
