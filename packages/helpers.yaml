@@ -1,77 +1,11 @@
-# NAVIQ — Helfer (eine Datei)
+# Allgemeine Helfer sind in Domain-Packages aufgeteilt:
+#   packages/klima.yaml           — Klima (Grundtemp, PV-Komfort)
+#   packages/dashboard_helpers.yaml — Dashboard, PV/Router/Wetter-Ansicht
+#   packages/esszimmer_light.yaml — Esszimmer-Licht
+#   packages/security_mode.yaml   — Sicherheitsmodus
+#   packages/outdoor_lighting.yaml — Außenbeleuchtung-Timer
+#   packages/dreame.yaml          — Staubsauger
+#   packages/energie.yaml         — PV-Sensoren
 #
-# Einbindung (empfohlen, eine Zeile in configuration.yaml):
-#
-#   homeassistant:
-#     packages: !include_dir_named packages
-#
-# Diese Datei nach:  config/packages/naviq.yaml  kopieren
-# Fertig. Kein input_select: !include — das war die Fehlerquelle.
-#
-# Vor dem ersten Import: gleichnamige UI-Helfer löschen (Einstellungen → Helfer).
-#
-# patternWarning in Studio Code Server = Schema-Bug der HA-Extension, kein echter
-# Konfigurationsfehler. YAML prüfen unter Entwicklerwerkzeuge ist maßgeblich.
-# =============================================================================
-
-input_boolean:
-  klima_pv_esszimmer:
-    name: Klima PV-Komfort Esszimmer
-    icon: mdi:solar-power
-    initial: false
-
-  klima_pv_kuche:
-    name: Klima PV-Komfort Küche
-    icon: mdi:solar-power
-    initial: false
-
-  klima_pv_schlafzimmer:
-    name: Klima PV-Komfort Schlafzimmer
-    icon: mdi:solar-power
-    initial: false
-
-input_text:
-  dashboard_active_area:
-    name: Dashboard aktiver Raum
-    icon: mdi:door-open
-    max: 120
-    initial: ""
-    # Speichert die Bereichs-ID (z. B. wohnzimmer), nicht den Anzeigenamen.
-
-input_select:
-  pv_zeitraum:
-    name: PV Zeitraum
-    icon: mdi:solar-power
-    options:
-      - Live
-      - 24h
-      - Woche
-      - Monat
-      - Jahr
-      - Lebenslang
-    initial: 24h
-
-  router_zeitraum:
-    name: Router Zeitraum
-    icon: mdi:router-wireless
-    options:
-      - 24h
-      - Woche
-      - Monat
-    initial: 24h
-
-  wetter_ansicht:
-    name: Wetter Ansicht
-    icon: mdi:weather-partly-cloudy
-    options:
-      - Stündlich
-      - Täglich
-    initial: Täglich
-
-template:
-  - sensor:
-      - name: PV Anlagenleistung
-        unique_id: pv_kwpeak
-        unit_of_measurement: kWp
-        icon: mdi:solar-power-variant
-        state: "29.93"
+# HA-UI-Gruppierung (Kategorien): siehe organize/ha_categories.yaml
+# und tools/assign_ha_categories.py

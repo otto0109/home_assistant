@@ -1,0 +1,39 @@
+# Dashboard- und Ansichts-Helfer
+
+input_text:
+  dashboard_active_area:
+    name: Dashboard aktiver Raum
+    icon: mdi:door-open
+    max: 120
+    initial: ""
+    # Speichert die Bereichs-ID (z. B. wohnzimmer), nicht den Anzeigenamen.
+
+input_select:
+  pv_zeitraum:
+    name: PV Zeitraum
+    icon: mdi:solar-power
+    options:
+      - Live
+      - 24h
+      - Woche
+      - Monat
+      - Jahr
+      - Lebenslang
+    initial: 24h
+
+  router_zeitraum:
+    name: Router Zeitraum
+    icon: mdi:router-wireless
+    options:
+      - 24h
+      - Woche
+      - Monat
+    initial: 24h
+
+  wetter_ansicht:
+    name: Wetter Ansicht
+    icon: mdi:weather-partly-cloudy
+    options:
+      - Stündlich
+      - Täglich
+    initial: Täglich

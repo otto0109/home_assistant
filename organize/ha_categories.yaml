@@ -1,0 +1,142 @@
+# HA-Kategorien für die UI-Gruppierung (Einstellungen → Automationen & Szenen).
+# Kategorien lassen sich NICHT in automations.yaml setzen — nur per UI oder dieses Skript:
+#   HA_URL=http://homeassistant.local:8123 HA_TOKEN=... python3 tools/assign_ha_categories.py
+#
+# Nach dem ersten Lauf: Einstellungen → Automationen → Filter → Kategorie
+
+automations:
+  Benachrichtigungen:
+    icon: mdi:bell-outline
+    ids:
+      - '1729955991524'
+      - '1729956078690'
+
+  Beleuchtung:
+    icon: mdi:lightbulb-group
+    ids:
+      - '1776440759559'
+      - '1776440873696'
+      - '1776524694158'
+      - '1776524741557'
+      - '1776532212638'
+      - '1776532520243'
+      - esszimmer_schalter_toggle
+      - aussenbeleuchtung_sonnenuntergang_an
+      - aussenbeleuchtung_mitternacht_aus
+      - aussenbeleuchtung_frueh_an
+      - aussenbeleuchtung_sonnenaufgang_aus
+      - aussenbeleuchtung_heimkehr_nachts
+      - aussenbeleuchtung_heimkehr_timer_aus
+      - aussenbeleuchtung_startup
+
+  Klima:
+    icon: mdi:air-conditioner
+    ids:
+      - klima_grund_esszimmer
+      - klima_grund_kueche
+      - klima_grund_schlafzimmer
+      - klima_steuerung_esszimmer
+      - klima_steuerung_kueche
+      - klima_steuerung_schlafzimmer
+
+  Sicherheit:
+    icon: mdi:shield-home
+    ids:
+      - sicherheitsmodus_sonnenuntergang
+      - sicherheitsmodus_haus_verlassen
+      - sicherheitsmodus_heimkehr
+
+  Garten:
+    icon: mdi:sprinkler
+    ids:
+      - '1781678373399'
+
+scripts:
+  Beleuchtung:
+    icon: mdi:lightbulb-off-outline
+    entity_ids:
+      - script.alle_lichter_aus
+
+  Dashboard:
+    icon: mdi:view-dashboard
+    entity_ids:
+      - script.dashboard_raum_oeffnen
+
+  Klima:
+    icon: mdi:air-conditioner
+    entity_ids:
+      - script.klima_anwenden
+
+  Sicherheit:
+    icon: mdi:shield-home
+    entity_ids:
+      - script.sicherheitsmodus_start
+      - script.sicherheitsmodus_stop
+      - script.sicherheitsmodus_zyklus
+
+  Dreame:
+    icon: mdi:robot-vacuum
+    entity_ids:
+      - script.dreame_reinigen_wohnzimmer
+      - script.dreame_reinigen_esszimmer
+      - script.dreame_reinigen_kueche
+      - script.dreame_reinigen_flur_eg
+
+helpers:
+  Klima:
+    icon: mdi:air-conditioner
+    entity_ids:
+      - input_number.klima_pv_offset
+      - input_number.klima_grund_esszimmer
+      - input_number.klima_grund_kueche
+      - input_number.klima_grund_schlafzimmer
+      - input_boolean.klima_pv_esszimmer
+      - input_boolean.klima_pv_kuche
+      - input_boolean.klima_pv_schlafzimmer
+      - sensor.klima_bedarf_esszimmer
+      - sensor.klima_bedarf_kueche
+      - sensor.klima_bedarf_schlafzimmer
+
+  Esszimmer:
+    icon: mdi:silverware-fork-knife
+    entity_ids:
+      - input_boolean.esszimmer_lampe_gewuenscht
+      - light.esszimmer_licht
+
+  Sicherheit:
+    icon: mdi:shield-home
+    entity_ids:
+      - input_boolean.sicherheitsmodus_aktiv
+      - input_number.sicherheitsmodus_licht_min
+      - input_number.sicherheitsmodus_licht_max
+      - input_number.sicherheitsmodus_pause_min
+      - input_number.sicherheitsmodus_pause_max
+      - input_text.sicherheitsmodus_aktives_licht
+      - sensor.sicherheitsmodus_lichter
+
+  Außen:
+    icon: mdi:outdoor-lamp
+    entity_ids:
+      - timer.aussenlicht_heimkehr
+
+  Dashboard:
+    icon: mdi:view-dashboard
+    entity_ids:
+      - input_text.dashboard_active_area
+      - input_select.pv_zeitraum
+      - input_select.router_zeitraum
+      - input_select.wetter_ansicht
+      - sensor.dashboard_kalender_heute
+
+  Energie:
+    icon: mdi:solar-power
+    entity_ids:
+      - sensor.pv_anlagenleistung
+
+  Dreame:
+    icon: mdi:robot-vacuum
+    entity_ids:
+      - input_number.dreame_segment_wohnzimmer
+      - input_number.dreame_segment_flur_eg
+      - input_number.dreame_segment_kueche
+      - input_number.dreame_segment_esszimmer

@@ -4,7 +4,23 @@
 # - input_number.klima_grund_* = dein Wunsch (hoch/runter an der Klima = Trend ändern)
 # - input_boolean.klima_pv_* = PV-Komfort: ±2 K um die Grundtemperatur
 # - Script klima_anwenden entscheidet, ob überhaupt geheizt/gekühlt wird (Außen + Innen)
-# - Automationen nur bei relevanten Änderungen, kein 10-Minuten-Zwang
+# - Automationen in automations.yaml
+
+input_boolean:
+  klima_pv_esszimmer:
+    name: Klima PV-Komfort Esszimmer
+    icon: mdi:solar-power
+    initial: false
+
+  klima_pv_kuche:
+    name: Klima PV-Komfort Küche
+    icon: mdi:solar-power
+    initial: false
+
+  klima_pv_schlafzimmer:
+    name: Klima PV-Komfort Schlafzimmer
+    icon: mdi:solar-power
+    initial: false
 
 input_number:
   klima_pv_offset:

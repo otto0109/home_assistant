@@ -1,5 +1,6 @@
+# === Benachrichtigungen =======================================================
 - id: '1729955991524'
-  alias: 'Thorge verlässt Arbeit'
+  alias: Benachrichtigung - Thorge verlässt Arbeit
   description: ''
   triggers:
   - trigger: zone
@@ -24,7 +25,7 @@
       message: Ich komme home
   mode: single
 - id: '1729956078690'
-  alias: Laura verlässt Arbeit
+  alias: Benachrichtigung - Laura verlässt Arbeit
   description: ''
   triggers:
   - trigger: zone
@@ -47,8 +48,9 @@
     data:
       message: Ich fahre los, Schatzi
   mode: single
+# === Beleuchtung (Bewegung / Präsenz) ========================================
 - id: '1776440759559'
-  alias: Licht an
+  alias: Beleuchtung - Sensor 1 an
   description: ''
   triggers:
   - type: opened
@@ -64,7 +66,7 @@
     domain: switch
   mode: single
 - id: '1776440873696'
-  alias: Licht aus
+  alias: Beleuchtung - Sensor 1 aus
   description: ''
   triggers:
   - type: not_opened
@@ -80,7 +82,7 @@
     domain: switch
   mode: single
 - id: '1776524694158'
-  alias: Licht ein
+  alias: Beleuchtung - Sensor 2 an
   description: ''
   triggers:
   - type: opened
@@ -96,7 +98,7 @@
     domain: switch
   mode: single
 - id: '1776524741557'
-  alias: Licht aus
+  alias: Beleuchtung - Sensor 2 aus
   description: ''
   triggers:
   - type: not_opened
@@ -112,7 +114,7 @@
     domain: switch
   mode: single
 - id: '1776532212638'
-  alias: Licht Flur an
+  alias: Beleuchtung - Flur an
   description: ''
   triggers:
   - type: occupied
@@ -136,7 +138,7 @@
     domain: light
   mode: single
 - id: '1776532520243'
-  alias: Licht Flur Oben aus
+  alias: Beleuchtung - Flur OG aus
   description: ''
   triggers:
   - type: not_occupied
@@ -166,8 +168,9 @@
     entity_id: d880a2ff2eb7f9751d00fef5f14c7b09
     domain: light
   mode: single
+# === Garten ==================================================================
 - id: '1781678373399'
-  alias: Bewässerung an
+  alias: Garten - Bewässerung an
   description: ''
   triggers:
   - trigger: time_pattern
@@ -182,6 +185,7 @@
       entity_id: switch.automatisch_bewasserung
     data: {}
   mode: single
+# === Esszimmer ===============================================================
 - id: esszimmer_schalter_toggle
   alias: Esszimmer - Schalter toggelt Leuchte (Strom bleibt)
   description: Sonoff-Matter-Schalter kann Relais nicht abkoppeln. Deshalb nach jedem
@@ -215,12 +219,12 @@
     - action: light.turn_off
       target:
         entity_id: light.esszimmer_lampe_leuchte
-# Hoch/Runter an der Klima = Grundtemperatur-Trend (nicht Automatik pausieren)
+# === Klima ===================================================================
+# Grundtemperatur = Sollwert - angewandte Strom-Differenz
 - id: klima_grund_esszimmer
   alias: Klima - Grundtemperatur Esszimmer
-  description: Änderungen am Sollwert verschieben die Grundtemperatur um die gleiche Differenz.
-  mode: queued
-  max: 5
+  description: Grundtemperatur = Sollwert minus aktuell angewandter PV-Differenz.
+  mode: single
   triggers:
   - trigger: state
     entity_id: climate.esszimmer_klimaanlage
@@ -228,33 +232,31 @@
   conditions:
   - condition: template
     value_template: >
-      {{ trigger.from_state is not none
-         and trigger.to_state is not none
-         and trigger.to_state.attributes.temperature is not none
-         and trigger.from_state.attributes.temperature is not none
-         and trigger.to_state.attributes.temperature != trigger.from_state.attributes.temperature
-         and trigger.to_state.context.parent_id is none }}
+      {{ trigger.to_state is not none
+         and trigger.to_state.state != 'off'
+         and trigger.to_state.attributes.temperature is not none }}
   actions:
   - variables:
-      delta: "{{ trigger.to_state.attributes.temperature | float(22) - trigger.from_state.attributes.temperature | float(22) }}"
-      neu: "{{ (states('input_number.klima_grund_esszimmer') | float(22) + delta) | round(1) }}"
+      soll: "{{ trigger.to_state.attributes.temperature | float(22) }}"
+      offset: "{{ states('input_number.klima_pv_offset') | float(2) }}"
+      pv: "{{ is_state('input_boolean.klima_pv_esszimmer', 'on') }}"
+      differenz: >
+        {% if pv and trigger.to_state.state == 'cool' %}{{ -offset }}
+        {% elif pv and trigger.to_state.state == 'heat' %}{{ offset }}
+        {% else %}0{% endif %}
+      neu: "{{ (soll - (differenz | float)) | round(1) }}"
+  - condition: template
+    value_template: "{{ (neu | float - states('input_number.klima_grund_esszimmer') | float(22)) | abs >= 0.25 }}"
   - action: input_number.set_value
     target:
       entity_id: input_number.klima_grund_esszimmer
     data:
-      value: "{{ [16, [30, neu] | min] | max }}"
-  - action: script.klima_anwenden
-    data:
-      klima: climate.esszimmer_klimaanlage
-      grund: input_number.klima_grund_esszimmer
-      freigabe: input_boolean.klima_pv_esszimmer
-      aussen_sensor: sensor.esszimmer_klimaanlage_aussentemperatur
+      value: "{{ [16, [30, neu | float] | min] | max }}"
 
 - id: klima_grund_kueche
   alias: Klima - Grundtemperatur Küche
-  description: Änderungen am Sollwert verschieben die Grundtemperatur um die gleiche Differenz.
-  mode: queued
-  max: 5
+  description: Grundtemperatur = Sollwert minus aktuell angewandter PV-Differenz.
+  mode: single
   triggers:
   - trigger: state
     entity_id: climate.raum_neben_der_kuche_klimaanlage
@@ -262,33 +264,31 @@
   conditions:
   - condition: template
     value_template: >
-      {{ trigger.from_state is not none
-         and trigger.to_state is not none
-         and trigger.to_state.attributes.temperature is not none
-         and trigger.from_state.attributes.temperature is not none
-         and trigger.to_state.attributes.temperature != trigger.from_state.attributes.temperature
-         and trigger.to_state.context.parent_id is none }}
+      {{ trigger.to_state is not none
+         and trigger.to_state.state != 'off'
+         and trigger.to_state.attributes.temperature is not none }}
   actions:
   - variables:
-      delta: "{{ trigger.to_state.attributes.temperature | float(22) - trigger.from_state.attributes.temperature | float(22) }}"
-      neu: "{{ (states('input_number.klima_grund_kueche') | float(22) + delta) | round(1) }}"
+      soll: "{{ trigger.to_state.attributes.temperature | float(22) }}"
+      offset: "{{ states('input_number.klima_pv_offset') | float(2) }}"
+      pv: "{{ is_state('input_boolean.klima_pv_kuche', 'on') }}"
+      differenz: >
+        {% if pv and trigger.to_state.state == 'cool' %}{{ -offset }}
+        {% elif pv and trigger.to_state.state == 'heat' %}{{ offset }}
+        {% else %}0{% endif %}
+      neu: "{{ (soll - (differenz | float)) | round(1) }}"
+  - condition: template
+    value_template: "{{ (neu | float - states('input_number.klima_grund_kueche') | float(22)) | abs >= 0.25 }}"
   - action: input_number.set_value
     target:
       entity_id: input_number.klima_grund_kueche
     data:
-      value: "{{ [16, [30, neu] | min] | max }}"
-  - action: script.klima_anwenden
-    data:
-      klima: climate.raum_neben_der_kuche_klimaanlage
-      grund: input_number.klima_grund_kueche
-      freigabe: input_boolean.klima_pv_kuche
-      aussen_sensor: sensor.esszimmer_klimaanlage_aussentemperatur
+      value: "{{ [16, [30, neu | float] | min] | max }}"
 
 - id: klima_grund_schlafzimmer
   alias: Klima - Grundtemperatur Schlafzimmer
-  description: Änderungen am Sollwert verschieben die Grundtemperatur um die gleiche Differenz.
-  mode: queued
-  max: 5
+  description: Grundtemperatur = Sollwert minus aktuell angewandter PV-Differenz.
+  mode: single
   triggers:
   - trigger: state
     entity_id: climate.schlafzimmer_klimaanlage
@@ -296,27 +296,26 @@
   conditions:
   - condition: template
     value_template: >
-      {{ trigger.from_state is not none
-         and trigger.to_state is not none
-         and trigger.to_state.attributes.temperature is not none
-         and trigger.from_state.attributes.temperature is not none
-         and trigger.to_state.attributes.temperature != trigger.from_state.attributes.temperature
-         and trigger.to_state.context.parent_id is none }}
+      {{ trigger.to_state is not none
+         and trigger.to_state.state != 'off'
+         and trigger.to_state.attributes.temperature is not none }}
   actions:
   - variables:
-      delta: "{{ trigger.to_state.attributes.temperature | float(21) - trigger.from_state.attributes.temperature | float(21) }}"
-      neu: "{{ (states('input_number.klima_grund_schlafzimmer') | float(21) + delta) | round(1) }}"
+      soll: "{{ trigger.to_state.attributes.temperature | float(21) }}"
+      offset: "{{ states('input_number.klima_pv_offset') | float(2) }}"
+      pv: "{{ is_state('input_boolean.klima_pv_schlafzimmer', 'on') }}"
+      differenz: >
+        {% if pv and trigger.to_state.state == 'cool' %}{{ -offset }}
+        {% elif pv and trigger.to_state.state == 'heat' %}{{ offset }}
+        {% else %}0{% endif %}
+      neu: "{{ (soll - (differenz | float)) | round(1) }}"
+  - condition: template
+    value_template: "{{ (neu | float - states('input_number.klima_grund_schlafzimmer') | float(21)) | abs >= 0.25 }}"
   - action: input_number.set_value
     target:
       entity_id: input_number.klima_grund_schlafzimmer
     data:
-      value: "{{ [16, [30, neu] | min] | max }}"
-  - action: script.klima_anwenden
-    data:
-      klima: climate.schlafzimmer_klimaanlage
-      grund: input_number.klima_grund_schlafzimmer
-      freigabe: input_boolean.klima_pv_schlafzimmer
-      aussen_sensor: sensor.esszimmer_klimaanlage_aussentemperatur
+      value: "{{ [16, [30, neu | float] | min] | max }}"
 
 # Smarte Anwendung nur bei relevanten Änderungen
 - id: klima_steuerung_esszimmer
@@ -399,6 +398,7 @@
       grund: input_number.klima_grund_schlafzimmer
       freigabe: input_boolean.klima_pv_schlafzimmer
       aussen_sensor: sensor.esszimmer_klimaanlage_aussentemperatur
+# === Sicherheitsmodus =========================================================
 - id: sicherheitsmodus_sonnenuntergang
   alias: Sicherheitsmodus - Sonnenuntergang
   description: Startet Simulation ab Sonnenuntergang, wenn niemand zu Hause ist.
@@ -461,6 +461,7 @@
     state: 'on'
   actions:
   - action: script.sicherheitsmodus_stop
+# === Außenbeleuchtung ========================================================
 - id: aussenbeleuchtung_sonnenuntergang_an
   alias: Außenbeleuchtung - Sonnenuntergang an
   mode: single

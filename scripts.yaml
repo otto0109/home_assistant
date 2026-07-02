@@ -1,5 +1,5 @@
 alle_lichter_aus:
-  alias: Alle Lichter aus
+  alias: Beleuchtung - Alle Lichter aus
   icon: mdi:lightbulb-off-outline
   mode: single
   sequence:
@@ -8,7 +8,7 @@ alle_lichter_aus:
         entity_id: all
 
 dashboard_raum_oeffnen:
-  alias: Dashboard Raum öffnen
+  alias: Dashboard - Raum öffnen
   icon: mdi:door-open
   mode: single
   fields:

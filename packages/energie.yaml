@@ -1,0 +1,9 @@
+# Energie / PV (Template-Sensoren für Dashboards)
+
+template:
+  - sensor:
+      - name: PV Anlagenleistung
+        unique_id: pv_kwpeak
+        unit_of_measurement: kWp
+        icon: mdi:solar-power-variant
+        state: "29.93"
