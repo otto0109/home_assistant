@@ -47,8 +47,6 @@ script:
   klima_anwenden:
     alias: Klima smart anwenden
     icon: mdi:air-conditioner
-    labels:
-      - Klima
     mode: queued
     max: 5
     fields:

@@ -1,5 +1,5 @@
 # Esszimmer: Sonoff-Matter-Schalter (kein Detach-Relay).
-# Steuernde Automation liegt in automations/esszimmer.yaml: esszimmer_schalter_toggle
+# Steuernde Automation liegt in automations.yaml: esszimmer_schalter_toggle
 #
 # WICHTIG: Die alten Automationen (esszimmer_lichtschalter_an / _aus_abfangen)
 # waren PACKAGE-Automationen. Sie verschwinden erst nach einem VOLLEN Neustart
