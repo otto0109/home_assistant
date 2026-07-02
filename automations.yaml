@@ -434,3 +434,212 @@
     temp: '{{ state_attr(klima, ''current_temperature'') | float(21) }}'
     aussen_temp: '{{ states(''sensor.esszimmer_klimaanlage_aussentemperatur'') | float(25)
       }}'
+- id: sicherheitsmodus_sonnenuntergang
+  alias: Sicherheitsmodus - Sonnenuntergang
+  description: Startet Simulation ab Sonnenuntergang, wenn niemand zu Hause ist.
+  mode: single
+  triggers:
+  - trigger: sun
+    event: sunset
+  conditions:
+  - condition: state
+    entity_id: input_boolean.sicherheitsmodus_aktiv
+    state: 'off'
+  - condition: template
+    value_template: '{{ is_state(''person.thorge'', ''not_home'') and is_state(''person.laura'',
+      ''not_home'') }}'
+  - condition: template
+    value_template: '{{ (state_attr(''sensor.sicherheitsmodus_lichter'', ''entity_ids'')
+      or []) | length > 0 }}'
+  actions:
+  - action: script.sicherheitsmodus_start
+- id: sicherheitsmodus_haus_verlassen
+  alias: Sicherheitsmodus - Haus verlassen (nachts)
+  description: Startet Simulation, wenn nach Sonnenuntergang alle weggehen.
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id:
+    - person.thorge
+    - person.laura
+  conditions:
+  - condition: state
+    entity_id: input_boolean.sicherheitsmodus_aktiv
+    state: 'off'
+  - condition: sun
+    after: sunset
+    before: sunrise
+  - condition: template
+    value_template: '{{ is_state(''person.thorge'', ''not_home'') and is_state(''person.laura'',
+      ''not_home'') }}'
+  - condition: template
+    value_template: '{{ (state_attr(''sensor.sicherheitsmodus_lichter'', ''entity_ids'')
+      or []) | length > 0 }}'
+  actions:
+  - action: script.sicherheitsmodus_start
+- id: sicherheitsmodus_heimkehr
+  alias: Sicherheitsmodus - Home-Zone
+  description: Beendet Simulation und schaltet alle Simulations-Lichter aus.
+  mode: restart
+  triggers:
+  - trigger: zone
+    entity_id: person.thorge
+    zone: zone.home
+    event: enter
+  - trigger: zone
+    entity_id: person.laura
+    zone: zone.home
+    event: enter
+  conditions:
+  - condition: state
+    entity_id: input_boolean.sicherheitsmodus_aktiv
+    state: 'on'
+  actions:
+  - action: script.sicherheitsmodus_stop
+- id: aussenbeleuchtung_sonnenuntergang_an
+  alias: Außenbeleuchtung - Sonnenuntergang an
+  mode: single
+  triggers:
+  - trigger: sun
+    event: sunset
+  conditions: []
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.draussen_aussenbeleuchtung_haus
+- id: aussenbeleuchtung_mitternacht_aus
+  alias: Außenbeleuchtung - Mitternacht aus
+  mode: single
+  triggers:
+  - trigger: time
+    at: '00:00:00'
+  conditions: []
+  actions:
+  - action: light.turn_off
+    target:
+      entity_id: light.draussen_aussenbeleuchtung_haus
+- id: aussenbeleuchtung_frueh_an
+  alias: Außenbeleuchtung - 06:00 an
+  mode: single
+  triggers:
+  - trigger: time
+    at: '06:00:00'
+  conditions:
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.draussen_aussenbeleuchtung_haus
+- id: aussenbeleuchtung_sonnenaufgang_aus
+  alias: Außenbeleuchtung - Sonnenaufgang aus
+  mode: single
+  triggers:
+  - trigger: sun
+    event: sunrise
+  conditions: []
+  actions:
+  - action: light.turn_off
+    target:
+      entity_id: light.draussen_aussenbeleuchtung_haus
+- id: aussenbeleuchtung_heimkehr_nachts
+  alias: Außenbeleuchtung - Home-Zone nachts
+  description: Bei Ankunft nachts an. In der 00-06 Uhr Lücke nach 30 min wieder aus.
+  mode: single
+  triggers:
+  - trigger: zone
+    entity_id: person.thorge
+    zone: zone.home
+    event: enter
+  - trigger: zone
+    entity_id: person.laura
+    zone: zone.home
+    event: enter
+  conditions:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.draussen_aussenbeleuchtung_haus
+  - if:
+    - condition: time
+      after: '00:00:00'
+      before: '06:00:00'
+    then:
+    - action: timer.start
+      target:
+        entity_id: timer.aussenlicht_heimkehr
+- id: aussenbeleuchtung_heimkehr_timer_aus
+  alias: Außenbeleuchtung - Heimkehr-Timer abgelaufen
+  description: Schaltet das Heimkehr-Licht aus, wenn es nicht in der Sowieso-an-Zeit
+    ist.
+  mode: single
+  triggers:
+  - trigger: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.aussenlicht_heimkehr
+  conditions:
+  - condition: time
+    after: '00:00:00'
+    before: '06:00:00'
+  actions:
+  - action: light.turn_off
+    target:
+      entity_id: light.draussen_aussenbeleuchtung_haus
+- id: aussenbeleuchtung_startup
+  alias: Außenbeleuchtung - Status nach Neustart
+  mode: single
+  triggers:
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - if:
+    - condition: template
+      value_template: '{{ is_state(''sun.sun'', ''below_horizon'') and not (now().hour
+        < 6) }}'
+    then:
+    - action: light.turn_on
+      target:
+        entity_id: light.draussen_aussenbeleuchtung_haus
+    else:
+    - action: light.turn_off
+      target:
+        entity_id: light.draussen_aussenbeleuchtung_haus
+- id: esszimmer_schalter_toggle
+  alias: Esszimmer - Schalter toggelt Leuchte (Strom bleibt)
+  description: Sonoff-Matter-Schalter kann Relais nicht abkoppeln. Deshalb nach jedem
+    physischen Aus sofort wieder einschalten und die Leuchte per Software umschalten.
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: light.esszimmer_lichtschalter_esszimmer
+    to: 'off'
+  conditions: []
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.esszimmer_lichtschalter_esszimmer
+  - action: input_boolean.toggle
+    target:
+      entity_id: input_boolean.esszimmer_lampe_gewuenscht
+  - wait_template: '{{ not is_state(''light.esszimmer_lampe_leuchte'', ''unavailable'')
+      }}'
+    timeout: '00:00:10'
+    continue_on_timeout: true
+  - if:
+    - condition: state
+      entity_id: input_boolean.esszimmer_lampe_gewuenscht
+      state: 'on'
+    then:
+    - action: light.turn_on
+      target:
+        entity_id: light.esszimmer_lampe_leuchte
+    else:
+    - action: light.turn_off
+      target:
+        entity_id: light.esszimmer_lampe_leuchte

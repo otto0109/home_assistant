@@ -1,68 +1,11 @@
-# Esszimmer: Schalter hält Strom, Lampe wird softwareseitig geschaltet.
-# Der Lichtschalter schaltet nicht physisch ab, sondern steuert die Leuchte.
+# Esszimmer: Sonoff-Matter-Schalter (kein Detach-Relay möglich).
+# Strategie: Der Schalter wird nach jedem physischen "Aus" sofort wieder
+# eingeschaltet (Strom bleibt für die Leuchte), und der Wunschzustand der
+# Leuchte wird per Software umgeschaltet.
+# Automation liegt in automations.yaml (UI-editierbar): esszimmer_schalter_toggle
 
 input_boolean:
-  esszimmer_licht_sync_bypass:
-    name: Esszimmer Licht Sync Bypass
-    icon: mdi:sync-off
-    initial: false
-
-automation:
-  - id: esszimmer_lichtschalter_aus_abfangen
-    alias: Esszimmer — Schalter aus → Lampe aus (Strom bleibt)
-    description: >
-      Wenn der Lichtschalter „aus“ geht, Relais sofort wieder an und Leuchte per Software aus.
-    mode: single
-    triggers:
-      - trigger: state
-        entity_id: light.esszimmer_lichtschalter_esszimmer
-        from: "on"
-        to: "off"
-    conditions:
-      - condition: state
-        entity_id: input_boolean.esszimmer_licht_sync_bypass
-        state: "off"
-    actions:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.esszimmer_licht_sync_bypass
-      - action: light.turn_on
-        target:
-          entity_id: light.esszimmer_lichtschalter_esszimmer
-      - delay:
-          milliseconds: 400
-      - action: light.turn_off
-        target:
-          entity_id: light.esszimmer_lampe_leuchte
-      - delay:
-          milliseconds: 300
-      - action: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.esszimmer_licht_sync_bypass
-
-  - id: esszimmer_lichtschalter_an
-    alias: Esszimmer — Schalter an → Lampe an
-    mode: single
-    triggers:
-      - trigger: state
-        entity_id: light.esszimmer_lichtschalter_esszimmer
-        from: "off"
-        to: "on"
-    conditions:
-      - condition: state
-        entity_id: input_boolean.esszimmer_licht_sync_bypass
-        state: "off"
-    actions:
-      - action: input_boolean.turn_on
-        target:
-          entity_id: input_boolean.esszimmer_licht_sync_bypass
-      - delay:
-          milliseconds: 400
-      - action: light.turn_on
-        target:
-          entity_id: light.esszimmer_lampe_leuchte
-      - delay:
-          milliseconds: 300
-      - action: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.esszimmer_licht_sync_bypass
+  esszimmer_lampe_gewuenscht:
+    name: Esszimmer Lampe gewünscht
+    icon: mdi:lightbulb
+    initial: true
